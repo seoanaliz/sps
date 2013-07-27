@@ -18,131 +18,58 @@ tr,
 td {
   vertical-align: top;
 }
-.table>.body>.row>.column {
-  vertical-align: top;
-}
-.table>.header>.row>.column {
-  vertical-align: middle;
-}
-.table>.body,
-.table>.header {
-  font-size: 0;
-}
-.table>.body .row + .row,
-.table>.header .row + .row {
-  border-top: 1px solid #DAE1E8;
-}
-.table>.body>.row>.column12,
-.table>.header>.row>.column12 {
+.table .column12 {
   width: 100%;
 }
-.table>.body>.row>.column11,
-.table>.header>.row>.column11 {
+.table .column11 {
   width: 91.6%;
 }
-.table>.body>.row>.column10,
-.table>.header>.row>.column10 {
+.table .column10 {
   width: 83.3%;
 }
-.table>.body>.row>.column9,
-.table>.header>.row>.column9 {
+.table .column9 {
   width: 75%;
 }
-.table>.body>.row>.column8,
-.table>.header>.row>.column8 {
+.table .column8 {
   width: 66.6%;
 }
-.table>.body>.row>.column7,
-.table>.header>.row>.column7 {
+.table .column7 {
   width: 58.3%;
 }
-.table>.body>.row>.column6,
-.table>.header>.row>.column6 {
+.table .column6 {
   width: 50%;
 }
-.table>.body>.row>.column5-5,
-.table>.header>.row>.column5-5 {
+.table .column5-5 {
   width: 45.8%;
 }
-.table>.body>.row>.column5,
-.table>.header>.row>.column5 {
+.table .column5 {
   width: 41.6%;
 }
-.table>.body>.row>.column4-5,
-.table>.header>.row>.column4-5 {
+.table .column4-5 {
   width: 37.5%;
 }
-.table>.body>.row>.column4,
-.table>.header>.row>.column4 {
+.table .column4 {
   width: 33.3%;
 }
-.table>.body>.row>.column3-5,
-.table>.header>.row>.column3-5 {
+.table .column3-5 {
   width: 29.2%;
 }
-.table>.body>.row>.column3,
-.table>.header>.row>.column3 {
+.table .column3 {
   width: 25%;
 }
-.table>.body>.row>.column2,
-.table>.header>.row>.column2 {
+.table .column2 {
   width: 16.6%;
 }
-.table>.body>.row>.column1-5,
-.table>.header>.row>.column1-5 {
+.table .column1-5 {
   width: 12.5%;
 }
-.table>.body>.row>.column1,
-.table>.header>.row>.column1 {
+.table .column1 {
   width: 8.3%;
 }
-.table>.body>.row>.column,
-.table>.header>.row>.column {
-  font-size: 12px;
-  display: inline-block;
-  zoom: 1;
-  *display: inline;
-}
-.table>.body>.row>.column .cell,
-.table>.header>.row>.column .cell {
-  padding: 10px 0;
-}
-.table>.body>.row>.column.publics .cell,
-.table>.header>.row>.column.publics .cell {
-  padding: 10px;
-}
-.table>.body>.row>.column.left,
-.table>.header>.row>.column.left {
-  text-align: left;
-}
-.table>.body>.row>.column.center,
-.table>.header>.row>.column.center {
-  text-align: center;
-}
-.table>.body>.row>.column.right,
-.table>.header>.row>.column.right {
-  text-align: right;
-}
-.table>.body>.row>.column.top,
-.table>.header>.row>.column.top {
+.table .body .column {
   vertical-align: top;
 }
-.table>.body>.row>.column.middle,
-.table>.header>.row>.column.middle {
-  vertical-align: middle;
-}
-.table>.body>.row>.column.bottom,
-.table>.header>.row>.column.bottom {
-  vertical-align: bottom;
-}
-.table>.body>.empty,
-.table>.header>.empty {
-  padding: 100px 0;
-  text-align: center;
-  color: #777;
-  font-size: 14px;
-}
-.table>.header {
+.table .list-head {
   color: #2B587A;
   background-color: #DEE5EB;
   -webkit-touch-callout: none;
@@ -153,8 +80,55 @@ td {
   -o-user-select: none;
   user-select: none;
 }
-.table>.header>.row>.column {
+.table .list-head .column {
+  vertical-align: middle;
+}
+.table .list-head .row .column {
   font-weight: bold;
+}
+.table .body,
+.table .list-head {
+  font-size: 0;
+}
+.table .body .empty,
+.table .list-head .empty {
+  padding: 100px 0;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}
+.table .row + .row {
+  border-top: 1px solid #DAE1E8;
+}
+.table .row .column {
+  font-size: 12px;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.table .row .column .cell {
+  padding: 10px 0;
+}
+.table .row .column.publics .cell {
+  padding: 10px;
+}
+.table .row .column.left {
+  text-align: left;
+}
+.table .row .column.center {
+  text-align: center;
+}
+.table .row .column.right {
+  text-align: right;
+}
+.table .row .column.top {
+  vertical-align: top;
+}
+.table .row .column.middle {
+  vertical-align: middle;
+}
+.table .row .column.bottom {
+  vertical-align: bottom;
 }
 #main {
   width: 980px;
@@ -260,10 +234,6 @@ td {
 #main .left-column > .content .list-head .item.active .icon,
 #main .left-column > .content .list-head .column.active .icon {
   opacity: 1;
-}
-#main .left-column > .content .list-head .item.reverse .icon,
-#main .left-column > .content .list-head .column.reverse .icon {
-  background-image: url('../../images/common/arrow-top.png');
 }
 #main .left-column > .content .list-head .item.contacts,
 #main .left-column > .content .list-head .column.contacts {
@@ -422,6 +392,7 @@ td {
   top: 0;
   left: 0;
   width: 128px;
+  height: 100%;
   border: none;
   padding-right: 37px;
   padding-left: 4px;
@@ -469,18 +440,6 @@ td {
 }
 .right-column .ui-sortable-helper {
   cursor: move;
-}
-#global-loader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
-  z-index: 999;
-  text-align: center;
-  line-height: 300px;
-  font-size: 14px;
 }
 #go-to-top {
   display: none;
@@ -708,22 +667,22 @@ td {
   white-space: nowrap;
   max-width: 150px;
 }
-.header .button-wrap {
-  display: inline-block;
-  zoom: 1;
-  *display: inline;
-  float: right;
-  margin-top: 7px;
+.header {
+  position: relative;
+}
+.header .controls {
+  width: 500px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 39px;
 }
 .header .under {
   height: 5px;
   width: 100%;
-  clear: both;
 }
 .header .actions {
-  display: inline-block;
-  zoom: 1;
-  *display: inline;
+  display: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -741,6 +700,21 @@ td {
 }
 .header .actions a:first-child {
   border: none;
+}
+.login-info,
+.button-wrap {
+  opacity: 0;
+  -webkit-transition: opacity 1s ease-out;
+  -moz-transition: opacity 1s ease-out;
+  -o-transition: opacity 1s ease-out;
+  transition: opacity 1s ease-out;
+}
+.button-wrap {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  float: right;
+  margin-top: 7px;
 }
 .login-info {
   margin: 3px 7px 0 24px;
@@ -784,6 +758,7 @@ td {
   zoom: 1;
   *display: inline;
   width: 460px;
+  height: 34px;
   padding-bottom: 0 !important;
 }
 #vk-button {

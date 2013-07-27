@@ -71,7 +71,8 @@
                     'shared' => $shared_groups,
                 );
                 $res['success'] = true;
-                die( ObjectHelper::ToJSON( $res ));
+                echo ObjectHelper::ToJSON( $res );
+                return true;
             }
 
             if ( $type == 'Barter' ) {
@@ -84,11 +85,12 @@
 
                 $options = array( 'orderBy' => 'type' );
                 $groups = GroupFactory::Get( $search, $options );
-                die( ObjectHelper::ToJSON( array( 'response' => GroupsUtility::form_response( $groups, $user_id, Group::BARTER_GROUP ))));
+                echo ObjectHelper::ToJSON( array( 'response' => GroupsUtility::form_response( $groups, $user_id, Group::BARTER_GROUP )));
+                return true;
             }
-//            $res = $m_class::get_groups( $user_id );
 
-            die( ObjectHelper::ToJSON( array( 'response' => $res )));
+            echo ObjectHelper::ToJSON( array( 'response' => $res ));
+            return true;
         }
 
         /** @var $groups Group[]*/

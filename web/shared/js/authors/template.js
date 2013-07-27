@@ -114,9 +114,7 @@ var LIST_ITEM =
     '<? } ?>' +
 '</div>';
 
-
 var TABLE_ROW =
-
 '<div class="column posts">' +
     '<span class="plus" >' +
         '<?=a?>'  +
@@ -130,17 +128,17 @@ var TABLE_ROW =
 '</div>';
 
 var TABLE_HEADER =
-    '<div class="list-head clear-fix">' +
-        '<div class="item authors">' +
-            'Автор</span>' +
-        '</div>' +
-        '<div class="item posts">' +
-            'Постов отправлено(всего)' +
-        '</div>' +
-        '<div class="item coolness">' +
-            'Крутизна лайков, %' +
-        '</div>' +
-        '<div class="item in-search">' +
-            'Крутизна репостов, %' +
-        '</div>' +
-    '</div>';
+'<div class="list-head clear-fix">' +
+    '<div class="item authors">' +
+        'Автор</span>' +
+    '</div>' +
+    '<div class="item posts">' +
+        'Постов отправлено(всего)' +
+    '</div>' +
+    '<div class="item coolness">' +
+        'Крутизна лайков, %' +
+    '</div>' +
+    '<div class="item in-search">' +
+        'Крутизна репостов, %' +
+    '</div>' +
+'</div>';
