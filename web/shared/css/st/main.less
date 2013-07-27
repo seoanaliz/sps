@@ -274,10 +274,14 @@ table, tr, td {
 
                 &.public-actions {
                     .action {
+                        .icon {
+                            width: 20px;
+                            height: 20px;
+                        }
+
                         cursor: pointer;
                         display: inline-block;
-                        padding: 4px;
-                        margin: 8px 0;
+                        padding: 9px 20px;
 
                         .icon.plus {
                             .opacity(0.3);
@@ -300,9 +304,9 @@ table, tr, td {
                         }
 
                         &.selected {
-                            background-color: #597DA3;
-
                             .icon {
+                                background-color: #597DA3;
+
                                 &.arrow {
                                     background-image: url('../../images/common/select-white.png');
                                 }

@@ -325,8 +325,11 @@ td {
 #main .left-column > .content .list-body .column.public-actions .action {
   cursor: pointer;
   display: inline-block;
-  padding: 4px;
-  margin: 8px 0;
+  padding: 9px 20px;
+}
+#main .left-column > .content .list-body .column.public-actions .action .icon {
+  width: 20px;
+  height: 20px;
 }
 #main .left-column > .content .list-body .column.public-actions .action .icon.plus {
   opacity: 0.3;
@@ -342,7 +345,7 @@ td {
 #main .left-column > .content .list-body .column.public-actions .action:hover .icon {
   opacity: 1;
 }
-#main .left-column > .content .list-body .column.public-actions .action.selected {
+#main .left-column > .content .list-body .column.public-actions .action.selected .icon {
   background-color: #597DA3;
 }
 #main .left-column > .content .list-body .column.public-actions .action.selected .icon.arrow {
