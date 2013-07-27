@@ -75,8 +75,6 @@ if(!empty($cssFilesAdds)) {
 
     <script type="text/javascript">
         rank = <?= $rank ?>;
-        entriesPrecache = <?= $entriesPrecache ?>;
-        groupsPrecache = <?= $groupsPrecache ?>;
     </script>
 
     <?= JsHelper::includeCombined(array(
@@ -94,6 +92,11 @@ if(!empty($cssFilesAdds)) {
         'st/template.js',
     )); ?>
 
+    <script type="text/javascript">
+        entriesPrecache = <?= $entriesPrecache ?>;
+        groupsPrecache = <?= $groupsPrecache ?>;
+    </script>
+    
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
     <? } ?>
