@@ -486,7 +486,7 @@ input[disabled] {
 .icon {
   width: 1em;
   height: 1em;
-  background-position: center;
+  background-position: 50%;
   background-repeat: no-repeat;
   display: inline-block;
   zoom: 1;
@@ -498,10 +498,6 @@ input[disabled] {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  -webkit-transition: .2s opacity;
-  -moz-transition: .2s opacity;
-  -o-transition: .2s opacity;
-  transition: .2s opacity;
 }
 .icon.plus {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAABlBMVEUAAABrjbHTrvgSAAAAAXRSTlMAQObYZgAAACBJREFUeNqdzbENAAAAAUH2XxqdUlwjX0HQsmuwjPH8CBj8AFHnZyj6AAAAAElFTkSuQmCC);
@@ -510,7 +506,7 @@ input[disabled] {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAADFBMVEUrWHorWHoAAABrjbHH6lvlAAAAA3RSTlMQCAAuie2mAAAANElEQVR42k3NyQkAMAwDQUfbf88hgiXWSwM+JisfLAAj4CkHeyZA+9vB9Jq9cKao1tN2YS5lkAFOvGpwkwAAAABJRU5ErkJggg==);
 }
 .icon.arrow {
-  background-image: url('../../images/common/arrow.png');
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAMAAAB1GNVPAAAABlBMVEUAAABFaI50ErlsAAAAAXRSTlMAQObYZgAAABpJREFUeNotxbENAAAMAiD8/2nTVBbksVhcBQFwABH/jlPCAAAAAElFTkSuQmCC);
 }
 .icon.arrow-top {
   background-image: url('../../images/common/arrow-top.png');
