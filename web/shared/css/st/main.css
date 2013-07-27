@@ -261,10 +261,6 @@ td {
 #main .left-column > .content .list-head .column.active .icon {
   opacity: 1;
 }
-#main .left-column > .content .list-head .item.reverse .icon,
-#main .left-column > .content .list-head .column.reverse .icon {
-  background-image: url('../../images/common/arrow-top.png');
-}
 #main .left-column > .content .list-head .item.contacts,
 #main .left-column > .content .list-head .column.contacts {
   cursor: default;

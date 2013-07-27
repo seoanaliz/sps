@@ -34,7 +34,7 @@ $(document).ready(function() {
     })(window);
 
     Configs.activeElement = document.body;
-    document.body.addEventListener && document.body.addEventListener('focus', function () {
+    document.body.addEventListener && document.body.addEventListener('focus', function() {
         Configs.activeElement = document.activeElement;
     }, true);
 
@@ -61,7 +61,7 @@ function initHistory() {
 
     // в переменную entriesPrecache передавались данные с сервера
     if (entriesPrecache &&
-        typeof history === 'object' && ('replaceState' in history)) {
+            typeof history === 'object' && ('replaceState' in history)) {
         // запишем в history состояние, взятое из прекеша
         history.replaceState({listId: entriesPrecache.groupId || 'all', slug: ''}, '');
     }
@@ -85,13 +85,14 @@ function authInfo(response) {
         makeVkButton();
     } else {
         var code = 'return {' +
-            'user: API.getProfiles({fields: "photo"})[0]' +
-        '};';
-        VK.Api.call('execute', {code: code}, function (answer) {
+                'user: API.getProfiles({fields: "photo"})[0]' +
+                '};';
+        VK.Api.call('execute', {code: code}, function(answer) {
             if (answer && answer.response) {
                 jQuery.extend(cur.dataUser, answer.response.user);
                 handleUserLoggedIn(answer.response.user);
-            };
+            }
+            ;
         });
     }
 }
@@ -100,24 +101,24 @@ function makeVkButton() {
     var $loginInfo = $('.login-info');
     if ($loginInfo.length) {
         var vkHref = 'https://oauth.vk.com/authorize?' +
-                    'client_id='+ Configs.appId +
-                    '&scope=stats,groups,offline,wall' +
-                    '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
-                    '&display=page' +
-                    '&response_type=code';
-        $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
+                'client_id=' + Configs.appId +
+                '&scope=stats,groups,offline,wall' +
+                '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
+                '&display=page' +
+                '&response_type=code';
+        $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
     }
 }
 
 function handleUserLoggedIn(userData) {
     var $loginInfo = $('.login-info');
-    $loginInfo.html('<a class="logout" href="/logout/?to='+ encodeURIComponent(location.pathname) +'">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
+    $loginInfo.html('<a class="logout" href="/logout/?to=' + encodeURIComponent(location.pathname) + '">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
     var name = userData.first_name + ' ' + userData.last_name;
     $('.username', $loginInfo)
-        .attr('href', 'http://vk.com/id' + userData.uid)
-        .attr('title', name)
-    .find('span')
-        .text(name);
+            .attr('href', 'http://vk.com/id' + userData.uid)
+            .attr('title', name)
+            .find('span')
+            .text(name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
 }
 
@@ -134,7 +135,7 @@ function changeState(listId, slug, doReplace) {
     if (doReplace) {
         history.replaceState({listId: listId, slug: slug}, '', pushedURI);
     } else {
-        Filter.selectList(listId).success(function () {
+        Filter.selectList(listId).success(function() {
             history.pushState({listId: listId, slug: slug}, '', pushedURI);
         });
     }
@@ -179,17 +180,17 @@ var List = (function() {
                             Events.fire('load_list', function(dataLists) {
                                 if (dataVK && dataVK.error) {
                                     box
-                                        .setTitle('Ошибка')
-                                        .setHTML('Вы не предоставили доступ к друзьям.')
-                                        .setButtons([
-                                            {label: 'Перелогиниться', onclick: function() {
+                                            .setTitle('Ошибка')
+                                            .setHTML('Вы не предоставили доступ к друзьям.')
+                                            .setButtons([
+                                        {label: 'Перелогиниться', onclick: function() {
                                                 VK.Auth.logout(function() {
                                                     location.replace('login/');
                                                 });
                                             }},
-                                            {label: 'Отмена', isWhite: true}
-                                        ])
-                                    ;
+                                        {label: 'Отмена', isWhite: true}
+                                    ])
+                                            ;
                                 } else {
                                     var dataVKfriends = dataVK.response;
                                     var friends = [];
@@ -215,54 +216,54 @@ var List = (function() {
                                     var $users = $box.find('.users');
                                     var $lists = $box.find('.lists');
                                     $users
-                                        .tags({
-                                            onadd: function(tag) {
-                                                shareUsers.push(parseInt(tag.id));
-                                            },
-                                            onremove: function(tagId) {
-                                                shareUsers = jQuery.grep(shareUsers, function(value) {
-                                                    return value != tagId;
-                                                });
-                                            }
-                                        })
-                                        .autocomplete({
-                                            data: friends,
-                                            target: $users.closest('.ui-tags'),
-                                            onchange: function(item) {
-                                                $(this).tags('addTag', item).val('').focus();
-                                            }
-                                        })
-                                        .keydown(function(e) {
-                                            if (e.keyCode == KEY.DEL && !$(this).val()) {
-                                                $(this).tags('removeLastTag');
-                                            }
-                                        })
-                                    ;
+                                            .tags({
+                                        onadd: function(tag) {
+                                            shareUsers.push(parseInt(tag.id));
+                                        },
+                                        onremove: function(tagId) {
+                                            shareUsers = jQuery.grep(shareUsers, function(value) {
+                                                return value != tagId;
+                                            });
+                                        }
+                                    })
+                                            .autocomplete({
+                                        data: friends,
+                                        target: $users.closest('.ui-tags'),
+                                        onchange: function(item) {
+                                            $(this).tags('addTag', item).val('').focus();
+                                        }
+                                    })
+                                            .keydown(function(e) {
+                                        if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                            $(this).tags('removeLastTag');
+                                        }
+                                    })
+                                            ;
                                     $lists
-                                        .tags({
-                                            onadd: function(tag) {
-                                                shareLists.push(tag.id);
-                                            },
-                                            onremove: function(tagId) {
-                                                shareLists = jQuery.grep(shareLists, function(value) {
-                                                    return value != tagId;
-                                                });
-                                            }
-                                        })
-                                        .autocomplete({
-                                            data: lists,
-                                            target: $lists.closest('.ui-tags'),
-                                            onchange: function(item) {
-                                                $(this).tags('addTag', item).val('').focus();
-                                            }
-                                        })
-                                        .keydown(function(e) {
-                                            if (e.keyCode == KEY.DEL && !$(this).val()) {
-                                                $(this).tags('removeLastTag');
-                                            }
-                                        })
-                                        .tags('addTag', {id: listId, title: listTitle})
-                                    ;
+                                            .tags({
+                                        onadd: function(tag) {
+                                            shareLists.push(tag.id);
+                                        },
+                                        onremove: function(tagId) {
+                                            shareLists = jQuery.grep(shareLists, function(value) {
+                                                return value != tagId;
+                                            });
+                                        }
+                                    })
+                                            .autocomplete({
+                                        data: lists,
+                                        target: $lists.closest('.ui-tags'),
+                                        onchange: function(item) {
+                                            $(this).tags('addTag', item).val('').focus();
+                                        }
+                                    })
+                                            .keydown(function(e) {
+                                        if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                            $(this).tags('removeLastTag');
+                                        }
+                                    })
+                                            .tags('addTag', {id: listId, title: listTitle})
+                                            ;
                                     $box.find('input[value=""]:first').focus();
                                 }
                             });
@@ -332,7 +333,8 @@ var List = (function() {
         $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
         $actions = $('.actions', $container);
         select(id, function() {
-            if ($.isFunction(callback)) callback();
+            if ($.isFunction(callback))
+                callback();
         });
     }
 
@@ -346,7 +348,8 @@ var List = (function() {
         $container.find('.tab.selected').removeClass('selected');
         $item.addClass('selected');
 
-        if ($.isFunction(callback)) callback();
+        if ($.isFunction(callback))
+            callback();
         else {
             Filter.selectList(id);
         }
@@ -401,7 +404,7 @@ var Filter = (function() {
                 $val.removeAttr('contenteditable');
             });
             $sliderRange.find('.value-min, .value-max').bind('keyup keydown', function(e) {
-                switch(e.keyCode) {
+                switch (e.keyCode) {
                     case KEY.ENTER:
                     case KEY.ESC:
                         $(this).blur();
@@ -461,7 +464,7 @@ var Filter = (function() {
         $period.delegate('input', 'change', function() {
             var $input = $(this);
             var period;
-            switch($input.val()) {
+            switch ($input.val()) {
                 case 'day':
                     period = 1;
                     break;
@@ -507,28 +510,28 @@ var Filter = (function() {
             $item.append($editField);
             $editField.focus();
             $editField.val($item.attr('title'));
-            var saverAppendTimeout = setTimeout(function () {
+            var saverAppendTimeout = setTimeout(function() {
                 $item.append($saver);
                 $saver.animate({'margin-right': 0});
             }, 150);
-            $saver.click(function (e) {
+            $saver.click(function(e) {
                 e.stopPropagation();
                 saveEditor();
             });
             $editField
-                .on('click', function (e) {
-                    e.stopPropagation();
-                })
-                .on('keyup', function (e) {
-                    if (e.keyCode === KEY.ESC) {
-                        destroyEditor();
-                    }
-                })
-                .on('blur', destroyEditor);
+                    .on('click', function(e) {
+                e.stopPropagation();
+            })
+                    .on('keyup', function(e) {
+                if (e.keyCode === KEY.ESC) {
+                    destroyEditor();
+                }
+            })
+                    .on('blur', destroyEditor);
 
             function saveEditor() {
                 var id = $item.data('id');
-                Events.fire('rename_list', id, $editField.val(), function (success, data) {
+                Events.fire('rename_list', id, $editField.val(), function(success, data) {
                     if (success) {
                         $item.attr('title', data.groupName);
                         $item.attr('data-slug', data.slug);
@@ -548,26 +551,26 @@ var Filter = (function() {
         });
         // сортировка списков
         if (cur.dataUser.isAdmin) {
-            var preventEvent = function () {
+            var preventEvent = function() {
                 return false;
             };
             $list.filter('.private, .global').sortable({
                 axis: 'y',
                 tolerance: 'pointer',
-                update: function (_, ui) {
+                update: function(_, ui) {
                     var listId = ui.item.data('id');
                     var index = $(this).find('.item').index(ui.item);
-                    Events.fire('sort_list', listId, index, function (success) {
+                    Events.fire('sort_list', listId, index, function(success) {
                         if (!success) {
                             Filter.refreshList();
                         }
                     });
                 },
-                start: function (_, ui) { // нужно в FireFox (версия 22) для превента выбора списка при окончании драг-н-дропа
+                start: function(_, ui) { // нужно в FireFox (версия 22) для превента выбора списка при окончании драг-н-дропа
                     ui.item.on('click', preventEvent);
                 },
-                stop: function (_, ui) {
-                    setInterval(function () { // отменяет хак для FF
+                stop: function(_, ui) {
+                    setInterval(function() { // отменяет хак для FF
                         ui.item.off('click', preventEvent);
                     }, 10);
                 }
@@ -587,18 +590,20 @@ var Filter = (function() {
     function refreshList(callback, maybeListId) {
         var $selectedItem = $list.find('.item.selected');
         var id = maybeListId || $selectedItem.data('id');
-        var $list_global  =  $('> .list.global', $container);
-        var $list_private =  $('> .list.private', $container);
-        var $list_shared  =  $('> .list.shared', $container);
+        var $list_global = $('> .list.global', $container);
+        var $list_private = $('> .list.private', $container);
+        var $list_shared = $('> .list.shared', $container);
         getList(function(data) {
             $list_global.html(tmpl(FILTER_LIST, {items: data.global}));
             $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
             $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
             if (id) {
                 selectList(id, function() {
-                    if ($.isFunction(callback)) callback();
+                    if ($.isFunction(callback))
+                        callback();
                 });
-            } else if ($.isFunction(callback)) callback();
+            } else if ($.isFunction(callback))
+                callback();
         });
     }
     function selectList(id, callback) {
@@ -612,7 +617,7 @@ var Filter = (function() {
         } else {
             var id = $item.data('id');
             List.select(id, function() {
-                Table.changeList(id, $item.data('slug')).success(function () {
+                Table.changeList(id, $item.data('slug')).success(function() {
                     Def.fireSuccess();
                 });
             });
@@ -657,7 +662,8 @@ var Table = (function() {
         $container = $('#table');
         _initEvents();
         changeList();
-        if ($.isFunction(callback)) callback();
+        if ($.isFunction(callback))
+            callback();
     }
     function prepareServerData(dirtyData) {
         var clearList = [];
@@ -704,21 +710,21 @@ var Table = (function() {
             }
         } else {
             /*
-            id - id
-            name - name
-            ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
-            auth_likes_eff: 0 - Авторское/спарсенное: лайки
-            auth_posts: 0 - авторских постов
-            auth_reposts_eff: 0 - Авторское/спарсенное: репосты
-            avg_vie_grouth: null - средний суточный прирост просмотров
-            avg_vis_grouth: null - средний суточный прирост уников
-            overall_posts: 68 - общее количество постов за период
-            posts_days_rel: 0 - в среднем постов за сутки
-            sb_posts_count: 56 - постов из источников
-            sb_posts_rate: 0 - средний рейтинг постов из источников
-            views: null - просмотры
-            visitors: null - посетители
-            */
+             id - id
+             name - name
+             ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+             auth_likes_eff: 0 - Авторское/спарсенное: лайки
+             auth_posts: 0 - авторских постов
+             auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+             avg_vie_grouth: null - средний суточный прирост просмотров
+             avg_vis_grouth: null - средний суточный прирост уников
+             overall_posts: 68 - общее количество постов за период
+             posts_days_rel: 0 - в среднем постов за сутки
+             sb_posts_count: 56 - постов из источников
+             sb_posts_rate: 0 - средний рейтинг постов из источников
+             views: null - просмотры
+             visitors: null - посетители
+             */
             if ($.isArray(dirtyData.list)) {
                 $.each(dirtyData.list, function(i, publicItem) {
                     clearList.push({
@@ -752,7 +758,8 @@ var Table = (function() {
     }
     function loadMore() {
         var $el = $("#load-more-table");
-        if ($el.hasClass('loading')) return;
+        if ($el.hasClass('loading'))
+            return;
         $el.addClass('loading');
 
         var $tableBody = $('.list-body');
@@ -775,21 +782,21 @@ var Table = (function() {
         }
 
         Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded += 1;
-                if (!listType) {
-                    if (data.length) {
-                        dataTable = $.merge(dataTable, data);
-                        $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
+                function(data, maxPeriod, listType) {
+                    pagesLoaded += 1;
+                    if (!listType) {
+                        if (data.length) {
+                            dataTable = $.merge(dataTable, data);
+                            $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
+                        }
+                    } else {
+                        if (data.length) {
+                            dataTable = $.merge(dataTable, data);
+                            $tableBody.append(tmpl(OUR_TABLE_BODY, {rows: data}));
+                        }
                     }
-                } else {
-                    if (data.length) {
-                        dataTable = $.merge(dataTable, data);
-                        $tableBody.append(tmpl(OUR_TABLE_BODY, {rows: data}));
-                    }
+                    $el.removeClass('loading');
                 }
-                $el.removeClass('loading');
-            }
         );
     }
     function sort(field, reverse, callback) {
@@ -808,19 +815,20 @@ var Table = (function() {
         };
 
         Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentSortBy = field;
-                currentSortReverse = reverse;
-                dataTable = data;
-                if (!listType) {
-                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                } else {
-                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                function(data, maxPeriod, listType) {
+                    pagesLoaded = 1;
+                    currentListType = listType;
+                    currentSortBy = field;
+                    currentSortReverse = reverse;
+                    dataTable = data;
+                    if (!listType) {
+                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    } else {
+                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    }
+                    if ($.isFunction(callback))
+                        callback(data);
                 }
-                if ($.isFunction(callback)) callback(data);
-            }
         );
     }
     function search(text, callback) {
@@ -839,23 +847,24 @@ var Table = (function() {
         };
 
         Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentSearch = text;
-                dataTable = data;
-                if (!listType) {
-                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                } else {
-                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                function(data, maxPeriod, listType) {
+                    pagesLoaded = 1;
+                    currentListType = listType;
+                    currentSearch = text;
+                    dataTable = data;
+                    if (!listType) {
+                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    } else {
+                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    }
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
+                    if ($.isFunction(callback))
+                        callback(data);
                 }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                if ($.isFunction(callback)) callback(data);
-            }
         );
     }
     function setPeriod(period, callback) {
@@ -874,18 +883,19 @@ var Table = (function() {
         };
 
         Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentPeriod = period;
-                dataTable = data;
-                if (!listType) {
-                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                } else {
-                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                function(data, maxPeriod, listType) {
+                    pagesLoaded = 1;
+                    currentListType = listType;
+                    currentPeriod = period;
+                    dataTable = data;
+                    if (!listType) {
+                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    } else {
+                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    }
+                    if ($.isFunction(callback))
+                        callback(data);
                 }
-                if ($.isFunction(callback)) callback(data);
-            }
         );
     }
     function setAudience(audience, callback) {
@@ -906,18 +916,19 @@ var Table = (function() {
         }
 
         Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentAudience = audience;
-                dataTable = data;
-                if (!listType) {
-                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                } else {
-                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                function(data, maxPeriod, listType) {
+                    pagesLoaded = 1;
+                    currentListType = listType;
+                    currentAudience = audience;
+                    dataTable = data;
+                    if (!listType) {
+                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    } else {
+                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    }
+                    if ($.isFunction(callback))
+                        callback(data);
                 }
-                if ($.isFunction(callback)) callback(data);
-            }
         );
     }
     function setInterval(interval, callback) {
@@ -936,18 +947,19 @@ var Table = (function() {
         };
 
         Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentInterval = interval;
-                dataTable = data;
-                if (!listType) {
-                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                } else {
-                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                function(data, maxPeriod, listType) {
+                    pagesLoaded = 1;
+                    currentListType = listType;
+                    currentInterval = interval;
+                    dataTable = data;
+                    if (!listType) {
+                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    } else {
+                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    }
+                    if ($.isFunction(callback))
+                        callback(data);
                 }
-                if ($.isFunction(callback)) callback(data);
-            }
         );
     }
     function changeList(listId, slug) {
@@ -1074,11 +1086,15 @@ var Table = (function() {
                 var $target = $(this);
                 $target.closest('.list-head').find('.column').not($target).removeClass('reverse active');
                 if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                    $target.addClass('reverse');
+                    $target.addClass('reverse')
+                        .find('.arrow')
+                            .addClass('top');
                     sort(sortFieldKey, true);
                 } else {
-                    $target.addClass('active');
-                    $target.removeClass('reverse');
+                    $target.addClass('active')
+                           .removeClass('reverse')
+                           .find('.arrow')
+                               .removeClass('top');
                     sort(sortFieldKey, false);
                 }
             });
@@ -1124,12 +1140,12 @@ var Table = (function() {
         Events.fire('load_list', function(dataList) {
             if (!$el.hasClass('selected')) {
                 var categories = [{
-                    title: 'Личные',
-                    items: dataList.private
-                }, {
-                    title: 'Категории',
-                    items: dataList.global
-                }];
+                        title: 'Личные',
+                        items: dataList.private
+                    }, {
+                        title: 'Категории',
+                        items: dataList.global
+                    }];
 
                 $dropdown = $(tmpl(DROPDOWN, {categories: categories})).appendTo('body');
 
@@ -1149,14 +1165,14 @@ var Table = (function() {
                     onChange($item);
                 });
                 $dropdown
-                    .delegate('.add-item', 'keyup', function(e) {
-                        if (e.keyCode === KEY.ENTER) {
-                            onSave($.trim($input.val()));
-                        }
-                    })
-                    .delegate('.add-item', 'blur', function () {
+                        .delegate('.add-item', 'keyup', function(e) {
+                    if (e.keyCode === KEY.ENTER) {
                         onSave($.trim($input.val()));
-                    })
+                    }
+                })
+                        .delegate('.add-item', 'blur', function() {
+                    onSave($.trim($input.val()));
+                })
                 $dropdown.bind('mousedown', function(e) {
                     e.stopPropagation();
                 });
@@ -1166,10 +1182,10 @@ var Table = (function() {
                     }
                     $dropdown.hide();
                     $el.removeClass('selected');
-                    setTimeout(function () {
+                    setTimeout(function() {
                         if (document.activeElement === document.body) {
                             $(Configs.activeBeforeDropdown).focus();
-                        } 
+                        }
                     }, 50);
                 });
 
@@ -1177,7 +1193,7 @@ var Table = (function() {
                     Events.fire('add_list', groupName, function() {
                         Events.fire('load_list', function(dataList) {
                             var all_lists = dataList.private;
-                            all_lists.push.apply(all_lists,dataList.global);
+                            all_lists.push.apply(all_lists, dataList.global);
 
                             var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                             $dropdown.html($tmpDropdown.html());
@@ -1191,7 +1207,8 @@ var Table = (function() {
                     listId = $item.data('id');
                     var isSelected = !$item.hasClass('selected');
                     var callback = function(data) {
-                        if (!data) return;
+                        if (!data)
+                            return;
                         $item.toggleClass('selected');
                         if ($dropdown.find('.item.selected').length) {
                             $el.find('.icon').removeClass('plus').addClass('select');
@@ -1222,38 +1239,38 @@ var Table = (function() {
             }
             var previousValue = '';
             $dropdown
-                .delegate('.search', 'keyup drop paste change', function (e) {
-                    var val = $(this).val();
-                    if (('keyCode' in e) && e.keyCode === KEY.ESC) {
-                        return clearSearch(); // ---- RETURN
-                    }
-                    if (val !== previousValue) {
-                        var regexp = new RegExp(val, 'gim');
-                        
-                        $dropdown.find('.category').each(function() {
-                            var $category = $(this);
-                            var i = Number(this.getAttribute('data-number'));
-                            $category.find('.item').each(function () {
-                                var text = this.getAttribute('title');
-                                if (regexp.test(text)) {
-                                    var div = this.childNodes[0];
-                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                                    this.style.display = previousDisplay;
-                                } else {
-                                    i--;
-                                    this.style.display = 'none';
-                                }
-                            });
-                            if (i === 0) {
-                                this.style.display = 'none';
+                    .delegate('.search', 'keyup drop paste change', function(e) {
+                var val = $(this).val();
+                if (('keyCode' in e) && e.keyCode === KEY.ESC) {
+                    return clearSearch(); // ---- RETURN
+                }
+                if (val !== previousValue) {
+                    var regexp = new RegExp(val, 'gim');
+
+                    $dropdown.find('.category').each(function() {
+                        var $category = $(this);
+                        var i = Number(this.getAttribute('data-number'));
+                        $category.find('.item').each(function() {
+                            var text = this.getAttribute('title');
+                            if (regexp.test(text)) {
+                                var div = this.childNodes[0];
+                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                this.style.display = previousDisplay;
                             } else {
-                                this.style.display = previousCategoryDisplay;
+                                i--;
+                                this.style.display = 'none';
                             }
                         });
-                        previousValue = val;
-                    }
-                })
-                .delegate('.clear-search', 'click', clearSearch);
+                        if (i === 0) {
+                            this.style.display = 'none';
+                        } else {
+                            this.style.display = previousCategoryDisplay;
+                        }
+                    });
+                    previousValue = val;
+                }
+            })
+                    .delegate('.clear-search', 'click', clearSearch);
         }
 
         function showDropdown() {
