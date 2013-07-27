@@ -79,17 +79,20 @@ if(!empty($cssFilesAdds)) {
 
     <?= JsHelper::includeCombined(array(
         'common/jquery-1.7.2.min.js',
+        'common/class.js',
+    )); ?>
+
+    <?= JsHelper::includeCombined(array(
         'fe/jquery-ui-1.8.18.custom.min.js',
+        'fe/jquery.ui.slider.js',
+        'common/deferred.js',
+        'st/template.js',
+        'st/events.js',
     )); ?>
 
     <?= JsHelper::includeCombined(array(
         'common/common.js',
-        'common/class.js',
-        'common/deferred.js',
-        'fe/jquery.ui.slider.js',
         'st/main.js',
-        'st/events.js',
-        'st/template.js',
     )); ?>
 
     <script type="text/javascript">
