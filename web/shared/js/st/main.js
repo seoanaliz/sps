@@ -1213,6 +1213,7 @@ var Table = (function() {
                 $search.focus();
             }
             var previousValue = '';
+            var clearSearchNode = $dropdown.find('.clear-search')[0];
             $dropdown
                 .delegate('.search', 'keyup drop paste change', function (e) {
                     var val = $(this).val();
@@ -1220,8 +1221,9 @@ var Table = (function() {
                         return clearSearch(); // ---- RETURN
                     }
                     if (val !== previousValue) {
+                        clearSearchNode.style.display = val ? 'block' : 'none';
                         var regexp = new RegExp(val, 'gim');
-                        
+
                         $dropdown.find('.category').each(function() {
                             var $category = $(this);
                             var i = Number(this.getAttribute('data-number'));

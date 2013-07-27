@@ -422,6 +422,7 @@ td {
   top: 0;
   left: 0;
   width: 128px;
+  height: 100%;
   border: none;
   padding-right: 37px;
   padding-left: 4px;
@@ -580,6 +581,7 @@ td {
   color: #585858;
 }
 .dropdown .clear-search {
+  display: none;
   position: absolute;
   top: 0;
   right: 2px;
