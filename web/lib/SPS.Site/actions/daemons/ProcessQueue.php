@@ -106,7 +106,7 @@ sql;
                 Logger::Warning($err);
 
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
-                  
+                return true;
             }
         }
 
@@ -181,7 +181,7 @@ sql;
                 }
             } catch (ChangeSenderException $Ex){
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
-                    'failed to post from publisher ' . $publisher->publisherId .', ' . $Ex->getMessage());
+                    'failed to post from token' . $token . ' ' . $Ex->getMessage());
                 throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
