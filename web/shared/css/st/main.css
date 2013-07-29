@@ -542,6 +542,7 @@ td {
   color: #585858;
 }
 .dropdown .clear-search {
+  display: none;
   position: absolute;
   top: 0;
   right: 2px;

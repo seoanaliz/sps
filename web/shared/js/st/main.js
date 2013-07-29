@@ -1242,12 +1242,14 @@ var Table = (function() {
                 $search.focus();
             }
             var previousValue = '';
+            var clearSearchNode = $dropdown.find('.clear-search')[0];
             $dropdown.delegate('.search', 'keyup drop paste change', function(e) {
                 var val = $(this).val();
                 if (('keyCode' in e) && e.keyCode === KEY.ESC) {
                     return clearSearch(); // ---- RETURN
                 }
                 if (val !== previousValue) {
+                    clearSearchNode.style.display = val ? 'block' : 'none';
                     var regexp = new RegExp(val, 'gim');
 
                     $dropdown.find('.category').each(function() {
@@ -1273,7 +1275,7 @@ var Table = (function() {
                     previousValue = val;
                 }
             })
-                    .delegate('.clear-search', 'click', clearSearch);
+            .delegate('.clear-search', 'click', clearSearch);
         }
 
         function showDropdown() {
