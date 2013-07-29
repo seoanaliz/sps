@@ -31,10 +31,6 @@ class GetStatData extends BaseControl
         $EntryGetter = new EntryGetter();
         $id = null;
         if ($slug) {
-//            if ($slug === "~update-sAPDixIx6SNVl4~gX0QM307hADw--cxpuO3rYwnKeyB") {
-//                $EntryGetter->updateSlugs();
-//                die('done');
-//            }
             $id = $EntryGetter->getGroupIdBySlug($slug);
             if (!$id) { // несуществующий URI
                 return 'default'; // редирект

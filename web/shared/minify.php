@@ -45,7 +45,7 @@ if (!defined('MINIFY_REWRITE_CSS_URLS')) {
    * mistakes. If you find that URL rewriting results in problems, you should
    * disable it.
    */
-  define('MINIFY_REWRITE_CSS_URLS', false);
+  define('MINIFY_REWRITE_CSS_URLS', true);
 }
 
 if (!defined('MINIFY_USE_CACHE')) {
