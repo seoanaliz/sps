@@ -43,5 +43,12 @@ class GetStatData extends BaseControl
 
         Request::setInteger('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
         Response::setString('entriesPrecache', ObjectHelper::ToJSON($EntryGetter->getEntriesData()));
+        
+        include __DIR__ . '/controls/groups/getGroupList.php';
+        $gl = new getGroupList();
+        ob_start();
+        $gl->Execute();
+        $json = ob_get_clean();
+        Response::setString('groupsPrecache', $json);
     }
 }

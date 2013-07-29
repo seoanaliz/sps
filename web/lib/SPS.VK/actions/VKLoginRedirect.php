@@ -58,7 +58,7 @@
                     if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
-                        ($apiAnswer->permissions & VkHelper::PERM_WALL)
+                        ($apiAnswer->permissions & VkHelper::PERM_WALL) // исправляете здесь, поправьте и в сообщении об ошибке ниже
                     ) {
                         $existingToken = AccessTokenFactory::GetOne( array(
                             'vkId' => $vkId,
@@ -74,7 +74,7 @@
                         }
                         EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
                     } else {
-                        error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE));
+                        error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE + VkHelper::PERM_WALL));
                     }
                 }
             }

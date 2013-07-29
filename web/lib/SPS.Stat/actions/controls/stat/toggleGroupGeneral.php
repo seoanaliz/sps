@@ -46,7 +46,9 @@
                         ));
                     }
                     GroupFactory::Update($group);
-                    EntryGetter::updateSlugs(false);
+                    if( $group->type ==GroupsUtility::Group_Global ) {
+                        EntryGetter::updateSlugs($group->group_id, $onLogging = false, $setNewSlug = true );
+                    }
                     die(ObjectHelper::ToJSON(array('response' => true)));
                 }
             };

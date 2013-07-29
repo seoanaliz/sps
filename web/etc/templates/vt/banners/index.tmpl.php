@@ -57,11 +57,6 @@
                     <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.mobile.platform}</label>
-                    <?= FormHelper::FormInput( "search[platform]", $search['platform'], 'platform', null, array( 'size' => 80 ) ); ?>
-                </div>
-
-                <div class="row">
                     <label>{lang:vt.mobile.prob}</label>
                     <?= FormHelper::FormInput( "search[prob]", $search['prob'], 'prob', null, array( 'size' => 80 ) ); ?>
                 </div>
@@ -74,8 +69,12 @@
                     <?= FormHelper::FormInput( "search[actionUrl]", $search['actionUrl'], 'actionUrl', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
+                    <label>{lang:vt.mobile.platform}</label>
+                    <?= FormHelper::FormSelect( "search[platform]", array('ios' => 'ios', 'android' => 'android'),null, null, $search['platform'], null, null, true ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.mobile.active}</label>
-                    <?= FormHelper::FormInput( "search[active]", $search['active'], 'active', null, array( 'size' => 80 ) ); ?>
+                    <?= FormHelper::FormSelect( "search[active]", array('on' => 'on', 'off' => 'off'),null, null, $search['active'], null, null, true ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
@@ -88,7 +87,7 @@
     $langDelete = LocaleLoader::Translate( "vt.common.delete" );
 
     foreach ( $list as $object )  {
-        $id         = $object->bannerId;
+        $id         = $object->id;
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">

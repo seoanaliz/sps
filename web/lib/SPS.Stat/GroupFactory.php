@@ -16,7 +16,7 @@ class GroupFactory
     'class'       => 'Group'
     , 'table'     => 'groups'
     , 'view'      => 'get_groups'
-    , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
+    , 'flags'     => array( 'CanPages' => 'CanPages' )
     , 'cacheDeps' => array()
     , 'fields'    => array(
         'group_id' => array(
@@ -60,6 +60,7 @@ class GroupFactory
             , 'type'        => TYPE_STRING
         )
     )
+    , 'lists'     => array()
     , 'search'    => array(
         '_group_id' => array(
               'name'          => 'group_id'
