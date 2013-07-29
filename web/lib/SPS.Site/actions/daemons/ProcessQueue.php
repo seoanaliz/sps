@@ -118,7 +118,7 @@ sql;
          * @param Publisher $publisher
          * @param Article $article
          */
-        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher, $article) {
+        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article) {
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
             if ($isWithSmallPhoto) {
                 $articleRecord->photos = array();
@@ -131,8 +131,7 @@ sql;
             $post_data = array(
                 'text' => $articleRecord->content,
                 'group_id' => $targetFeed->externalId,
-                'vk_app_seckey' => $publisher->vk_seckey,
-                'vk_access_token' => $publisher->vk_token,
+                'vk_access_token' => $token,
                 'photo_array' => array(),
                 'audio_id' => array(),
                 'video_id' => array(),
