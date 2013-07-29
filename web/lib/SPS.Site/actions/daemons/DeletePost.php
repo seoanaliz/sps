@@ -39,13 +39,15 @@ sql;
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             if ($targetFeed->type == TargetFeedUtility::VK) {
 
-                if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleQueue)) {
+                if (empty($targetFeed) || empty($articleQueue)) {
                     continue;
                 }
 
-                foreach ($targetFeed->publishers as $publisher) {
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version);
+
+                foreach ($tokens as $token ) {
                     try {
-                        $sender->vk_access_token = $publisher->publisher->vk_token;
+                        $sender->vk_access_token = $token;
                         if ( $sender->delete_post($articleQueue->externalId)) {
                             $articleQueue->isDeleted = true;
                             ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
