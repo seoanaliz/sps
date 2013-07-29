@@ -18,7 +18,7 @@ class PublicsParser
     public function execute() {
         set_time_limit(240);
         $i = 0;
-        echo 'Начианаем с: ', $this->current_public, '<br>';
+        echo 'Начинаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             $ms = microtime(1);
@@ -33,6 +33,7 @@ class PublicsParser
                 continue;
             $new_entries = array();
             foreach( $res as $public ) {
+                sleep( self::PAUSE );
                 if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
                 if( $public->name == 'DELETED' && $this->current_public > 61000000 && $public->members_count == 0) {
