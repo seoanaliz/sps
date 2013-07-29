@@ -22,7 +22,7 @@ class PublicsParser
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             $ms = microtime(1);
-            $take_counter = rand(450, self::PUBLICS_PER_REQUEST);
+            $take_counter = rand( 450, self::PUBLICS_PER_REQUEST);
             $params = array(
                 'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + $take_counter )),
                 'fields'    =>  'members_count'
@@ -35,7 +35,7 @@ class PublicsParser
             foreach( $res as $public ) {
                 if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
-                if( $public->name == 'DELETED' && $this->current_public > 53000000 && $public->members_count == 0) {
+                if( $public->name == 'DELETED' && $this->current_public > 61000000 && $public->members_count == 0) {
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
