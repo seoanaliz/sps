@@ -74,6 +74,7 @@ if(!empty($jsFilesAdds)) {
         var controlsRoot = '{web:controls://}';
         var vk_appId = <?= AuthVkontakte::$AppId ?>;
         var hostname = '<?= Site::$Host->GetHostname() ?>';
+        rank = <?= $rank ?>;
     </script>
 
     <title><?=$__pageTitle?></title>
@@ -90,15 +91,14 @@ if(!empty($jsFilesAdds)) {
     <link rel="image_src" href="{web:/shared/images/st/stat.png}">
     <?= CssHelper::Flush(); ?>
 
-    <script type="text/javascript">
-        rank = <?= $rank ?>;
-        entriesPrecache = <?= $entriesPrecache ?>;
-    </script>
- 
     <?= JsHelper::Flush(); ?>
+
+    <script type="text/javascript">
+        entriesPrecache = <?= $entriesPrecache ?>;
+        groupsPrecache = <?= $groupsPrecache ?>;
+    </script>
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
     <? } ?>
-    <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>
 <body>

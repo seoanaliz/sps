@@ -6,7 +6,7 @@ var LIST_ITEM =
 '<? } ?>';
 
 var TABLE =
-'<div class="header list-head">' +
+'<div class="list-head">' +
     '<?=tmpl(TABLE_HEADER)?>' +
 '</div>' +
 '<div class="body list-body">' +
