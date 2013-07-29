@@ -82,16 +82,21 @@ sql;
                     return false;
                 }
 
-                $publishers = array();
-
-                foreach( $targetFeed->publishers as $ptf ) {
-                    $publishers[] = $ptf;
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version );
+                //отправка в ненаши - только с токена запланировавшего пост
+                if ( !$targetFeed->isOur ) {
+                    if( isset($tokens[$articleQueue->author] )) {
+                        $tokens = array( $tokens[$articleQueue->author]);
+                    } else {
+                        $tokens = array();
+                    }
+                } else {
+                    shuffle($tokens);
                 }
 
-                $targetFeed->publishers = $publishers;
-                foreach ($targetFeed->publishers as $publisher) {
+                foreach ($tokens as $token) {
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
                         return true;
                     } catch (Exception $Ex) {
                     }
