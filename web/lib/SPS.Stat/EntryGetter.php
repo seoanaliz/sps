@@ -58,17 +58,16 @@ class EntryGetter {
         );
 
         //поиск по названию - глобальный
-        if($search_name) {
-            if( strlen( $search_name) > 5) {
-                $search_name = mb_substr($search_name,0, (mb_strlen($search_name) - 3));
-
+        if( $search_name ) {
+            if( mb_strlen( $search_name ) > 5) {
+                $search_name = mb_substr( $search_name, 0, ( mb_strlen( $search_name ) - 2 ));
             }
             $search['_nameIL'] = $search_name;
         } elseif( $group_id == GroupsUtility::Group_Id_Special_All_Not ) {
             $search['inLists'] = false;
         } elseif( $group_id ) {
 
-            $group_entries_by_group = GroupEntryFactory::Get(array(
+            $group_entries_by_group = GroupEntryFactory::Get( array(
                 'groupId'   =>  $group_id,
                 'sourceType'=>  Group::STAT_GROUP,
             ));
@@ -118,7 +117,7 @@ class EntryGetter {
                 'visitors'  =>  $vkPublic->$visitors,
                 'viewers'   =>  $vkPublic->$viewers,
                 'in_search' =>  $vkPublic->in_search == 't' ? 1 : 0,
-                'active'    =>  $vkPublic->active== 't' ? true : false
+                'active'    =>  $vkPublic->active == 't' ? true : false
             );
         }
 
@@ -213,8 +212,8 @@ class EntryGetter {
     {
         $sql = 'SELECT ava
                 FROM ' . TABLE_STAT_PUBLICS .
-               ' WHERE vk_id=@publ_id';
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+               ' WHERE vk_id = @publ_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
         $cmd->SetInteger( '@publ_id', $public_id);
         $ds = $cmd->Execute();
         $ds->Next();
@@ -226,14 +225,14 @@ class EntryGetter {
     {
         $resul = array();
         $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
         $cmd->SetInteger( '@publ_id',  $publ );
         $ds = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
         while ( $ds->next()) {
             $vk_id = $ds->getValue( 'vk_id', TYPE_INTEGER );
             if ( $vk_id == $sadmin ) {
-                if ( isset( $resul[0] ) )
+                if ( isset( $resul[0] ))
                     $k = $resul[0];
 
                 $resul[0] = $this->get_row($ds, $structure);
