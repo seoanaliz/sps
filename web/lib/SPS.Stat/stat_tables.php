@@ -16,7 +16,7 @@
     define( 'TABLE_STAT_PUBLICS_POINTS', 'stat_publics_50k_points');   #посуточные чек-ауты
     define( 'TABLE_STAT_PUBLICS',        'stat_publics_50k');          #таблица пабликов
     define( 'TABLE_STAT_PUBLICS_AUDIT',  'stat_public_audit');         #таблица изменения состояния пабликов(пока в поиск/из поиска, активен/неактивен, поменялось название) -
-    define( 'TABLE_STAT_GROUPS',         'stat_groups');               #группы(листы) пабликов
+    define( 'TABLE_STAT_GROUPS',         'groups');                    #группы(листы) пабликов
     define( 'TABLE_STAT_ADMINS',         'stat_admins');               #админы этих пабликов
     define( 'TABLE_STAT_OUR_GROWTH',     'stat_our_auditory' );        #админы этих пабликов
 

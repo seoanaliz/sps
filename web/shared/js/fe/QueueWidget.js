@@ -193,8 +193,31 @@ var QueueWidget = Event.extend({
 
             if (time && time != $time.text()) {
                 $time.text(time);
-                if ($post.hasClass('new')) {
-                     Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
+                if (!$post.hasClass('new')) {
+                    // Редактирование времени ячейки для текущего дня
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
+                        if (isOk) {
+                            var oldVerticalPosition = $page.position().top + $post.position().top;
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (data.gridLineItemId && (t.scrollAtEditBegin === oldVerticalPosition)) {
+                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ data.gridLineItemId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = verticalPosition - oldVerticalPosition;
+                                       if (delta !== 0) {
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.scrollTop(newScrollTop);
+                                       }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
                         if (isOk && data) {
                             t.updateSinglePage($page).success(function($newPage) {
                                 if (data.gridLineId) {
@@ -213,29 +236,6 @@ var QueueWidget = Event.extend({
                                                newScrollTop = 0;
                                            }
                                            t.$queue.animate({scrollTop: newScrollTop}, 500);
-                                       }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
-                        if (isOk) {
-                            var oldVerticalPosition = $page.position().top + $post.position().top;
-                            t.updateSinglePage($page).success(function($newPage) {
-                                if (data.gridLineItemId && (t.scrollAtEditBegin === oldVerticalPosition)) {
-                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ data.gridLineItemId +'"]');
-                                    if ($elem.length) {
-                                       var verticalPosition = $newPage.position().top + $elem.position().top;
-                                       var delta = verticalPosition - oldVerticalPosition;
-                                       if (delta !== 0) {
-                                           var newScrollTop = t.$queue.scrollTop() + delta;
-                                           if (newScrollTop < 0) {
-                                               newScrollTop = 0;
-                                           }
-                                           t.$queue.scrollTop(newScrollTop);
                                        }
                                     }
                                 }
@@ -346,6 +346,7 @@ var QueueWidget = Event.extend({
         // Показать полностью в правом меню
         $queue.delegate('.toggle-text', 'click', function() {
             $(this).parent().toggleClass('collapsed');
+            return false;
         });
 
         // Показать полностью в раскрытом правом меню
@@ -402,7 +403,7 @@ var QueueWidget = Event.extend({
         var t = this;
         var $queue = this.$queue;
 
-        $queue.delegate('.slot.empty:not(.new):not(.edit)', 'click', function(e) {
+        $queue.delegate('.slot.empty:not(.new):not(.edit):not(.locked)', 'click', function(e) {
             if (e.target != e.currentTarget) {
                 return;
             }
@@ -461,7 +462,7 @@ var QueueWidget = Event.extend({
             }).success(function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
-                    Events.fire('post_moved', postId, $slot.data('id'), null, function(isOk, data) {
+                    Events.fire('post_moved', postId, $slot.data('id'), null, null, function(isOk, data) {
                         if (isOk && data && data.html) {
                             t.setSlotArticleHtml($slot, data.html);
                         }

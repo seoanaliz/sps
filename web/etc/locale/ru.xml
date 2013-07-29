@@ -233,6 +233,31 @@
         <addTitle><![CDATA[Добавление админа]]></addTitle>
         <editTitle><![CDATA[Редактирование админа]]></editTitle>
       </editor>
+      <category>
+        <list><![CDATA[Список категорий]]></list>
+        <addTitle><![CDATA[Добавление категории]]></addTitle>
+        <editTitle><![CDATA[Редактирование категории]]></editTitle>
+      </category>
+      <androidSetting>
+        <list><![CDATA[Настройки для андроида]]></list>
+        <addTitle><![CDATA[Добавление настроек паблика(андроид)]]></addTitle>
+        <editTitle><![CDATA[Редактирование настроек паблика(андроид)]]></editTitle>
+      </androidSetting>
+      <iOSsetting>
+        <list><![CDATA[Настройки для iOS]]></list>
+        <addTitle><![CDATA[Добавление настроек паблика(iOS)]]></addTitle>
+        <editTitle><![CDATA[Редактирование настроек паблика(iOS)]]></editTitle>
+      </iOSsetting>
+      <banner>
+        <list><![CDATA[Список баннеров]]></list>
+        <addTitle><![CDATA[Добавление баннера]]></addTitle>
+        <editTitle><![CDATA[Редактирование баннера]]></editTitle>
+      </banner>
+      <promotionPost>
+        <list><![CDATA[Список постов]]></list>
+        <addTitle><![CDATA[Добавление поста]]></addTitle>
+        <editTitle><![CDATA[Редактирование поста]]></editTitle>
+      </promotionPost>
     </screens>
     <vfs>
       <queue>
@@ -265,6 +290,12 @@
       <navigations><![CDATA[Элементы навигации]]></navigations>
       <navigationTypes><![CDATA[Типы навигации]]></navigationTypes>
       <siteParams><![CDATA[Параметры]]></siteParams>
+      <mobParams><![CDATA[Моби]]></mobParams>
+      <andSettings><![CDATA[Андроид]]></andSettings>
+      <iosSettings><![CDATA[IOS]]></iosSettings>
+      <banners><![CDATA[Баннеры]]></banners>
+      <categories><![CDATA[Категории]]></categories>
+      <promPosts><![CDATA[Промо посты]]></promPosts>
       <exit><![CDATA[Выход]]></exit>
       <articles><![CDATA[Статьи]]></articles>
       <sourceFeeds><![CDATA[Источники]]></sourceFeeds>
@@ -334,6 +365,7 @@
       <statusId><![CDATA[Статус]]></statusId>
       <externalId><![CDATA[externalId]]></externalId>
       <useFullExport><![CDATA[Экспорт описаний фото]]></useFullExport>
+      <onlyOurs><![CDATA[Только наши ленты]]></onlyOurs>
       <processed><![CDATA[processed]]></processed>
       <targetFeedIds><![CDATA[Ленты отправки]]></targetFeedIds>
       <type><![CDATA[Тип]]></type>
@@ -457,6 +489,27 @@
       <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
       <statusId><![CDATA[Статус]]></statusId>
     </editor>
+    <mobile>
+        <minVersion><![CDATA[Мин. версия]]></minVersion>
+        <curVersion><![CDATA[Текущая версия]]></curVersion>
+        <shareText><![CDATA[Текст]]></shareText>
+        <headerText><![CDATA[Текст заголовка]]></headerText>
+        <actionText><![CDATA[Текст экшена]]></actionText>
+        <bannerId><![CDATA[ID баннера]]></bannerId>
+        <publicId><![CDATA[ID паблика]]></publicId>
+        <platform><![CDATA[Платформа]]></platform>
+        <prob><![CDATA[prob]]></prob>
+        <imgUrl><![CDATA[Url фото]]></imgUrl>
+        <actionUrl><![CDATA[Url экшена]]></actionUrl>
+        <active><![CDATA[Активность]]></active>
+        <name><![CDATA[Название]]></name>
+        <mask><![CDATA[Маска]]></mask>
+        <index><![CDATA[Порядковый номер]]></index>
+        <indexPP><![CDATA[Порядковый номер]]></indexPP>
+        <showsCount><![CDATA[Cчетчик просмотров]]></showsCount>
+        <imageHeight><![CDATA[Высота изображения]]></imageHeight>
+        <imageWidth><![CDATA[Ширина изображения]]></imageWidth>
+    </mobile>
   </vt>
   <objects>
     <siteParam>

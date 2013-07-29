@@ -8,12 +8,14 @@ var Configs = {
     tableLoadOffset: 20,
     controlsRoot: controlsRoot,
     eventsDelay: 0,
-
     etc: null
 };
 
 var cur = {
-    dataUser: {}
+    dataUser: {
+        isEditor: (window.rank > 2),
+        isAdmin: (window.rank > 3)
+    }
 };
 
 $(document).ready(function() {
@@ -31,15 +33,39 @@ $(document).ready(function() {
         });
     })(window);
 
-    cur.dataUser.isEditor = false;
+    Configs.activeElement = document.body;
+    document.body.addEventListener && document.body.addEventListener('focus', function () {
+        Configs.activeElement = document.activeElement;
+    }, true);
+
     Filter.init(function() {
         List.init(function() {
+            initHistory();
             Table.init();
-            Counter.init();
         });
     });
+
     checkVkStatus();
 });
+
+function initHistory() {
+    window.onpopstate = function(e) {
+        if (typeof e.state === 'object' && e.state) {
+            if ('listId' in e.state) {
+                Filter.selectList(e.state.listId);
+            } else {
+                Filter.selectList('all');
+            }
+        }
+    };
+
+    // в переменную entriesPrecache передавались данные с сервера
+    if (entriesPrecache &&
+        typeof history === 'object' && ('replaceState' in history)) {
+        // запишем в history состояние, взятое из прекеша
+        history.replaceState({listId: entriesPrecache.groupId || 'all', slug: ''}, '');
+    }
+}
 
 function checkVkStatus() {
     if (typeof VK !== 'undefined' && VK.Api) {
@@ -54,38 +80,6 @@ function checkVkStatus() {
     }
 }
 
-// taken from http://www.quirksmode.org/js/cookies.html
-//function createCookie(name, value, days) {
-//    if (days) {
-//        var date = new Date();
-//        date.setTime(date.getTime()+(days*24*60*60*1000));
-//        var expires = "; expires="+date.toGMTString();
-//    }
-//    else {
-//        expires = "";
-//    }
-//    document.cookie = name+"="+value+expires+"; path=/";
-//}
-//
-//function readCookie(name) {
-//    var nameEQ = name + "=";
-//    var ca = document.cookie.split(';');
-//    for (var i=0; i < ca.length; i++) {
-//        var c = ca[i];
-//        while (c.charAt(0)==' ') {
-//            c = c.substring(1,c.length);
-//        }
-//        if (c.indexOf(nameEQ) == 0) {
-//            return c.substring(nameEQ.length,c.length);
-//        }
-//    }
-//    return null;
-//}
-//
-//function removeCookie(name) {
-//    createCookie(name, "", -1);
-//}
-
 function authInfo(response) {
     if (!response.session) {
         makeVkButton();
@@ -95,9 +89,9 @@ function authInfo(response) {
         '};';
         VK.Api.call('execute', {code: code}, function (answer) {
             if (answer && answer.response) {
-                cur.dataUser = answer.response.user;
+                jQuery.extend(cur.dataUser, answer.response.user);
                 handleUserLoggedIn(answer.response.user);
-            }
+            };
         });
     }
 }
@@ -107,7 +101,7 @@ function makeVkButton() {
     if ($loginInfo.length) {
         var vkHref = 'https://oauth.vk.com/authorize?' +
                     'client_id='+ Configs.appId +
-                    '&scope=stats,groups,offline' +
+                    '&scope=stats,groups,offline,wall' +
                     '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
                     '&display=page' +
                     '&response_type=code';
@@ -127,21 +121,24 @@ function handleUserLoggedIn(userData) {
     $('.userpic', $loginInfo).attr('src', userData.photo);
 }
 
-//function initVK(data) {
-//    if (data) {
-//        var r = data.response;
-//        cur.dataUser = r.me;
-//        Events.fire('get_user', cur.dataUser.uid, function(us) {
-//            cur.dataUser.isEditor = us.rank == 2 ;
-//            Filter.init(function() {
-//                List.init(function() {
-//                    Table.init();
-//                    Counter.init();
-//                });
-//            });
-//        });
-//    }
-//}
+function changeState(listId, slug, doReplace) {
+    var pushedURI = '/stat/' + (slug || '');
+
+    if ('pushState' in history) {
+        // ничего не делаем, всё ок
+    } else if (location.pathname !== pushedURI) { // для старых браузеров — перезагружаем страницу, если URI должен поменяться
+        location.href = pushedURI; // REDIRECT, перезагрузка страницы
+        return;
+    }
+
+    if (doReplace) {
+        history.replaceState({listId: listId, slug: slug}, '', pushedURI);
+    } else {
+        Filter.selectList(listId).success(function () {
+            history.pushState({listId: listId, slug: slug}, '', pushedURI);
+        });
+    }
+}
 
 var List = (function() {
     var $container;
@@ -149,18 +146,18 @@ var List = (function() {
 
     function init(callback) {
         $container = $('.header');
-
-        refresh(function() {
-            _initEvents();
-            if ($.isFunction(callback)) callback();
-        });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        if (entriesPrecache && entriesPrecache.groupId) {
+            var listId = entriesPrecache.groupId;
+        } else {
+            listId = 'all';
+        }
+        select(listId, callback);
+        _initEvents();
     }
     function _initEvents() {
-        $container.delegate('.tab', 'click', function() {
-            var $item = $(this);
-            select($item.data('id'));
-        });
-        $container.delegate('.actions .share', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var listTitle = $('.filter > .list > .item.selected').text();
             var isFirstShow = true;
@@ -303,10 +300,7 @@ var List = (function() {
                 }
             }
         });
-        $container.delegate('.actions .edit', 'click', function() {
-            Table.toggleEditMode();
-        });
-        $container.delegate('.actions .delete', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
                 id: 'deleteList' + listId,
@@ -321,35 +315,32 @@ var List = (function() {
             function deleteList() {
                 this.hide();
                 Events.fire('remove_list', listId, function() {
-                    List.refresh(function() {
-                        Filter.listRefresh(function() {
-                            $('.filter > .list > .item[data-id="null"]').click();
-                        });
+                    Filter.refreshList(function() {
+                        $('.filter > .list > .item[data-id="all"]').click();
                     });
                 });
             }
+        });
+        $container.delegate('.tab', 'click', function() {
+            Filter.selectList($(this).data('id'));
         });
     }
 
     function refresh(callback) {
         var $selectedItem = $container.find('.tab.selected');
         var id = $selectedItem.data('id');
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select(id, function() {
-                if ($.isFunction(callback)) callback();
-            });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select(id, function() {
+            if ($.isFunction(callback)) callback();
         });
     }
 
     function select(id, callback) {
-        if (!id) {
-            id = null;
-            $actions.hide();
-        }
-        else {
-            $actions.show();
+        if (id === 'all' || id === 'all_not_listed') {
+            $actions.fadeOut(140);
+        } else {
+            cur.dataUser.isAdmin && $actions.fadeIn(300);
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
@@ -357,7 +348,7 @@ var List = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            Filter.listSelect($item.data('id'));
+            Filter.selectList(id);
         }
     }
 
@@ -375,8 +366,6 @@ var Filter = (function() {
     var $periodWrapper;
     var $period;
     var $list;
-    var $intervalWrapper;
-    var $interval;
 
     function init(callback) {
         $container = $('td > .filter');
@@ -385,11 +374,15 @@ var Filter = (function() {
         $audience = $('> .audience', $audienceWrapper);
         $periodWrapper = $('> .period-wrapper', $container);
         $period = $('> .period', $periodWrapper);
-        $intervalWrapper = $('> .interval-wrapper', $container);
-        $interval = $('> .interval', $intervalWrapper);
+
+        if (entriesPrecache && entriesPrecache.groupId) {
+            var listId = entriesPrecache.groupId;
+        } else {
+            listId = 'all';
+        }
 
         _initEvents();
-        listRefresh(callback);
+        refreshList(callback, listId);
     }
 
     function _initEvents() {
@@ -465,41 +458,6 @@ var Filter = (function() {
                 }
             }
         })();
-        (function() {
-            var $timeFrom = $interval.find('.timeFrom');
-            var $timeTo = $interval.find('.timeTo');
-            $($timeFrom).add($timeTo).datepicker({
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: 'd MM yy'
-            }).change(function(e) {
-                var $timeFrom = $interval.find('.timeFrom');
-                var $timeTo = $interval.find('.timeTo');
-                var dateFrom = $timeFrom.datepicker('getDate');
-                var dateTo = $timeTo.datepicker('getDate');
-                $timeTo.datepicker('option', 'minDate', dateFrom);
-                $timeFrom.datepicker('option', 'maxDate', dateTo);
-                Table.setInterval([
-                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
-                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
-                ]);
-            });
-            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
-            $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
-            var dateFrom = $timeFrom.datepicker('getDate');
-            var dateTo = $timeTo.datepicker('getDate');
-            $timeTo.datepicker('option', 'minDate', dateFrom);
-            $timeFrom.datepicker('option', 'maxDate', dateTo);
-            Table.setCurrentInterval([
-                intval($timeFrom.datepicker('getDate').getTime() / 1000),
-                intval($timeTo.datepicker('getDate') / 1000)
-            ]);
-        })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
             var period;
@@ -519,55 +477,138 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            var $item = $(this);
-            listSelect($item.data('id'));
+            changeState(this.getAttribute('data-id'), this.getAttribute('data-slug'));
         });
-        $list.delegate('.item > .bookmark', 'click', function(e) {
+        $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
-            var $icon = $(this);
-            var $item = $icon.closest('.item');
-            var listId = $item.data('id');
-            if (!$icon.hasClass('selected')) {
-                Events.fire('add_to_general', listId, function() {
-                    $icon.addClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
-                });
-            } else {
-                $icon.removeClass('selected');
-                Events.fire('remove_from_general', listId, function() {
-                    $icon.removeClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
+            var listId = $(this).closest('.item').data('id');
+
+            var box = new Box({
+                title: 'Перемещение списка',
+                html: 'Вы уверены, что хотите перенести список?',
+                buttons: [
+                    {label: 'Переместить', onclick: moveList},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function moveList() {
+                this.hide();
+                Events.fire('toggle_group_general', listId, function() {
+                    Filter.refreshList();
                 });
             }
         });
+        $list.delegate('.edit', 'click', function(e) {
+            e.stopPropagation();
+            var $item = $(this).closest('.item');
+            var $editField = $('<textarea class="edit-field"></textarea>');
+            var $saver = $('<span class="saver">Save</span>');
+            $item.append($editField);
+            $editField.focus();
+            $editField.val($item.attr('title'));
+            var saverAppendTimeout = setTimeout(function () {
+                $item.append($saver);
+                $saver.animate({'margin-right': 0});
+            }, 150);
+            $saver.click(function (e) {
+                e.stopPropagation();
+                saveEditor();
+            });
+            $editField
+                .on('click', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', function (e) {
+                    if (e.keyCode === KEY.ESC) {
+                        destroyEditor();
+                    }
+                })
+                .on('blur', destroyEditor);
+
+            function saveEditor() {
+                var id = $item.data('id');
+                Events.fire('rename_list', id, $editField.val(), function (success, data) {
+                    if (success) {
+                        $item.attr('title', data.groupName);
+                        $item.attr('data-slug', data.slug);
+                        $item.find('.text').text(data.groupName);
+                        changeState(id, data.slug, true/*doReplace*/);
+                    } else {
+                        Filter.refreshList();
+                    }
+                    destroyEditor();
+                });
+            }
+            function destroyEditor() {
+                clearTimeout(saverAppendTimeout);
+                $editField.remove();
+                $saver.remove();
+            }
+        });
+        // сортировка списков
+        if (cur.dataUser.isAdmin) {
+            var preventEvent = function () {
+                return false;
+            };
+            $list.filter('.private, .global').sortable({
+                axis: 'y',
+                tolerance: 'pointer',
+                update: function (_, ui) {
+                    var listId = ui.item.data('id');
+                    var index = $(this).find('.item').index(ui.item);
+                    Events.fire('sort_list', listId, index, function (success) {
+                        if (!success) {
+                            Filter.refreshList();
+                        }
+                    });
+                },
+                start: function (_, ui) { // нужно в FireFox (версия 22) для превента выбора списка при окончании драг-н-дропа
+                    ui.item.on('click', preventEvent);
+                },
+                stop: function (_, ui) {
+                    setInterval(function () { // отменяет хак для FF
+                        ui.item.off('click', preventEvent);
+                    }, 10);
+                }
+            });
+        }
     }
-    function listRefresh(callback) {
+
+    function refreshList(callback, maybeListId) {
         var $selectedItem = $list.find('.item.selected');
-        var id = $selectedItem.data('id');
+        var id = maybeListId || $selectedItem.data('id');
+        var $list_global  =  $('> .list.global', $container);
+        var $list_private =  $('> .list.private', $container);
+        var $list_shared  =  $('> .list.shared', $container);
         Events.fire('load_list', function(data) {
-            $list.html(tmpl(FILTER_LIST, {items: data}));
+            $list_global.html(tmpl(FILTER_LIST, {items: data.global}));
+            $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
+            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
             if (id) {
-                listSelect(id, function() {
+                selectList(id, function() {
                     if ($.isFunction(callback)) callback();
                 });
             } else if ($.isFunction(callback)) callback();
         });
     }
-    function listSelect(id, callback) {
+    function selectList(id, callback) {
+        var Def = new Deferred();
         var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
 
-        if ($.isFunction(callback)) callback();
-        else {
-            List.select($item.data('id'), function() {
-                Table.changeList($item.data('id'));
+        if ($.isFunction(callback)) {
+            callback();
+        } else {
+            var id = $item.data('id');
+            List.select(id, function() {
+                Table.changeList(id, $item.data('slug')).success(function () {
+                    Def.fireSuccess();
+                });
             });
         }
+        return Def;
     }
     function setSliderMin(min) {
         var $slider = $audience.find('> .slider-wrap');
@@ -581,31 +622,17 @@ var Filter = (function() {
         $slider.slider('value', $slider.slider('value'));
     }
 
-    function showInterval() {
-        $audienceWrapper.slideUp(400);
-        $periodWrapper.slideUp(400);
-        $intervalWrapper.slideDown(200);
-    }
-    function hideInterval() {
-        $audienceWrapper.slideDown(200);
-        $periodWrapper.slideDown(200);
-        $intervalWrapper.slideUp(400);
-    }
-
     return {
         init: init,
-        listRefresh: listRefresh,
-        listSelect: listSelect,
+        refreshList: refreshList,
+        selectList: selectList,
         setSliderMin: setSliderMin,
-        setSliderMax: setSliderMax,
-        showInterval: showInterval,
-        hideInterval: hideInterval
+        setSliderMax: setSliderMax
     };
 })();
 
 var Table = (function() {
     var $container;
-    var idEditMode = false;
     var dataTable = {};
     var pagesLoaded = 0;
     var currentListId = 0;
@@ -622,6 +649,97 @@ var Table = (function() {
         _initEvents();
         changeList();
         if ($.isFunction(callback)) callback();
+    }
+    function prepareServerData(dirtyData) {
+        var clearList = [];
+        var clearPeriod = [];
+        var clearListType = 0;
+
+        if (dirtyData.min_max) {
+            clearPeriod = [
+                dirtyData.min_max.min,
+                dirtyData.min_max.max
+            ];
+        }
+        if (dirtyData.group_type == 2) {
+            clearListType = 1;
+        }
+        if (!clearListType) {
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    var users = [];
+                    $.each(publicItem.admins, function(i, data) {
+                        users.push({
+                            userId: data.vk_id,
+                            userName: data.name,
+                            userPhoto: data.ava === 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                            userDescription: data.role || '&nbsp;'
+                        });
+                    });
+                    clearList.push({
+                        intId: publicItem.id,
+                        publicId: publicItem.vk_id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicFollowers: publicItem.quantity,
+                        publicGrowthNum: publicItem.diff_abs,
+                        publicGrowthPer: publicItem.diff_rel,
+                        publicIsActive: !!publicItem.active,
+                        publicInSearch: !!publicItem.in_search,
+                        publicVisitors: publicItem.visitors,
+                        publicAudience: publicItem.viewers,
+                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                        users: users
+                    });
+                });
+            }
+        } else {
+            /*
+            id - id
+            name - name
+            ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+            auth_likes_eff: 0 - Авторское/спарсенное: лайки
+            auth_posts: 0 - авторских постов
+            auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+            avg_vie_grouth: null - средний суточный прирост просмотров
+            avg_vis_grouth: null - средний суточный прирост уников
+            overall_posts: 68 - общее количество постов за период
+            posts_days_rel: 0 - в среднем постов за сутки
+            sb_posts_count: 56 - постов из источников
+            sb_posts_rate: 0 - средний рейтинг постов из источников
+            views: null - просмотры
+            visitors: null - посетители
+            */
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicPosts: publicItem.overall_posts,
+                        publicViews: publicItem.views,
+                        publicVisitors: publicItem.visitors,
+                        publicPostsPerDay: publicItem.posts_days_rel,
+                        publicSbPosts: publicItem.sb_posts_count,
+                        publicSbLikes: publicItem.sb_posts_rate,
+                        publicAuthorsPosts: publicItem.auth_posts,
+                        publicAuthorsLikes: publicItem.auth_likes_eff,
+                        publicAuthorsReposts: publicItem.auth_reposts_eff,
+                        publicGrowthViews: publicItem.avg_vie_grouth,
+                        publicGrowthVisitors: intval(publicItem.abs_vis_grow),
+                        publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
+                    });
+                });
+            }
+        }
+
+        var data = {
+            clearList: clearList,
+            clearPeriod: clearPeriod,
+            clearListType: clearListType
+        };
+
+        return data;
     }
     function loadMore() {
         var $el = $("#load-more-table");
@@ -823,7 +941,9 @@ var Table = (function() {
             }
         );
     }
-    function changeList(listId) {
+    function changeList(listId, slug) {
+        var Def = new Deferred();
+
         var defSearch = '';
         var defSortBy = 'growth';
         var defSortReverse = false;
@@ -837,41 +957,53 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1],
             timeFrom: currentInterval[0],
-            timeTo: currentInterval[1]
+            timeTo: currentInterval[1],
+            slug: slug
         };
 
-        Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentListId = listId;
-                currentSearch = defSearch;
-                currentSortBy = defSortBy;
-                currentSortReverse = defSortReverse;
-                dataTable = data;
-                if (!listType) {
-                    $container.html(tmpl(TABLE, {rows: data}));
-                    Filter.hideInterval();
-                } else {
-                    $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    Filter.showInterval();
-                }
-                $container.find('.' + currentSortBy).addClass('active');
-                if (!currentListId) {
-                    $container.removeClass('no-list-id');
-                } else {
-                    $container.addClass('no-list-id');
-                }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                Filter.setSliderMin(maxPeriod[0]);
-                Filter.setSliderMax(maxPeriod[1]);
-                $('#global-loader').fadeOut(200);
+        getTable(params, loadTableCallback);
+
+        function getTable(params, callback) {
+            if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
+                var data = prepareServerData(entriesPrecache);
+                callback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
+                entriesPrecache = false;
+            } else {
+                Events.fire('load_table', params, callback);
             }
-        );
+        }
+
+        function loadTableCallback(data, maxPeriod, listType) {
+            pagesLoaded = 1;
+            currentListType = listType;
+            currentListId = listId;
+            currentSearch = defSearch;
+            currentSortBy = defSortBy;
+            currentSortReverse = defSortReverse;
+            dataTable = data;
+            if (!listType) {
+                $container.html(tmpl(TABLE, {rows: data}));
+            } else {
+                $container.html(tmpl(OUR_TABLE, {rows: data}));
+            }
+            $container.find('.' + currentSortBy).addClass('active');
+            if (!currentListId) {
+                $container.removeClass('no-list-id');
+            } else {
+                $container.addClass('no-list-id');
+            }
+            if (dataTable.length < Configs.tableLoadOffset) {
+                $('#load-more-table').hide();
+            } else {
+                $('#load-more-table').show();
+            }
+            Filter.setSliderMin(maxPeriod[0]);
+            Filter.setSliderMax(maxPeriod[1]);
+            $('#global-loader').fadeOut(200);
+            Def.fireSuccess();
+        }
+
+        return Def;
     }
 
     function _initEvents() {
@@ -880,10 +1012,17 @@ var Table = (function() {
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
             var publicData;
+
             for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
+                if (dataTable[i].intId === publicId) {
+                    publicData = dataTable[i];
+                    break; // ------------------- BREAK
+                }
             }
-            _createDropdownList(e, publicData);
+            if (publicData) {
+                e.stopPropagation();
+                _createDropdown($(e.currentTarget), publicData);
+            }
         });
 
         $container.delegate('.action.delete-public', 'click', function(e) {
@@ -966,122 +1105,156 @@ var Table = (function() {
         })();
     }
 
-    function _createDropdownList(e, publicData) {
-        var $el = $(e.currentTarget);
+    function _createDropdown($el, publicData) {
         var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
+        var $dropdown;
         var $public = $el.closest('.public');
         var publicId = $public.data('id');
         var selectedLists = publicData.lists;
         var listId = null;
 
-        e.stopPropagation();
+        Events.fire('load_list', function(dataList) {
+            if (!$el.hasClass('selected')) {
+                var categories = [{
+                    title: 'Личные',
+                    items: dataList.private
+                }, {
+                    title: 'Категории',
+                    items: dataList.global
+                }];
+                
+                $dropdown = $(tmpl(DROPDOWN, {categories: categories})).appendTo('body');
 
-        if (!$dropdown) {
-            Events.fire('load_list', function(dataList) {
-                if (!$el.hasClass('selected')) {
-                    var lists = dataList;
-                    $dropdown = $(tmpl(DROPDOWN, {items: lists})).appendTo('body');
-                    var $input = $dropdown.find('input');
+                // поиск по категориям
+                initListSearch();
 
-                    $.each(selectedLists, function(i, listId) {
-                        $dropdown.find('[data-id=' + listId + ']').addClass('selected');
-                    });
+                var $input = $dropdown.find('.add-item');
+                $.each(selectedLists, function(i, listId) {
+                    $dropdown.find('[data-id=' + listId + ']').addClass('selected');
+                });
 
-                    $dropdown.delegate('.show-input', 'click', function() {
-                        $input.show().focus();
-                    });
-                    $dropdown.delegate('.hide-public', 'click', function() {
-                        var $item = $(this);
-                        if ($item.hasClass('selected')) {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.removeClass('selected');
-                                $public.css('opacity', 1);
-                            });
-                        } else {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.addClass('selected');
-                                $public.css('opacity',.5);
-                            });
+                $dropdown.delegate('.show-input', 'click', function() {
+                    $input.show().focus();
+                });
+                $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
+                    var $item = $(this);
+                    onChange($item);
+                });
+                $dropdown
+                    .delegate('.add-item', 'keyup', function(e) {
+                        if (e.keyCode === KEY.ENTER) {
+                            onSave($.trim($input.val()));
                         }
-                    });
-                    $dropdown.delegate('.item:not(.show-input):not(.hide-public)', 'mousedown', function(e) {
-                        var $item = $(this);
-                        onChange($item);
-                    });
-                    $dropdown.delegate('input', 'keyup blur', function(e) {
-                        var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != KEY.ENTER) return false;
-                        if (!text) return false;
-                        if (e.keyCode == KEY.ENTER) return $input.blur();
-                        return onSave(text);
-                    });
-                    $dropdown.bind('mousedown', function(e) {
-                        e.stopPropagation();
-                    });
-                    $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) return;
-                        $dropdown.hide();
-                        $el.removeClass('selected');
-                    });
+                    })
+                    .delegate('.add-item', 'blur', function () {
+                        onSave($.trim($input.val()));
+                    })
+                $dropdown.bind('mousedown', function(e) {
+                    e.stopPropagation();
+                });
+                $(document).mousedown(function() {
+                    if ($dropdown.is(':hidden')) {
+                        return;
+                    }
+                    $dropdown.hide();
+                    $el.removeClass('selected');
+                    setTimeout(function () {
+                        if (document.activeElement === document.body) {
+                            $(Configs.activeBeforeDropdown).focus();
+                        } 
+                    }, 50);
+                });
 
-                    function onSave(text) {
-                        Events.fire('add_list', text, function() {
-                            Events.fire('load_list', function(dataList) {
-                                $el.data('dropdown', false);
-                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
-                                $dropdown.html($tmpDropdown.html());
-                                $input = $dropdown.find('input');
-                                Filter.listRefresh();
-                            });
+                function onSave(groupName) {
+                    Events.fire('add_list', groupName, function() {
+                        Events.fire('load_list', function(dataList) {
+                            var all_lists = dataList.private;
+                            all_lists.push.apply(all_lists,dataList.global);
+
+                            var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
+                            $dropdown.html($tmpDropdown.html());
+                            $input = $dropdown.find('.add-item');
+                            $dropdown.find('.search').focus();
+                            Filter.refreshList();
                         });
-                    }
-                    function onChange($item) {
-                        listId = $item.data('id');
-                        var isSelected = !$item.hasClass('selected');
-                        var callback = function(data) {
-                            if (!data) return;
-                            $item.toggleClass('selected');
-                            if ($dropdown.find('.item.selected').length) {
-                                $el.find('.icon').removeClass('plus').addClass('select');
-                            } else {
-                                $el.find('.icon').removeClass('select').addClass('plus');
-                            }
-                        };
-                        if (isSelected) {
-                            Events.fire('add_to_list', publicId, listId, callback);
-                        } else {
-                            Events.fire('remove_from_list', publicId, listId, callback);
-                        }
-                    }
-                    $el.addClass('selected');
-                    $el.data('dropdown', $dropdown);
-                    $dropdown.show().css({
-                        top: offset.top + $el.outerHeight(),
-                        left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
                     });
                 }
-            });
-        } else {
+                function onChange($item) {
+                    listId = $item.data('id');
+                    var isSelected = !$item.hasClass('selected');
+                    var callback = function(data) {
+                        if (!data) return;
+                        $item.toggleClass('selected');
+                        if ($dropdown.find('.item.selected').length) {
+                            $el.find('.icon').removeClass('plus').addClass('select');
+                        } else {
+                            $el.find('.icon').removeClass('select').addClass('plus');
+                        }
+                    };
+                    if (isSelected) {
+                        Events.fire('add_to_list', publicId, listId, callback);
+                    } else {
+                        Events.fire('remove_from_list', publicId, listId, callback);
+                    }
+                }
+
+                showDropdown();
+                $dropdown.find('.search').focus();
+            }
+        });
+
+        function initListSearch() {
+            var previousDisplay = $dropdown.find('.item')[0].style.display;
+            var previousCategoryDisplay = $dropdown.find('.category')[0].style.display;
+            function clearSearch() {
+                var $search = $dropdown.find('.search');
+                $search.attr('value', '');
+                $search.trigger('change');
+                $search.focus();
+            }
+            var previousValue = '';
+            $dropdown
+                .delegate('.search', 'keyup drop paste change', function (e) {
+                    var val = $(this).val();
+                    if (('keyCode' in e) && e.keyCode === KEY.ESC) {
+                        return clearSearch(); // ---- RETURN
+                    }
+                    if (val !== previousValue) {
+                        var regexp = new RegExp(val, 'gim');
+                        
+                        $dropdown.find('.category').each(function() {
+                            var $category = $(this);
+                            var i = Number(this.getAttribute('data-number'));
+                            $category.find('.item').each(function () {
+                                var text = this.getAttribute('title');
+                                if (regexp.test(text)) {
+                                    var div = this.childNodes[0];
+                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                    this.style.display = previousDisplay;
+                                } else {
+                                    i--;
+                                    this.style.display = 'none';
+                                }
+                            });
+                            if (i === 0) {
+                                this.style.display = 'none';
+                            } else {
+                                this.style.display = previousCategoryDisplay;
+                            }
+                        });
+                        previousValue = val;
+                    }
+                })
+                .delegate('.clear-search', 'click', clearSearch);
+        }
+
+        function showDropdown() {
+            Configs.activeBeforeDropdown = Configs.activeElement;
             $el.addClass('selected');
             $dropdown.show().css({
                 top: offset.top + $el.outerHeight(),
                 left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
             });
-        }
-    }
-
-    function toggleEditMode() {
-        editMode(!idEditMode);
-    }
-
-    function editMode(on) {
-        idEditMode = on;
-        var $list = $container.find('.list-body');
-        if (on) {
-            $list.addClass('edit-mode');
-        } else {
-            $list.removeClass('edit-mode');
         }
     }
 
@@ -1097,30 +1270,8 @@ var Table = (function() {
         search: search,
         setPeriod: setPeriod,
         setAudience: setAudience,
-        editMode: editMode,
-        toggleEditMode: toggleEditMode,
         setInterval: setInterval,
-        setCurrentInterval: setCurrentInterval
-    };
-})();
-
-var Counter = (function(){
-    var $container;
-
-    function init( callback ){
-        $container = $('#listed-counter');
-        if( cur.dataUser.isEditor ) {
-            $container.show();
-        }
-        refresh();
-    }
-
-    function refresh(){
-       $container.find('span').text( cur.dataUser.listed );
-    }
-
-    return {
-        init: init,
-        refresh: refresh
+        setCurrentInterval: setCurrentInterval,
+        prepareServerData: prepareServerData
     };
 })();

@@ -24,6 +24,7 @@
             <label>{lang:vt.sourceFeed.title}</label>
             <?= FormHelper::FormInput( $prefix . '[title]', $SourceFeed->title, 'title', null, array( 'size' => 80 ) ); ?>
         </div>
+
         <div data-row="externalId" class="row required">
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $SourceFeed->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
@@ -31,6 +32,10 @@
         <div data-row="useFullExport" class="row required">
             <label>{lang:vt.sourceFeed.useFullExport}</label>
             <?= FormHelper::FormCheckBox( $prefix . '[useFullExport]', null, 'useFullExport', null, $SourceFeed->useFullExport ); ?>
+        </div>
+        <div data-row="onlyOurs" class="row required">
+            <label>{lang:vt.sourceFeed.onlyOurs}</label>
+            <?= FormHelper::FormCheckBox(  'onlyOurs', null, 'onlyOurs', null, $onlyOuers ); ?>
         </div>
         <div data-row="targetFeedIds" class="row">
             <label>{lang:vt.sourceFeed.targetFeedIds}</label>

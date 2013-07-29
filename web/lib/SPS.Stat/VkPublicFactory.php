@@ -11,7 +11,7 @@ class VkPublicFactory implements IFactory {
 
     /** VkPublic instance mapping  */
     public static $mapping = array (
-        'class'       => 'VkPublic'
+      'class'     => 'VkPublic'
     , 'table'     => 'stat_publics_50k'
     , 'view'      => 'get_publics'
     , 'flags'     => array( 'CanPages' => 'CanPages' )
@@ -33,91 +33,127 @@ class VkPublicFactory implements IFactory {
             , 'max'         => 280
             )
         ,'short_name' => array(
-                'name'          => 'short_name'
+              'name'        => 'short_name'
             , 'type'        => TYPE_STRING
             , 'max'         => 50
             )
         ,'diff_abs' => array(
-                'name'          => 'diff_abs'
+              'name'        => 'diff_abs'
             , 'type'        => TYPE_INTEGER
             )
         ,'diff_rel' => array(
-                'name'          => 'diff_rel'
+              'name'        => 'diff_rel'
             , 'type'        => TYPE_FLOAT
             )
         ,'quantity' => array(
-                'name'          => 'quantity'
+              'name'        => 'quantity'
             , 'type'        => TYPE_INTEGER
             )
         ,'sh_in_main' => array(
-                'name'          => 'sh_in_main'
+              'name'        => 'sh_in_main'
             , 'type'        => TYPE_BOOLEAN
             )
         ,'diff_abs_week' => array(
-                'name'          => 'diff_abs_week'
+              'name'        => 'diff_abs_week'
             , 'type'        => TYPE_INTEGER
             )
         ,'diff_abs_month' => array(
-                'name'          => 'diff_abs_month'
+              'name'        => 'diff_abs_month'
             , 'type'        => TYPE_INTEGER
             )
         ,'diff_rel_week' => array(
-                'name'          => 'diff_rel_week'
+              'name'        => 'diff_rel_week'
             , 'type'        => TYPE_FLOAT
             )
         ,'diff_rel_month' => array(
-                'name'          => 'diff_rel_month'
+              'name'        => 'diff_rel_month'
             , 'type'        => TYPE_FLOAT
             )
         ,'is_page' => array(
-                'name'          => 'is_page'
+              'name'        => 'is_page'
             , 'type'        => TYPE_BOOLEAN
             )
         ,'visitors' => array(
-                'name'          => 'visitors'
+              'name'        => 'visitors'
             , 'type'        => TYPE_INTEGER
             )
         ,'in_search' => array(
-                'name'          => 'in_search'
+              'name'        => 'in_search'
             , 'type'        => TYPE_BOOLEAN
             )
         ,'closed' => array(
-                'name'          => 'closed'
+              'name'        => 'closed'
             , 'type'        => TYPE_BOOLEAN
             )
         ,'active' => array(
-                'name'          => 'active'
+              'name'        => 'active'
             , 'type'        => TYPE_BOOLEAN
             )
         ,'visitors_week' => array(
-                'name'          => 'visitors_week'
+              'name'        => 'visitors_week'
             , 'type'        => TYPE_INTEGER
             )
         ,'visitors_month' => array(
-                'name'          => 'visitors_month'
+              'name'        => 'visitors_month'
             , 'type'        => TYPE_INTEGER
             )
         ,'updated_at' => array(
-                'name'          => 'updated_at'
+              'name'        => 'updated_at'
             , 'type'        => TYPE_DATETIME
             )
         ,'vk_public_id' => array(
-                'name'          => 'vk_public_id'
+              'name'        => 'vk_public_id'
             , 'type'        => TYPE_INTEGER
             , 'key'         => true
-            ))
+        )
+        ,'viewers' => array(
+              'name'        => 'viewers'
+            , 'type'        => TYPE_INTEGER
+        )
+        ,'viewers_week' => array(
+              'name'        => 'viewers_week'
+            , 'type'        => TYPE_INTEGER
+        )
+        ,'viewers_month' => array(
+              'name'        => 'viewers_month'
+            , 'type'        => TYPE_INTEGER
+        ),'inLists' => array(
+              'name'        => 'viewers_month'
+            , 'type'        => TYPE_BOOLEAN
+        ))
     , 'lists'     => array()
     , 'search'    => array(
             'page' => array(
-                'name'         => 'page'
-            , 'type'       => TYPE_INTEGER
-            , 'default'    => 0
+                '  name'       => 'page'
+                , 'type'       => TYPE_INTEGER
+                , 'default'    => 0
             )
-        ,'pageSize' => array(
-                'name'         => 'pageSize'
-            , 'type'       => TYPE_INTEGER
-            , 'default'    => 25
-            ))
+            ,'pageSize' => array(
+                  'name'       => 'pageSize'
+                , 'type'       => TYPE_INTEGER
+                , 'default'    => 25
+            )
+            ,'_vk_public_id' => array(
+                  'name'         => 'vk_public_id'
+                , 'type'         => TYPE_INTEGER
+                , 'searchType'   => SEARCHTYPE_ARRAY
+            )
+            ,'_quantityLE' => array(
+                  'name'         => 'quantity'
+                , 'type'         => TYPE_INTEGER
+                , 'searchType'   => SEARCHTYPE_LE
+            )
+            ,'_quantityGE' => array(
+                  'name'         => 'quantity'
+                , 'type'         => TYPE_INTEGER
+                , 'searchType'   => SEARCHTYPE_GE
+            )
+            ,'_nameIL'     => array(
+                  'name'         => 'name'
+                , 'type'         => TYPE_STRING
+                , 'searchType'   => SEARCHTYPE_ILIKE
+            )
+        )
     );
 
     /** @return array */

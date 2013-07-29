@@ -15,7 +15,7 @@
             );
             $vkHref = 'https://oauth.vk.com/authorize?'.
                     'client_id='. AuthVkontakte::$AppId .
-                    '&scope=stats,groups,offline'.
+                    '&scope=stats,groups,offline,wall'.
                     '&redirect_uri='. $vkRedirectUrl .
                     '&display=page'.
                     '&response_type=code';

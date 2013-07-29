@@ -1,4 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
     <action name="GetSettings" />
+
+ <group name="androidsetting">
+    <action name="GetAndroidSettingList">
+      <path>androidSettings/GetAndroidSettingListAction</path>
+    </action>
+    <action name="SaveAndroidSetting">
+      <path>androidSettings/SaveAndroidSettingAction</path>
+      <redirects>
+        <redirect name="success" path="vt://androidSettings/" />
+      </redirects>
+    </action>
+    <action name="DeleteAndroidSetting">
+      <path>androidSettings/SaveAndroidSettingAction</path>
+      <parameters>
+        <request>
+          <param name="action">'delete'</param>
+        </request>
+      </parameters>
+    </action>
+  </group>
+  <group name="banner">
+    <action name="GetBannerList">
+      <path>banners/GetBannerListAction</path>
+    </action>
+    <action name="SaveBanner">
+      <path>banners/SaveBannerAction</path>
+      <redirects>
+        <redirect name="success" path="vt://banners/" />
+      </redirects>
+    </action>
+    <action name="DeleteBanner">
+      <path>banners/SaveBannerAction</path>
+      <parameters>
+        <request>
+          <param name="action">'delete'</param>
+        </request>
+      </parameters>
+    </action>
+  </group>
+  <group name="category">
+    <action name="GetCategoryList">
+      <path>categories/GetCategoryListAction</path>
+    </action>
+    <action name="SaveCategory">
+      <path>categories/SaveCategoryAction</path>
+      <redirects>
+        <redirect name="success" path="vt://categories/" />
+      </redirects>
+    </action>
+    <action name="DeleteCategory">
+      <path>categories/SaveCategoryAction</path>
+      <parameters>
+        <request>
+          <param name="action">'delete'</param>
+        </request>
+      </parameters>
+    </action>
+  </group>
+  <group name="iossetting">
+    <action name="GetIOSsettingList">
+      <path>iOSsettings/GetIOSsettingListAction</path>
+    </action>
+    <action name="SaveIOSsetting">
+      <path>iOSsettings/SaveIOSsettingAction</path>
+      <redirects>
+        <redirect name="success" path="vt://iOSsettings/" />
+      </redirects>
+    </action>
+    <action name="DeleteIOSsetting">
+      <path>iOSsettings/SaveIOSsettingAction</path>
+      <parameters>
+        <request>
+          <param name="action">'delete'</param>
+        </request>
+      </parameters>
+    </action>
+  </group>
+  <group name="promotionpost">
+    <action name="GetPromotionPostList">
+      <path>promotionPost/GetPromotionPostListAction</path>
+    </action>
+    <action name="SavePromotionPost">
+      <path>promotionPost/SavePromotionPostAction</path>
+      <redirects>
+        <redirect name="success" path="vt://promotionPost/" />
+      </redirects>
+    </action>
+    <action name="DeletePromotionPost">
+      <path>promotionPost/SavePromotionPostAction</path>
+      <parameters>
+        <request>
+          <param name="action">'delete'</param>
+        </request>
+      </parameters>
+    </action>
+  </group>
+
 </actions>

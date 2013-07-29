@@ -27,6 +27,9 @@
                 </request>
             </parameters>
         </action>
+        <action name="RunTest">
+            <path>RunTest</path>
+        </action>
     </group>
 
     <group name="Daemons">
@@ -35,6 +38,9 @@
         </action>
         <action name="SyncSources">
             <path>daemons/SyncSources</path>
+        </action>
+        <action name="SyncFbSources">
+            <path>daemons/SyncFbSources</path>
         </action>
         <action name="SyncSuggestedPosts">
             <path>daemons/SyncSuggestedPosts</path>
@@ -74,6 +80,9 @@
         </action>
         <action name="GetLinkInfoControl">
             <path>controls/GetLinkInfoControl</path>
+        </action>
+        <action name="GetQueuedSuggestsControl">
+            <path>controls/GetQueuedSuggestsControl</path>
         </action>
         <action name="SaveLinkInfoControl">
             <path>controls/SaveLinkInfoControl</path>

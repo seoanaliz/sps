@@ -13,24 +13,44 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
-
-            $group_id  =  Request::getInteger( 'groupId' );
+            $group_id  =  Request::getInteger('groupId');
             $user_id   =  AuthVkontakte::IsAuth();
-            if ( !StatUsers::is_Sadmin( $user_id ) ) {
-                echo  ObjectHelper::ToJSON(array('response' => false));
-                die();
+            if (!$group_id) {
+                die( ObjectHelper::ToJSON(array('response' => false)));
             }
 
-            $query = 'UPDATE ' . TABLE_STAT_GROUPS . ' SET general = NOT general where group_id=@group_id';
-            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger(  '@user_id',  $user_id  );
-            $cmd->SetInteger(  '@group_id', $group_id );
-            $cmd->SetInteger(  '@type',     StatGroups::GROUP_GLOBAL );
-            $cmd->Execute();
-//            echo $cmd->GetQuery();
-            echo  ObjectHelper::ToJSON( array( 'response' => true ) );
+            if (StatAccessUtility::CanManageGlobalGroups($user_id, Group::STAT_GROUP)) {
+                $group = GroupFactory::GetById($group_id);
+                if (!empty($group)) {
+                    if ($group->type == GroupsUtility::Group_Global) {
+                        $group->type = GroupsUtility::Group_Private;
+                        GroupUserFactory::DeleteByMask( array(
+                            'groupId'       =>  $group_id,
+                            'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
+                            'sourceType'    =>  Group::STAT_GROUP
+                        ));
+                        $tmp = new GroupUser($group_id, $user_id, Group::STAT_GROUP);
+                        $tmp->place = GroupsUtility::get_next_index_groupUser( $user_id, Group::STAT_GROUP);
+                        GroupUserFactory::Add( $tmp);
+                    } else {
+                        //нумерация
+                        $tmp = new GroupUser($group_id, GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
+                        $tmp->place = GroupsUtility::get_next_index_groupUser( GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
+                        GroupUserFactory::Add($tmp);
 
+                        $group->type = GroupsUtility::Group_Global;
+                        GroupUserFactory::DeleteByMask(array(
+                            'groupId'       =>  $group_id,
+                            'vkId'          =>  $user_id,
+                            'sourceType'    =>  Group::STAT_GROUP
+                        ));
+                    }
+                    GroupFactory::Update($group);
+                    EntryGetter::updateSlugs(false);
+                    die(ObjectHelper::ToJSON(array('response' => true)));
+                }
+            };
+            die(ObjectHelper::ToJSON(array('response' => false)));
         }
     }
 ?>

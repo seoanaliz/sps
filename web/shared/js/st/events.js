@@ -45,40 +45,20 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
-
     get_user: function(userId, callback) {
-    simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
-        callback(dirtyData);
-    });
-    },
-    load_list: function(callback) {
-        simpleAjax('getGroupList', function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData.list))
-                $.each(dirtyData.list, function(i, data) {
-                    clearData.push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.fave
-                    });
-                });
-            cur.dataUser.listed = intval(dirtyData.listed_by);
-            callback(clearData);
+        simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
+            callback(dirtyData);
         });
     },
-    load_bookmarks: function(callback) {
-        simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData)) {
-                $.each(dirtyData.list, function(i, data) {
-                    clearData.push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.general
-                    });
-                });
+    load_list: function(callback) {
+        $.ajax({
+            url: controlsRoot + 'getGroupList/',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
             }
-            callback(clearData);
         });
     },
     load_table: function(options, callback) {
@@ -138,94 +118,22 @@ var Eventlist = {
             timeTo: params.timeTo,
             show: 1
         }, function(dirtyData) {
-            var clearList = [];
-            var clearPeriod = [];
-            var clearListType = 0;
-
-            if (dirtyData.min_max) {
-                clearPeriod = [
-                    dirtyData.min_max.min,
-                    dirtyData.min_max.max
-                ];
-            }
-            if (dirtyData.group_type == 2) {
-                clearListType = 1;
-            }
-            if (!clearListType) {
-                if ($.isArray(dirtyData.list)) {
-                    $.each(dirtyData.list, function(i, publicItem) {
-                        var users = [];
-                        $.each(publicItem.admins, function(i, data) {
-                            users.push({
-                                userId: data.vk_id,
-                                userName: data.name,
-                                userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
-                                userDescription: data.role || '&nbsp;'
-                            });
-                        });
-                        clearList.push({
-                            publicId: publicItem.id,
-                            publicImg: publicItem.ava,
-                            publicName: publicItem.name,
-                            publicFollowers: publicItem.quantity,
-                            publicGrowthNum: publicItem.diff_abs,
-                            publicGrowthPer: publicItem.diff_rel,
-                            publicIsActive: !!publicItem.active,
-                            publicInSearch: !!publicItem.in_search,
-                            publicVisitors: publicItem.visitors,
-                            publicAudience: publicItem.viewers,
-                            lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
-                            users: users
-                        });
-                    });
-                }
-            } else {
-                /*
-                id - id
-                name - name
-                ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
-                auth_likes_eff: 0 - Авторское/спарсенное: лайки
-                auth_posts: 0 - авторских постов
-                auth_reposts_eff: 0 - Авторское/спарсенное: репосты
-                avg_vie_grouth: null - средний суточный прирост просмотров
-                avg_vis_grouth: null - средний суточный прирост уников
-                overall_posts: 68 - общее количество постов за период
-                posts_days_rel: 0 - в среднем постов за сутки
-                sb_posts_count: 56 - постов из источников
-                sb_posts_rate: 0 - средний рейтинг постов из источников
-                views: null - просмотры
-                visitors: null - посетители
-                */
-                if ($.isArray(dirtyData.list)) {
-                    $.each(dirtyData.list, function(i, publicItem) {
-                        clearList.push({
-                            publicId: publicItem.id,
-                            publicImg: publicItem.ava,
-                            publicName: publicItem.name,
-                            publicPosts: publicItem.overall_posts,
-                            publicViews: publicItem.views,
-                            publicVisitors: publicItem.visitors,
-                            publicPostsPerDay: publicItem.posts_days_rel,
-                            publicSbPosts: publicItem.sb_posts_count,
-                            publicSbLikes: publicItem.sb_posts_rate,
-                            publicAuthorsPosts: publicItem.auth_posts,
-                            publicAuthorsLikes: publicItem.auth_likes_eff,
-                            publicAuthorsReposts: publicItem.auth_reposts_eff,
-                            publicGrowthViews: publicItem.avg_vie_grouth,
-                            publicGrowthVisitors: intval(publicItem.abs_vis_grow),
-                            publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
-                        });
-                    });
-                }
-            }
-            callback(clearList, clearPeriod, clearListType);
+            var data = Table.prepareServerData(dirtyData);
+            callback(data.clearList, data.clearPeriod, data.clearListType);
         });
     },
-    add_list: function(title, callback) {
-        simpleAjax('setGroup', {
-            groupName: title
-        }, function(dirtyData) {
-            callback(true);
+    add_list: function(groupName, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroup/',
+            dataType: 'json',
+            data: {
+                groupName: groupName
+            },
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
+            }
         });
     },
     update_list: function(public_id, list_id, title, callback) {
@@ -249,8 +157,6 @@ var Eventlist = {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
-            cur.dataUser.listed = intval(dirtyData.listed_by);
-            Counter.refresh();
             callback(true);
         });
     },
@@ -271,21 +177,7 @@ var Eventlist = {
             callback(true);
         });
     },
-    hide_public: function(public_id, callback) {
-        simpleAjax('togglePublVisibil', {
-            publId: public_id
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
-    add_to_general: function(listId, callback) {
-        simpleAjax('toggleGroupGeneral', {
-            groupId: listId
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
-    remove_from_general: function(listId, callback) {
+    toggle_group_general: function(listId, callback) {
         simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
@@ -298,6 +190,42 @@ var Eventlist = {
             recId: userId
         }, function() {
             callback(true);
+        });
+    },
+    sort_list: function(groupId, index, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroupOrder/',
+            data: {
+                groupId: groupId,
+                index: index
+            },
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            }
+        });
+    },
+    rename_list: function(listId, listName, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroup/',
+            data: {
+                groupId: listId,
+                groupName: listName
+            },
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(true, resp.data);
+                } else {
+                    callback(false);
+                }
+            }
         });
     }
 };
