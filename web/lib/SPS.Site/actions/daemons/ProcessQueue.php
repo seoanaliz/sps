@@ -95,6 +95,7 @@ sql;
                 }
 
                 foreach ($tokens as $token) {
+
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
                         return true;

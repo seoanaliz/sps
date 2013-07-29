@@ -45,7 +45,6 @@ sql;
 
                 foreach ($targetFeed->publishers as $publisher) {
                     try {
-                        $sender->vk_app_seckey = $publisher->publisher->vk_seckey;
                         $sender->vk_access_token = $publisher->publisher->vk_token;
                         if ( $sender->delete_post($articleQueue->externalId)) {
                             $articleQueue->isDeleted = true;
