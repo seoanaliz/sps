@@ -1280,8 +1280,8 @@ var Table = (function() {
             Configs.activeBeforeDropdown = Configs.activeElement;
             $el.addClass('selected');
             $dropdown.show().css({
-                top: offset.top + $el.outerHeight(),
-                left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
+                top: offset.top + 29,
+                left: offset.left - $dropdown.outerWidth() + 40
             });
         }
     }
