@@ -81,8 +81,13 @@ sql;
                 if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
                     return false;
                 }
+                $roles = array();
 
-                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version );
+                //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
+                if ( !$targetFeed->isOur ) {
+                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR);
+                }
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
                 if ( !$targetFeed->isOur ) {
                     if( isset($tokens[$articleQueue->author] )) {
