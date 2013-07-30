@@ -59,7 +59,13 @@
                     , 'type'        => TYPE_INTEGER
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                'vkIdIn' => array(
+                      'name'          => 'vkId'
+                    , 'type'          => TYPE_STRING
+                    , 'searchType'    => SEARCHTYPE_ARRAY
+                )
+            )
             , 'templates' => array()
         );
 

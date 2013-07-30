@@ -8,7 +8,7 @@ class DeletePost
 {
     public function Execute()
     {
-        set_time_limit(1000);
+        set_time_limit(100);
         Logger::LogLevel(ELOG_DEBUG);
         ConnectionFactory::BeginTransaction();
 
@@ -39,14 +39,17 @@ sql;
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             if ($targetFeed->type == TargetFeedUtility::VK) {
 
-                if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleQueue)) {
+                if (empty($targetFeed) || empty($articleQueue)) {
                     continue;
                 }
 
-                foreach ($targetFeed->publishers as $publisher) {
+
+                $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR);
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles);
+
+                foreach ($tokens as $token ) {
                     try {
-                        $sender->vk_app_seckey = $publisher->publisher->vk_seckey;
-                        $sender->vk_access_token = $publisher->publisher->vk_token;
+                        $sender->vk_access_token = $token;
                         if ( $sender->delete_post($articleQueue->externalId)) {
                             $articleQueue->isDeleted = true;
                             ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));

@@ -1606,7 +1606,7 @@ var LeftPanelWidget = Event.extend({
                                     $input = $menu.find('input');
                                     $input.focus();
                                     $input.keydown(function(e) {
-                                        if (e.keyCode == KEY.ENTER) {
+                                        if (e.keyCode === KEY.ENTER) {
                                             var newUserGroupModel = new UserGroupModel();
                                             newUserGroupModel.name($input.val());
                                             Control.fire('add_list', {
