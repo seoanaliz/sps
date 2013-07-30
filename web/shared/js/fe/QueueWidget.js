@@ -142,7 +142,7 @@ var QueueWidget = Event.extend({
 
     initQueue: function() {
         var t = this;
-        var $queue = this.$queue;
+        var $queue = t.$queue;
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
@@ -179,10 +179,10 @@ var QueueWidget = Event.extend({
         $queue.delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+            if (e.type === 'keydown' && e.keyCode != KEY.ENTER) {
                 return;
             }
-            if (e.type == 'focusout' && !e.originalEvent) {
+            if (e.type === 'focusout' && !e.originalEvent) {
                 return;
             }
 
@@ -285,10 +285,10 @@ var QueueWidget = Event.extend({
         $queue.delegate('.time-of-removal-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+            if (e.type === 'keydown' && e.keyCode != KEY.ENTER) {
                 return;
             }
-            if (e.type == 'focusout' && !e.originalEvent) {
+            if (e.type === 'focusout' && !e.originalEvent) {
                 return;
             }
 
