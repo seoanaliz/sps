@@ -32,7 +32,7 @@
 
             $search = array(
                 'targetFeedId'  =>  $targetFeedId,
-                '_role'         =>  array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR),
+                '_role'         =>  array( UserFeed::ROLE_EDITOR ),
             );
 
             $userFeeds = UserFeedFactory::Get($search);
