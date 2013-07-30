@@ -85,7 +85,7 @@ sql;
 
                 //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
                 if ( !$targetFeed->isOur ) {
-                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR);
+                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
                 }
                 $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
