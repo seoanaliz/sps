@@ -3,6 +3,17 @@ var QueueWidget = Event.extend({
         var t = this;
         t.$queue = $('#queue');
         t.initAutoload();
+
+        // наивное решение проблемы скролла ленты отправки в начальном положении #18695
+        var handleFirstLoad = function () {
+            t.off('changeCurrentPage', handleFirstLoad);
+
+            setTimeout(function () {
+                t.$queue.css('padding-top', '1px');
+                t.$queue.scrollTop(1);
+            }, 50);
+        };
+        t.on('changeCurrentPage', handleFirstLoad);
     },
 
     scrollAtEditBegin: 0,
