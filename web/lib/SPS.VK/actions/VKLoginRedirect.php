@@ -58,7 +58,8 @@
                     if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
-                        ($apiAnswer->permissions & VkHelper::PERM_WALL)
+                        ($apiAnswer->permissions & VkHelper::PERM_WALL) &&
+                        ($apiAnswer->permissions & VkHelper::PERM_PHOTO)
                     ) {
                         $existingToken = AccessTokenFactory::GetOne( array(
                             'vkId' => $vkId,
