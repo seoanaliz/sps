@@ -8,7 +8,6 @@
         protected $vk_access_token;
         protected $vk_group_id;         //id паблика, куда постим
         protected $vk_aplication_id;    //id аппа, с которого постим
-        protected $vk_app_seckey;       //
         protected $link;                //ссылка на источник
         protected $sign;                //ссыль на пользователя, пока неактивно
         protected $header;              //заголовок ссылки
@@ -27,7 +26,6 @@
             $this->post_photo_array     = $post_date -> photo_array; //массив путей к фоткам
             $this->post_text            = $post_date -> text;
             $this->vk_group_id          = $post_date -> group_id;
-            $this->vk_app_seckey        = $post_date -> vk_app_seckey;
             $this->vk_access_token      = $post_date -> vk_access_token;
             $this->audio_id             = $post_date -> audio_id;//массив вида array('videoXXXX_YYYYYYY','...')
             $this->video_id             = $post_date -> video_id;//массив вида array('audioXXXX_YYYYYYY','...')
@@ -514,23 +512,5 @@
     }
 
 
-    
-    //данные тестового паблика
-    //$vk_group_id = 27421965;
-    //$vk_aplication_id = 2842244; //id аппа
-    //$vk_access_token = 'c7ac1842c3ddb889c3ddb88974c3f6e60dcc3ddc3d8801f85c16a3c7336abd4'; //
-    //$vk_app_seckey = V1us1w3lbkoaapuYiddg;
-    
-    //заголовок - поле header
-//    try{
-//        echo 'start<br>';
-//        $a = new Vsend($post_array);
-//        echo $a->send_post();
-//    
-//     
-//    } catch (Exception $e){
-//        $err = $e->getMessage();
-//        echo '<br>'.$err;
-//    
-//    }
+
     ?>

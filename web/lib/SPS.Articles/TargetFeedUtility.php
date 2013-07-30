@@ -10,12 +10,14 @@
 
         const FB = 'fb';
 
-        const vk_album = 'vk_album';
+        const VK_ALBUM = 'vk_album';
+
+
 
         public static $Types = array(
             self::VK        => 'ВКонтакте',
             self::FB        => 'Facebook',
-            self::vk_album  => 'VK альбом',
+            self::VK_ALBUM  => 'VK альбом',
         );
     }
 

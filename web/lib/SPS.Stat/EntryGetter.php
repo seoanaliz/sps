@@ -58,17 +58,16 @@ class EntryGetter {
         );
 
         //поиск по названию - глобальный
-        if($search_name) {
-            if( strlen( $search_name) > 5) {
-                $search_name = mb_substr($search_name,0, (mb_strlen($search_name) - 3));
-
+        if( $search_name ) {
+            if( mb_strlen( $search_name ) > 5) {
+                $search_name = mb_substr( $search_name, 0, ( mb_strlen( $search_name ) - 2 ));
             }
             $search['_nameIL'] = $search_name;
         } elseif( $group_id == GroupsUtility::Group_Id_Special_All_Not ) {
             $search['inLists'] = false;
         } elseif( $group_id ) {
 
-            $group_entries_by_group = GroupEntryFactory::Get(array(
+            $group_entries_by_group = GroupEntryFactory::Get( array(
                 'groupId'   =>  $group_id,
                 'sourceType'=>  Group::STAT_GROUP,
             ));
@@ -88,9 +87,8 @@ class EntryGetter {
             $sort_by .= $period_suffixes[$period];
         $sort_direction   = $sort_reverse ? ' ASC ': ' DESC ';
         $options    =   array(
-            BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST ' ))
+            BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST,vk_public_id ' ))
         );
-
         $vkPublics = VkPublicFactory::Get( $search, $options );
         $diff_abs = 'diff_abs' .  $period_suffixes[$period];
         $diff_rel = 'diff_rel' .  $period_suffixes[$period];
@@ -111,7 +109,7 @@ class EntryGetter {
                 'vk_id'     =>  $vkPublic->vk_id,
                 'quantity'  =>  $vkPublic->quantity,
                 'name'      =>  $vkPublic->name,
-                'ava'       =>  $vkPublic->ava,
+                'ava'       =>  trim($vkPublic->ava),
                 'group_id'  =>  $groups_ids,
                 'admins'    =>  array(),
                 'diff_abs'  =>  $vkPublic->$diff_abs,
@@ -119,7 +117,7 @@ class EntryGetter {
                 'visitors'  =>  $vkPublic->$visitors,
                 'viewers'   =>  $vkPublic->$viewers,
                 'in_search' =>  $vkPublic->in_search == 't' ? 1 : 0,
-                'active'    =>  $vkPublic->active== 't' ? true : false
+                'active'    =>  $vkPublic->active == 't' ? true : false
             );
         }
 
@@ -214,8 +212,8 @@ class EntryGetter {
     {
         $sql = 'SELECT ava
                 FROM ' . TABLE_STAT_PUBLICS .
-               ' WHERE vk_id=@publ_id';
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+               ' WHERE vk_id = @publ_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
         $cmd->SetInteger( '@publ_id', $public_id);
         $ds = $cmd->Execute();
         $ds->Next();
@@ -227,14 +225,14 @@ class EntryGetter {
     {
         $resul = array();
         $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
         $cmd->SetInteger( '@publ_id',  $publ );
         $ds = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
         while ( $ds->next()) {
             $vk_id = $ds->getValue( 'vk_id', TYPE_INTEGER );
             if ( $vk_id == $sadmin ) {
-                if ( isset( $resul[0] ) )
+                if ( isset( $resul[0] ))
                     $k = $resul[0];
 
                 $resul[0] = $this->get_row($ds, $structure);
@@ -277,9 +275,9 @@ class EntryGetter {
         return $result->GetInteger('group_id');
     }
 
-    public static  function updateSlugs( $show_results = true)
+    public static  function updateSlugs( $check_for_id = null, $show_results = true, $rename = false )
     {
-        $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .'  WHERE
+        $sql = 'SELECT group_id, name, slug FROM '. TABLE_STAT_GROUPS .'  WHERE
             type = ' .GroupsUtility::Group_Global . '
             AND status != 2
             AND source = ' . Group::STAT_GROUP .'
@@ -292,7 +290,11 @@ class EntryGetter {
         $result = $cmd->Execute();
         while ( $result->next()) {
             $name = $result->GetString('name');
-            $slug = self::transliterate($name);
+            if( $rename ) {
+                $slug = self::transliterate($name);
+            } else  {
+                $slug = $result->GetString('slug');
+            }
             if (!isset($found[$slug])) {
                 $found[$slug] = 1;
             } else {
@@ -304,6 +306,10 @@ class EntryGetter {
             }
 
             $id = $result->GetInteger('group_id');
+            if( $check_for_id && $check_for_id != $id ) {
+                continue;
+            }
+
             $updateResult = self::saveSlugForId($id, $slug);
             if( $show_results ) {
                 echo "$id - $name - $slug  [$updateResult]<br />";
@@ -365,9 +371,11 @@ class EntryGetter {
         $sql = 'UPDATE '. TABLE_STAT_GROUPS .'
             SET slug = @slug
             WHERE group_id = @group_id';
+
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetString('@slug', $slug);
         $cmd->SetInteger('@group_id', $id);
+
         $updateResult = $cmd->ExecuteNonQuery();
         return $updateResult;
     }

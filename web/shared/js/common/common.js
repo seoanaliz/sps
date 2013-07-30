@@ -352,7 +352,7 @@ function windowOpen(url, windowName) {
                 var firstImageHeight;
                 var options = {};
 
-                if (typeof hardPosition == 'object') {
+                if (typeof hardPosition === 'object') {
                     options = $.extend({
                         width: $wrap.width(),
                         height: $wrap.height()
