@@ -27,12 +27,15 @@
             return $access_token;
         }
 
-        public static function getAllTokens( $targetFeedId, $version = 0 ) {
+        public static function getAllTokens( $targetFeedId, $version = 0, $roles = array()) {
             $result = array();
+            if( empty( $roles )) {
+                $roles = array( UserFeed::ROLE_EDITOR );
+            }
 
             $search = array(
                 'targetFeedId'  =>  $targetFeedId,
-                '_role'         =>  array( UserFeed::ROLE_EDITOR ),
+                '_role'         =>  $roles,
             );
 
             $userFeeds = UserFeedFactory::Get($search);

@@ -8,7 +8,7 @@ class DeletePost
 {
     public function Execute()
     {
-        set_time_limit(1000);
+        set_time_limit(100);
         Logger::LogLevel(ELOG_DEBUG);
         ConnectionFactory::BeginTransaction();
 
@@ -43,7 +43,9 @@ sql;
                     continue;
                 }
 
-                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version);
+
+                $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR);
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles);
 
                 foreach ($tokens as $token ) {
                     try {
