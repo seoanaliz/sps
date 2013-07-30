@@ -78,7 +78,7 @@ sql;
             }
 
             if ($targetFeed->type == TargetFeedUtility::VK ) {
-                if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
+                if (empty($targetFeed)  || empty($articleRecord)) {
                     return false;
                 }
                 $roles = array();
@@ -96,11 +96,10 @@ sql;
                         $tokens = array();
                     }
                 } else {
-                    shuffle($tokens);
+                    shuffle( $tokens );
                 }
 
                 foreach ($tokens as $token) {
-
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
                         return true;
