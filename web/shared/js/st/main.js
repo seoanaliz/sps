@@ -104,21 +104,12 @@ function makeVkButton() {
     var $loginInfo = $('.login-info');
     if ($loginInfo.length) {
         var vkHref = 'https://oauth.vk.com/authorize?' +
-<<<<<<< HEAD
-                    'client_id='+ Configs.appId +
-                    '&scope=stats,groups,offline,wall,photos' +
-                    '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
-                    '&display=page' +
-                    '&response_type=code';
-        $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
-=======
                 'client_id=' + Configs.appId +
-                '&scope=stats,groups,offline,wall' +
+                '&scope=stats,groups,offline,wall,photos' +
                 '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
                 '&display=page' +
                 '&response_type=code';
         $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
->>>>>>> origin/master
     }
     $loginInfo.css({opacity: 1});
 }
