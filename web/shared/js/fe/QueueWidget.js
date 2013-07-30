@@ -371,6 +371,27 @@ var QueueWidget = Event.extend({
         t.initInlineCreate();
     },
 
+    getFirstVisibleSlot: function() {
+        var t = this;
+        var pages = t.$queue.find('.queue-page');
+        for (var i = 0; i < pages.length; i++) {
+            var $page = $(pages[i]);
+            var pageTop = $page.position().top;
+            var slots = $page.find('.slot');
+            for (var k = 0; k < slots.length; k++) {
+                var $slot = $(slots[k]);
+                var position = $slot.position().top + pageTop;
+                if (position > 0) {
+                    return {$slot: $slot, position: position}; // RETURN
+                }
+            }
+        }
+        return null;
+    },
+
+    /**
+     * Пометить день надписью "Пусто", если в нём нет ни одного слота
+     */
     markIfEmpty: function($elem, doScroll) {
         if (typeof doScroll === 'undefined') {
             doScroll = true;

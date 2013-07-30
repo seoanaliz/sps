@@ -143,33 +143,35 @@ var RightPanelWidget = Event.extend({
         var $rightPanelBackground = t.$rightPanelBackground;
         $rightPanelExpander.click(function() {
             if ($rightPanel.hasClass('expanded')) {
-                t.compact();
+                t.transform('compact');
             } else {
-                t.expand();
+                t.transform('expand');
             }
         });
         $rightPanelBackground.click(function() {
-            t.compact();
+            t.transform('compact');
         });
     },
 
-    expand: function() {
+    transform: function(transform) {
         var t = this;
-        var $rightPanel = t.$rightPanel;
-        var $rightPanelBackground = t.$rightPanelBackground;
-        $rightPanel.addClass('expanded');
-        $rightPanel.find('.expanded-post .images').imageComposition();
-        $rightPanelBackground.show();
-        $('html').width($('html').width()).css('overflow-y', 'hidden');
-    },
-
-    compact: function() {
-        var t = this;
-        var $rightPanel = t.$rightPanel;
-        var $rightPanelBackground = t.$rightPanelBackground;
-        $rightPanel.removeClass('expanded');
-        $rightPanelBackground.hide();
-        $('html').width('auto').css('overflow-y', 'scroll');
+        var firstVisibleData = t.getQueueWidget().getFirstVisibleSlot();
+        if (transform === 'expand') {
+            t.$rightPanel.addClass('expanded');
+            //$rightPanel.find('.expanded-post .images').imageComposition();
+            t.$rightPanelBackground.show();
+            $('html').width($('html').width()).css('overflow-y', 'hidden');
+        } else {
+            t.$rightPanel.removeClass('expanded');
+            t.$rightPanelBackground.hide();
+            $('html').width('auto').css('overflow-y', 'scroll');
+        }
+        if (firstVisibleData) {
+            var positionBefore = firstVisibleData.position;
+            var positionAfter = firstVisibleData.$slot.position().top + firstVisibleData.$slot.closest('.queue-page').position().top;
+            var $queue = t.getQueueWidget().$queue;
+            $queue.scrollTop($queue.scrollTop() - (positionBefore - positionAfter));
+        }
     },
 
     initVkAvatar: function() {
