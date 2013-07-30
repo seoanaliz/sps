@@ -106,6 +106,9 @@ function makeVkButton() {
         var vkHref = 'https://oauth.vk.com/authorize?' +
                 'client_id=' + Configs.appId +
                 '&scope=stats,groups,offline,wall,photos' +
+                'client_id=' + Configs.appId +
+                '&scope=stats,groups,offline,wall' +
+
                 '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
                 '&display=page' +
                 '&response_type=code';

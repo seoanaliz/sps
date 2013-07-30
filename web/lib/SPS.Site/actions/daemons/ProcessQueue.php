@@ -120,7 +120,6 @@ sql;
          * @param TargetFeed $targetFeed
          * @param ArticleQueue $articleQueue
          * @param ArticleRecord $articleRecord
-         * @param Publisher $publisher
          * @param Article $article
          */
         private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article) {

@@ -7,7 +7,6 @@
      */
     class EditorsUtility {
 
-        const TempPublisherId = 92;
 
         //делаем новые фиды, назначаем/удаляем админа
         public static function SetTargetFeeds( $userVkId, $publicsIds )
@@ -35,7 +34,7 @@
                     $targetFeed = new TargetFeed();
                     $targetFeed->externalId  =  $publicId;
                     $targetFeed->title       =  $publicInfo[$publicId]['name'];
-                    $targetFeed->publisherId =  self::TempPublisherId;
+                    $targetFeed->publisherId =  2;
                     $targetFeed->statusId    =  StatusUtility::Enabled;
                     $targetFeed->type        =  TargetFeedUtility::VK;
                     $targetFeed->period      =  60;
@@ -69,7 +68,6 @@
             if( !empty( $newUserFeeds )) {
                 UserFeedFactory::AddRange( $newUserFeeds);
             }
-
 
         }
 

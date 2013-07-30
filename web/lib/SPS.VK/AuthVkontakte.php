@@ -9,7 +9,7 @@
 
         public static $AuthSecret;
         
-        public static $Version = 2;
+        public static $Version = 3;
 
         protected static $CookieSecret = 't2MJebh87ZmYdN2i2btAXGLv+Z1NxrYcA4AgHNQMYvM=';
 

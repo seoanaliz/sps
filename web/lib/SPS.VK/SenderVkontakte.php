@@ -505,6 +505,8 @@
 
             //первый запрос, получение адреса для заливки фото
             $res = VkHelper::api_request( $method_get_server, $params, false );
+                print_r($params);
+
             sleep( 0.4 );
             if ( !isset( $res->upload_url )) {
                 if ( isset ( $res->error) && in_array( $res->error->error_code, $this->change_admin_errors )) {
