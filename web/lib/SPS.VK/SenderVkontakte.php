@@ -19,7 +19,6 @@
         public  $vk_access_token;
         private $vk_group_id;                   //id паблика, куда постим
         private $vk_aplication_id;              //id аппа, с которого постим
-        public  $vk_app_seckey;
         private $link;                          //ссылка на источник
         private $sign;                          //ссыль на пользователя, пока неактивно
         private $header;                        //заголовок ссылки
@@ -44,7 +43,6 @@
                 $this->post_photo_array =   isset( $post_data['photo_array'] ) ? $post_data['photo_array'] : array();
                 $this->post_text        =   $this->text_corrector( $post_data['text'] );
                 $this->vk_group_id      =   $post_data['group_id'] ;
-                $this->vk_app_seckey    =   $post_data['vk_app_seckey'];
                 $this->vk_access_token  =   $post_data['vk_access_token'];
                 $this->audio_id         =   isset( $post_data['audio_id'] ) ? $post_data['audio_id'] : array();//массив вида array('videoXXXX_YYYYYYY','...')
                 $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')

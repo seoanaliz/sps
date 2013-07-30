@@ -82,16 +82,22 @@ sql;
                     return false;
                 }
 
-                $publishers = array();
-
-                foreach( $targetFeed->publishers as $ptf ) {
-                    $publishers[] = $ptf;
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version );
+                //отправка в ненаши - только с токена запланировавшего пост
+                if ( !$targetFeed->isOur ) {
+                    if( isset($tokens[$articleQueue->author] )) {
+                        $tokens = array( $tokens[$articleQueue->author]);
+                    } else {
+                        $tokens = array();
+                    }
+                } else {
+                    shuffle($tokens);
                 }
 
-                $targetFeed->publishers = $publishers;
-                foreach ($targetFeed->publishers as $publisher) {
+                foreach ($tokens as $token) {
+
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
                         return true;
                     } catch (Exception $Ex) {
                     }
@@ -101,7 +107,7 @@ sql;
                 Logger::Warning($err);
 
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
-                  
+                return true;
             }
         }
 
@@ -113,7 +119,7 @@ sql;
          * @param Publisher $publisher
          * @param Article $article
          */
-        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher, $article) {
+        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article) {
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
             if ($isWithSmallPhoto) {
                 $articleRecord->photos = array();
@@ -126,8 +132,7 @@ sql;
             $post_data = array(
                 'text' => $articleRecord->content,
                 'group_id' => $targetFeed->externalId,
-                'vk_app_seckey' => $publisher->vk_seckey,
-                'vk_access_token' => $publisher->vk_token,
+                'vk_access_token' => $token,
                 'photo_array' => array(),
                 'audio_id' => array(),
                 'video_id' => array(),
@@ -177,7 +182,7 @@ sql;
                 }
             } catch (ChangeSenderException $Ex){
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
-                    'failed to post from publisher ' . $publisher->publisherId .', ' . $Ex->getMessage());
+                    'failed to post from token' . $token . ' ' . $Ex->getMessage());
                 throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
