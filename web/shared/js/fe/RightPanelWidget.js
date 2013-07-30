@@ -158,7 +158,6 @@ var RightPanelWidget = Event.extend({
         var firstVisibleData = t.getQueueWidget().getFirstVisibleSlot();
         if (transform === 'expand') {
             t.$rightPanel.addClass('expanded');
-            //$rightPanel.find('.expanded-post .images').imageComposition();
             t.$rightPanelBackground.show();
             $('html').width($('html').width()).css('overflow-y', 'hidden');
         } else {
