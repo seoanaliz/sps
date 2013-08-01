@@ -346,9 +346,12 @@ function windowOpen(url, windowName) {
                     };
                     return {type: 'photo', photo: photo};
                 });
-                //log('wrap, width, height', $wrap, $wrap.width(), $wrap.height());
                 var result = processThumbs($wrap.width(), Math.round($wrap.width() * 2 / 3) , attachments, {wide: true});
-                //log('imageComposition result:', result);
+                log('imageComposition result:', result);
+                $wrap.css({
+                    'width': result.width + 'px',
+                    'height': result.height + 'px'
+                });
                 $.each(result.thumbs, function (i, thumb) {
                     var crop = cropImage(thumb, thumb.width, thumb.height);
                     $($images[i]).css({
@@ -357,11 +360,11 @@ function windowOpen(url, windowName) {
                         'margin-left': crop.marginLeft + 'px',
                         'margin-top': crop.marginTop + 'px'
                     })
-                    .closest('.post-image').css({
+                    .closest('.image-wrap').css({
                         'width': thumb.width,
                         'height': thumb.height,
-                        'margin-right': thumb.lastColumn ? margin : '0',
-                        'margin-bottom': thumb.lastRow ? margin : '0'
+                        'margin-right': thumb.lastColumn ? '0' : margin,
+                        'margin-bottom': thumb.lastRow ? '0' : margin
 //                        height: 340
 //                        image: Object
 //                        lastColumn: 1
