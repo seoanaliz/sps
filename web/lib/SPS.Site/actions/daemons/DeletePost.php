@@ -43,8 +43,7 @@ sql;
                     continue;
                 }
 
-
-                $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR);
+                $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR );
                 $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles);
 
                 foreach ($tokens as $token ) {
