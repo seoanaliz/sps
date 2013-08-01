@@ -355,8 +355,8 @@ function windowOpen(url, windowName) {
                 $.each(result.thumbs, function (i, thumb) {
                     var crop = cropImage(thumb, thumb.width, thumb.height);
                     $($images[i]).css({
-                        'width': crop.width + 'px',
-                        'height': crop.height + 'px',
+                        'width': Math.round(crop.width) + 'px',
+                        'height': Math.round(crop.height) + 'px',
                         'margin-left': crop.marginLeft + 'px',
                         'margin-top': crop.marginTop + 'px'
                     })
