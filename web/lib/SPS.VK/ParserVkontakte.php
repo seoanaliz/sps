@@ -12,6 +12,10 @@
             'w', 'z', 'y', 'x', 'r', 'q', 'p', 'o', 'm', 's'
         );
 
+        public static $photo_sizes_rev = array(
+             's', 'm', 'o', 'p', 'q', 'r', 'x', 'y', 'z'
+        );
+
         const false_created_time = '1970-01-01 00:00:00';
         const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
@@ -309,11 +313,22 @@
 
             foreach( $result as $photo ) {
                 $tmp_url_list = ArrayHelper::Collapse( $photo->sizes, 'type', false );
+
+                $small = isset( $tmp_url_list['p'] ) ? $tmp_url_list['p']->src :
+                    self::get_next_photo( $tmp_url_list, 'p',$reverseOrder = true);
+                if( !$small ) {
+                    $small = self::get_next_photo( $tmp_url_list, 'p');
+                }
+                $middle = isset( $tmp_url_list['x'] ) ? $tmp_url_list['x']->src :
+                    self::get_next_photo( $tmp_url_list, 'x',$reverseOrder = true);
+                if( !$middle ) {
+                    $small = self::get_next_photo( $tmp_url_list, 'x');
+                }
                 $photo_ids[$photo->owner_id . '_' . $photo->pid] = array(
-                    'small'   => $tmp_url_list['p']->src,
-                    'middle'  => $tmp_url_list['x']->src,
+                    'small'   => $small,
+                    'middle'  => $middle,
                     'original'=> isset( $tmp_url_list['w'] ) ? $tmp_url_list['w']->src :
-                        self::get_next_biggest_photo( $tmp_url_list, 'w'),
+                        self::get_next_photo( $tmp_url_list, 'w'),
                 );
             }
 
@@ -328,9 +343,11 @@
 
         }
 
-        public static function get_next_biggest_photo( $photo_urls, $look_from_size ) {
+        public static function get_next_photo( $photo_urls, $look_from_size, $revers = false ) {
             $trig = false;
-            foreach( self::$photo_sizes as $size ) {
+            $sort_array = $revers ? self::$photo_sizes_rev :self::$photo_sizes;
+
+            foreach( $sort_array as $size ) {
                 if ( !$trig && $size == $look_from_size ) {
                     $trig = true;
                     continue;
