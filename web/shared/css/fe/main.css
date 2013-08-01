@@ -347,13 +347,6 @@ i {
   margin-top: 10px;
   overflow: hidden;
 }
-.images-ready .post-image {
-  background-color: #eee;
-  padding: 0;
-  outline: 3px solid #fff;
-  overflow: hidden;
-  text-align: center;
-}
 .images-ready > * {
   position: relative;
   display: block;
@@ -895,18 +888,9 @@ i {
   opacity: 0.3;
 }
 .post-image {
-  overflow-x: hidden;
-  overflow-y: hidden;
-  display: inline-block;
-  padding-right: 5px;
-  padding-bottom: 5px;
+  overflow: hidden;
+  margin: 0 6px 6px 0;
   float: left;
-}
-.post-image .first {
-  max-height: 320px;
-}
-.post-image .else {
-  max-width: 150px;
 }
 .editImagePopup {
   position: absolute;
