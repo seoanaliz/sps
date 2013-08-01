@@ -41,10 +41,14 @@
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
-            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp(), $queueId)) {
-                $result['message'] = 'Time between posts is too small';
-                echo ObjectHelper::ToJSON($result);
-                return false;
+
+            if ( $queueId ) {
+                $limits_check = ArticleUtility::checkLimitsForFeed($gridLine->targetFeedId, $itemDate->getTimestamp(), $queueId );
+                if( $limits_check ) {
+                    $result['message'] = $limits_check;
+                    echo ObjectHelper::ToJSON($result);
+                    return false;
+                }
             }
 
             $object = new GridLineItem();
