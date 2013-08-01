@@ -8,6 +8,10 @@
         private $page_short_name;
         private $count;
 
+        public static $photo_sizes = array(
+            'w', 'z', 'y', 'x', 'r', 'q', 'p', 'o', 'm', 's'
+        );
+
         const false_created_time = '1970-01-01 00:00:00';
         const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
@@ -153,7 +157,7 @@
         //
         public function  get_posts( $page_number )
         {
-            sleep(rand( 1,12 ));
+//            sleep(rand( 1,12 ));
             $offset = $page_number * self::PAGE_SIZE;
 
             if (!isset($this->count))
@@ -233,15 +237,13 @@
                     foreach( $post->attachments as $attachment ) {
                         switch( $attachment->type ) {
                             case 'photo':
-                                $url = self::get_biggest_picture( $attachment );
-
-                                 $photo[] =
-                                     array(
-                                         'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
-                                         'desc' =>  '',
-                                         'url'  => $url,
-                                     );
-                                 break;
+                                $photo[] =
+                                    array(
+                                        'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
+                                        'desc' =>  '',
+                                        'url'  =>  array(),
+                                    );
+                                break;
                             case 'graffiti':
                                  $photo[] =
                                      array(
@@ -279,7 +281,68 @@
                 );
 
             }
-            return $result_posts_array;
+
+
+
+            return self::get_photo_urls( $result_posts_array );
+        }
+
+        public static function get_photo_urls( $posts )
+        {
+            $photo_ids = array();
+            foreach( $posts as $post ) {
+                if (!empty( $post['photo'])) {
+                    foreach( $post['photo'] as $photo ) {
+                        $photo_ids[$photo['id']] = array();
+                    }
+
+                }
+            }
+            if( empty( $photo_ids))
+                return false;
+            $params = array(
+                'photos'        =>  implode(',', array_keys( $photo_ids )),
+                'photo_sizes'   =>  1
+            );
+            $result = VkHelper::api_request( 'photos.getById', $params );
+
+
+            foreach( $result as $photo ) {
+                $tmp_url_list = ArrayHelper::Collapse( $photo->sizes, 'type', false );
+                $photo_ids[$photo->owner_id . '_' . $photo->pid] = array(
+                    'small'   => $tmp_url_list['p']->src,
+                    'middle'  => $tmp_url_list['x']->src,
+                    'original'=> isset( $tmp_url_list['w'] ) ? $tmp_url_list['w']->src :
+                        self::get_next_biggest_photo( $tmp_url_list, 'w'),
+                );
+            }
+
+            foreach( $posts as &$post ) {
+                if (!empty( $post['photo'])) {
+                    foreach( $post['photo'] as &$photo ) {
+                        $photo['url'] = $photo_ids[$photo['id']];
+                    }
+                }
+            }
+            return $posts;
+
+        }
+
+        public static function get_next_biggest_photo( $photo_urls, $look_from_size ) {
+            $trig = false;
+            foreach( self::$photo_sizes as $size ) {
+                if ( !$trig && $size == $look_from_size ) {
+                    $trig = true;
+                    continue;
+                }
+
+                if( !$trig ) {
+                    continue;
+                }
+                if ( isset($photo_urls[$size]))
+                    return $photo_urls[$size]->src;
+            }
+            return false;
         }
 
         /** @return Article */
@@ -360,9 +423,10 @@
 
         public static function get_biggest_picture( $data )
         {
-
+            // разные форматы ответа на запрос фото со стены и из альбома
             if( isset($data->photo))
                 $data = $data->photo;
+            $i = 0;
             if ( isset( $data->src_xxxbig )) {
                 $url = $data->src_xxxbig;
             } elseif ( isset( $data->src_xxbig )) {
