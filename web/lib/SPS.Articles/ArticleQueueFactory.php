@@ -152,9 +152,15 @@
                     'name'         => 'startDate'
                     , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_LE
-                ), 'createdAtNE' => array(
+                )
+                , 'createdAtNE' => array(
                       'name'       => 'createdAt'
                     , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_NOT_EQUALS
+                )
+                , 'articleQueueIdNE' => array(
+                      'name'       => 'articleQueueId'
+                    , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_NOT_EQUALS
                 ))
         );

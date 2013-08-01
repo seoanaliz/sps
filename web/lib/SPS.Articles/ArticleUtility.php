@@ -7,9 +7,14 @@
      */
     class ArticleUtility {
 
-        /** in minutes*/
-        const PostsPerDayInFeed = 100;
-        const TimeBeetwenPosts  = 4;
+        /** in seconds*/
+        const TimeBeetwenPosts   =  59;
+
+        const PostsPerDayInFeed  =  150;
+
+        const PostsPerHourInFeed =  15;
+
+        const PostsPer7HourByUser = 40;
 
         public static function IsTopArticleWithSmallPhoto(SourceFeed $sourceFeed, ArticleRecord $articleRecord) {
             if (!empty($articleRecord->photos) && count($articleRecord->photos) == 1 && SourceFeedUtility::IsTopFeed($sourceFeed)) {
@@ -43,10 +48,10 @@
                 , 'articleQueue'
                 , $queueId
                 , "Changed by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId
-                    . ", queueId is " . $queueId
-                    . ", old time is " . $oldDate->modify('+1 minute')->defaultFormat()
-                    . ", new time is " . $newDate->modify('+1 minute')->defaultFormat()
-                    . ", public is " . $targetFeed->title
+                . ", queueId is " . $queueId
+                . ", old time is " . $oldDate->modify('+1 minute')->defaultFormat()
+                . ", new time is " . $newDate->modify('+1 minute')->defaultFormat()
+                . ", public is " . $targetFeed->title
             );
         }
 
@@ -58,25 +63,27 @@
             $object->endDate->modify('+9 minutes');
         }
 
-        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp, $queueId = '' )
+        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp, $articleQueueId )
         {
             $intervalTime = new DateTimeWrapper(date('r', $newPostTimestamp));
             $from = new DateTimeWrapper(date('r', $newPostTimestamp));
-            $from->modify( '- ' . self::TimeBeetwenPosts . ' minutes');
+            $from->modify( '- ' . self::TimeBeetwenPosts . ' seconds');
             $search = array(
                 'targetFeedId'  =>  $targetFeedId,
                 'startDateFrom' =>  $from,
-                'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . 'minutes')
+                'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . ' seconds')
             );
 
+            if( $articleQueueId ) {
+                $search['articleQueueIdNE'] = $articleQueueId;
+            }
             $check = ArticleQueueFactory::Get( $search );
             //удаляем из проверки сам пост
-            if(isset( $check[$queueId]))
-                unset( $check[$queueId] );
+
             return !empty( $check );
         }
 
-        public static function IsArticlesLimitReached($targetFeedId, $newPostTimestamp)
+        public static function IsArticlesLimitReached($targetFeedId, $newPostTimestamp, $articleQueueId )
         {
             $midnightNextDay = new DateTimeWrapper(date('r', $newPostTimestamp));
             $midnightNextDay->modify('+ 1 day')->modify('midnight');
@@ -89,9 +96,81 @@
                 'startDateTo'   =>  $midnightNextDay,
                  BaseFactoryPrepare::PageSize => 1
             );
+            if( $articleQueueId ) {
+                $search['articleQueueIdNE'] = $articleQueueId;
+            }
 
             $articlesCount = ArticleQueueFactory::Count( $search);
             return $articlesCount >= self::PostsPerDayInFeed;
         }
+
+        public static function IsInIntervalLimitsForFeed( $targetFeedId, $newPostTimestamp, $articleQueueId )
+        {
+            //добавляем 31 секунду, учитывая сдвиг в ArticleUtility::BuildDates
+            $intervalStart = new DateTimeWrapper(date('r', $newPostTimestamp + 31));
+            $h = $intervalStart->format('H');
+            $intervalStart->setTime($h, 0, 0);
+            $intervalStop  = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $intervalStop->setTime($h + 1, 0, 0);
+            //ограничение по количеству постов в ленте
+
+            $search = array(
+                'targetFeedId'  =>  $targetFeedId,
+                'startDateFrom' =>  $intervalStart,
+                'startDateTo'   =>  $intervalStop,
+                 BaseFactoryPrepare::PageSize => 1
+            );
+
+            if( $articleQueueId ) {
+                $search['articleQueueIdNE'] = $articleQueueId;
+            }
+            $articlesCount = ArticleQueueFactory::Count( $search);
+            return $articlesCount < self::PostsPerHourInFeed;
+        }
+
+        public static function IsInInervalsLimitsForUser($authorVkId, $newPostTimestamp )
+        {
+            $intervalStart  = new DateTimeWrapper(date('r', $newPostTimestamp));
+
+            $intervalStart->modify('- 7 hour');
+            $intervalStop   = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $intervalStop->
+            $intervalStop->modify('+ 7 hour');
+            $intervalMiddle = new DateTimeWrapper(date('r', $newPostTimestamp));
+
+            //ограничение по количеству постов в ленте
+            $search = array(
+                'author'  =>  $authorVkId,
+                'startDateFrom' =>  $intervalStart,
+                'startDateTo'   =>  $intervalMiddle,
+                 BaseFactoryPrepare::PageSize => 1
+            );
+
+            $firstIntervalCount = ArticleQueueFactory::Count( $search);
+
+            $search['startDateFrom'] = $intervalMiddle;
+            $search['startDateTo']   = $intervalStop;
+
+            $secondIntervalCount = ArticleQueueFactory::Count( $search);
+            return  (
+                  $firstIntervalCount   < self::PostsPer7HourByUser &&
+                  $secondIntervalCount  < self::PostsPer7HourByUser
+            );
+
+        }
+
+        public static function checkLimitsForFeed( $targetFeedId, $newPostTimestamp, $articleQueueId )
+        {
+            if( self::IsTooCloseToPrevious($targetFeedId, $newPostTimestamp, $articleQueueId)) {
+                return 'Time between posts is too small';
+            } elseif ( self::IsArticlesLimitReached($targetFeedId, $newPostTimestamp, $articleQueueId)) {
+                return 'Too many posts this day';
+            } elseif ( !self::IsInIntervalLimitsForFeed($targetFeedId, $newPostTimestamp, $articleQueueId)) {
+                return 'Too many posts this hour';
+            }
+            return false;
+        }
+
+
     }
 ?>
