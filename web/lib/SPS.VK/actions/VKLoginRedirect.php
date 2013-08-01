@@ -63,10 +63,11 @@
                         ($apiAnswer->permissions & VkHelper::PERM_WALL) // исправляете здесь, поправьте и в сообщении об ошибке ниже
                     ) {
                         $existingToken = AccessTokenFactory::GetOne( array(
-                            'vkId' => $vkId,
+                            'vkId'  => $vkId,
+                            'appId' => AuthVkontakte::$AppId,
                         ));
 
-                        if (!$existingToken) {
+                        if ( !$existingToken ) {
                             self::addAccessToken($vkId, $accessToken);
                         } else {
                             $existingToken->createdAt   = DateTimeWrapper::Now();
