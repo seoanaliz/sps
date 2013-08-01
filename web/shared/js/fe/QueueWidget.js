@@ -30,7 +30,7 @@ var QueueWidget = Event.extend({
             timestamp: timestamp,
             targetFeedId: Elements.rightdd(),
             type: Elements.rightType()
-        })
+        });
     },
 
     loadSingleDay: function(timestamp) {
@@ -39,7 +39,7 @@ var QueueWidget = Event.extend({
             timestamp: timestamp,
             targetFeedId: Elements.rightdd(),
             type: Elements.rightType()
-        })
+        });
     },
 
     /**

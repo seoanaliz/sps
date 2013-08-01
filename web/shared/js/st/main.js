@@ -995,6 +995,7 @@ var Table = (function() {
         function getTable(params, callback) {
             if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
                 var data = prepareServerData(entriesPrecache);
+                listId = entriesPrecache.groupId;
                 callback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
                 entriesPrecache = false;
             } else {
