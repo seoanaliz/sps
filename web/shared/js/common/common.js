@@ -771,6 +771,20 @@ function windowOpen(url, windowName) {
         return {width: img_w, height: img_h, marginLeft: x, marginTop: thumb.isAlbum && thumb.single ? 0 : y};
     }
 
+    function clone(obj, req) {
+        var newObj = $.isArray(obj) ? [] : {};
+        for (var i in obj) {
+            if ($.browser.webkit && (i === 'layerX' || i === 'layerY'))
+                continue;
+            if (req && typeof(obj[i]) === 'object' && i !== 'prototype') {
+                newObj[i] = clone(obj[i]);
+            } else {
+                newObj[i] = obj[i];
+            }
+        }
+        return newObj;
+    }
+
     $.fn[PLUGIN_NAME] = function(method) {
         return methods.init.apply(this, arguments);
     };
