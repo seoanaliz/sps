@@ -323,8 +323,13 @@
         }
 
         public static function GetArticlePhoto($photoItem, $size = 'original') {
+            //навтыкаем костылей для обратной совместимости
             if (!empty($photoItem['url'])) {
-                return $photoItem['url'];
+                if( is_array($photoItem['url'])) {
+                    return $photoItem['url'][$size];
+                } else {
+                    return $photoItem['url'];
+                }
             } else {
                 return self::GetFilePath( 'Article', 'photos', $size, $photoItem['filename'], MediaServerManager::$MainLocation);
             }
