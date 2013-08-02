@@ -287,7 +287,7 @@
             }
 
             $posts = self::get_photo_urls( $result_posts_array );
-            if( !$posts ) {
+            if( !is_array($posts )) {
                 throw new Exception ('failed to load posts' );
             }
             return $posts;
