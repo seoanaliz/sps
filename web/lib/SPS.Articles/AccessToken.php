@@ -30,5 +30,8 @@
         /** @var int */
         public $statusId;
 
+        /** @var int */
+        public $version;
+
     }
 ?>

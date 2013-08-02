@@ -36,7 +36,7 @@
                 ,'bannerId' => array(
                     'name'          => 'bannerId'
                     , 'type'        => TYPE_STRING
-                    , 'key'         => true
+
                 )
                 ,'prob' => array(
                     'name'          => 'prob'
@@ -53,7 +53,12 @@
                 ,'active' => array(
                     'name'          => 'active'
                     , 'type'        => TYPE_STRING
-                ))
+                )
+                ,'id' => array(
+                      'name'        => 'id'
+                    , 'type'        => TYPE_INTEGER
+                    , 'key'         => true
+            ))
             , 'lists'     => array()
             , 'search'    => array()
         );

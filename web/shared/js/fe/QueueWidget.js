@@ -3,6 +3,17 @@ var QueueWidget = Event.extend({
         var t = this;
         t.$queue = $('#queue');
         t.initAutoload();
+
+        // наивное решение проблемы скролла ленты отправки в начальном положении #18695
+        var handleFirstLoad = function () {
+            t.off('changeCurrentPage', handleFirstLoad);
+
+            setTimeout(function () {
+                t.$queue.css('padding-top', '1px');
+                t.$queue.scrollTop(1);
+            }, 50);
+        };
+        t.on('changeCurrentPage', handleFirstLoad);
     },
 
     scrollAtEditBegin: 0,
@@ -19,7 +30,7 @@ var QueueWidget = Event.extend({
             timestamp: timestamp,
             targetFeedId: Elements.rightdd(),
             type: Elements.rightType()
-        })
+        });
     },
 
     loadSingleDay: function(timestamp) {
@@ -28,7 +39,7 @@ var QueueWidget = Event.extend({
             timestamp: timestamp,
             targetFeedId: Elements.rightdd(),
             type: Elements.rightType()
-        })
+        });
     },
 
     /**
@@ -58,6 +69,9 @@ var QueueWidget = Event.extend({
                     Elements.initLinks($page);
                     $page.find('.post .images').imageComposition();
                     $page.find('.post.blocked').draggable('disable');
+                    setTimeout(function () {
+                        $page.find('.expanded-post .images-ready').imageComposition();
+                    }, 200);
                 } else {
                     t.$queue.empty();
                 }
@@ -102,7 +116,9 @@ var QueueWidget = Event.extend({
                 Elements.initLinks($loadedPage);
                 $loadedPage.find('.post .images').imageComposition();
                 $loadedPage.find('.post.blocked').draggable('disable');
-                //t.$queue.trigger('scroll');
+                setTimeout(function () {
+                    $page.find('.expanded-post .images-ready').imageComposition();
+                }, 200);
                 Def.fireSuccess($loadedPage);
             }
         });
@@ -137,7 +153,7 @@ var QueueWidget = Event.extend({
 
     initQueue: function() {
         var t = this;
-        var $queue = this.$queue;
+        var $queue = t.$queue;
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
@@ -174,10 +190,10 @@ var QueueWidget = Event.extend({
         $queue.delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+            if (e.type === 'keydown' && e.keyCode != KEY.ENTER) {
                 return;
             }
-            if (e.type == 'focusout' && !e.originalEvent) {
+            if (e.type === 'focusout' && !e.originalEvent) {
                 return;
             }
 
@@ -280,10 +296,10 @@ var QueueWidget = Event.extend({
         $queue.delegate('.time-of-removal-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+            if (e.type === 'keydown' && e.keyCode != KEY.ENTER) {
                 return;
             }
-            if (e.type == 'focusout' && !e.originalEvent) {
+            if (e.type === 'focusout' && !e.originalEvent) {
                 return;
             }
 
@@ -366,6 +382,27 @@ var QueueWidget = Event.extend({
         t.initInlineCreate();
     },
 
+    getFirstVisibleSlot: function() {
+        var t = this;
+        var pages = t.$queue.find('.queue-page');
+        for (var i = 0; i < pages.length; i++) {
+            var $page = $(pages[i]);
+            var pageTop = $page.position().top;
+            var slots = $page.find('.slot');
+            for (var k = 0; k < slots.length; k++) {
+                var $slot = $(slots[k]);
+                var position = $slot.position().top + pageTop;
+                if (position > 0) {
+                    return {$slot: $slot, position: position}; // RETURN
+                }
+            }
+        }
+        return null;
+    },
+
+    /**
+     * Пометить день надписью "Пусто", если в нём нет ни одного слота
+     */
     markIfEmpty: function($elem, doScroll) {
         if (typeof doScroll === 'undefined') {
             doScroll = true;
@@ -482,6 +519,9 @@ var QueueWidget = Event.extend({
         Elements.initLinks($page);
         $page.find('.post .images').imageComposition();
         $page.find('.post.blocked').draggable('disable');
+        setTimeout(function () {
+            $page.find('.expanded-post .images-ready').imageComposition();
+        }, 200);
     },
 
     /**

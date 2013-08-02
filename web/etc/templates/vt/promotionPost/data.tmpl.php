@@ -25,10 +25,6 @@
             <label>{lang:vt.mobile.publicId}</label>
             <?= FormHelper::FormInput( $prefix . '[publicId]', $object->publicId, 'publicId', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="platform" class="row">
-            <label>{lang:vt.mobile.platform}</label>
-            <?= FormHelper::FormInput( $prefix . '[platform]', $object->platform, 'platform', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
-        </div>
         <div data-row="headerText" class="row">
             <label>{lang:vt.mobile.headerText}</label>
             <?= FormHelper::FormInput( $prefix . '[headerText]', $object->headerText, 'headerText', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
@@ -38,7 +34,7 @@
             <?= FormHelper::FormInput( $prefix . '[imgUrl]', $object->imgUrl, 'imgUrl', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="text" class="row">
-            <label>{lang:vt.mobile.text}</label>
+            <label>{lang:vt.mobile.shareText}</label>
             <?= FormHelper::FormInput( $prefix . '[text]', $object->text, 'text', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="actionText" class="row">
@@ -49,21 +45,25 @@
             <label>{lang:vt.mobile.actionUrl}</label>
             <?= FormHelper::FormInput( $prefix . '[actionUrl]', $object->actionUrl, 'actionUrl', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
-        <div data-row="active" class="row">
-            <label>{lang:vt.mobile.active}</label>
-            <?= FormHelper::FormInput( $prefix . '[active]', $object->active, 'active', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
-        </div>
         <div data-row="showsCount" class="row">
             <label>{lang:vt.mobile.showsCount}</label>
             <?= FormHelper::FormInput( $prefix . '[showsCount]', $object->showsCount, 'showsCount', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="imageHeight" class="row">
             <label>{lang:vt.mobile.imageHeight}</label>
-            <?= FormHelper::FormInput( $prefix . '[image_height]', $object->showsCount, 'imageHeight', null, array( 'size' => 80 ) ); ?>
+            <?= FormHelper::FormInput( $prefix . '[image_height]', $object->image_height, 'imageHeight', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="imageWidth" class="row">
             <label>{lang:vt.mobile.imageWidth}</label>
-            <?= FormHelper::FormInput( $prefix . '[image_width]', $object->showsCount, 'imageWidth', null, array( 'size' => 80 ) ); ?>
+            <?= FormHelper::FormInput( $prefix . '[image_width]', $object->image_width, 'imageWidth', null, array( 'size' => 80 ) ); ?>
+        </div>
+        <div data-row="platform" class="row">
+            <label>{lang:vt.mobile.platform}</label>
+            <?= FormHelper::FormSelect( $prefix . '[platform]',array('ios' => 'ios', 'android' => 'android'), null, null, $object->platform, null, null, true ); ?>
+        </div>
+        <div data-row="active" class="row">
+            <label>{lang:vt.mobile.active}</label>
+            <?= FormHelper::FormSelect( $prefix . "[active]", array('on' => 'on', 'off' => 'off'), null, null, $object->active, null, null, true ); ?>
         </div>
 	</div>
 </div>

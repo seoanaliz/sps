@@ -16,98 +16,95 @@ table, tr, td {
 }
 
 .table {
-    &>.body>.row>.column {
+    .column12 { width: 100%  }
+    .column11 { width: 91.6% }
+    .column10 { width: 83.3% }
+    .column9  { width: 75%   }
+    .column8  { width: 66.6% }
+    .column7  { width: 58.3% }
+    .column6  { width: 50%   }
+    .column5-5{ width: 45.8% }
+    .column5  { width: 41.6% }
+    .column4-5{ width: 37.5% }
+    .column4  { width: 33.3% }
+    .column3-5{ width: 29.2% }
+    .column3  { width: 25%   }
+    .column2  { width: 16.6% }
+    .column1-5{ width: 12.5% }
+    .column1  { width: 8.3%  }
+
+    .body .column {
         vertical-align: top;
     }
 
-    &>.header>.row>.column {
-        vertical-align: middle;
+    .list-head {
+        color: @color_link;
+        background-color: #DEE5EB;
+        .user-select(none);
+
+        .column {
+            vertical-align: middle;
+        }
+        
+        .row .column {
+            font-weight: bold;
+        }
     }
 
-    &>.body,
-    &>.header {
+    .body,
+    .list-head {
         font-size: 0;
 
-        .row + .row {
-            border-top: 1px solid @border_inside;
-        }
-
-        &>.row {
-            &>.column12 { width: 100%  }
-            &>.column11 { width: 91.6% }
-            &>.column10 { width: 83.3% }
-            &>.column9  { width: 75%   }
-            &>.column8  { width: 66.6% }
-            &>.column7  { width: 58.3% }
-            &>.column6  { width: 50%   }
-            &>.column5-5{ width: 45.8% }
-            &>.column5  { width: 41.6% }
-            &>.column4-5{ width: 37.5% }
-            &>.column4  { width: 33.3% }
-            &>.column3-5{ width: 29.2% }
-            &>.column3  { width: 25%   }
-            &>.column2  { width: 16.6% }
-            &>.column1-5{ width: 12.5% }
-            &>.column1  { width: 8.3%  }
-
-            &>.column {
-                font-size: 12px;
-                .inline-block;
-
-                .cell {
-                    padding: 10px 0;
-                }
-                
-                &.publics .cell {
-                    padding: 10px;
-                }
-
-                &.left {
-                    text-align: left;
-                }
-
-                &.center {
-                    text-align: center;
-                }
-
-                &.right {
-                    text-align: right;
-                }
-
-                &.top {
-                    vertical-align: top;
-                }
-
-                &.middle {
-                    vertical-align: middle;
-                }
-
-                &.bottom {
-                    vertical-align: bottom;
-                }
-            }
-        }
-
-        &>.empty {
+        .empty {
             padding: 100px 0;
             text-align: center;
             color: #777;
             font-size: 14px;
         }
     }
+ 
+    .row + .row {
+        border-top: 1px solid @border_inside;
+    }
 
-    &>.header {
-        color: @color_link;
-        background-color: #DEE5EB;
-        .user-select(none);
+    .row {
+        .column {
+            font-size: 12px;
+            .inline-block;
 
-        &>.row {
-            &>.column {
-                font-weight: bold;
+            .cell {
+                padding: 10px 0;
+            }
+
+            &.publics .cell {
+                padding: 10px;
+            }
+
+            &.left {
+                text-align: left;
+            }
+
+            &.center {
+                text-align: center;
+            }
+
+            &.right {
+                text-align: right;
+            }
+
+            &.top {
+                vertical-align: top;
+            }
+
+            &.middle {
+                vertical-align: middle;
+            }
+
+            &.bottom {
+                vertical-align: bottom;
             }
         }
     }
-
 }
 
 #main {
@@ -202,9 +199,6 @@ table, tr, td {
                 &.active .icon {
                     .opacity(1);
                 }
-                &.reverse .icon {
-                    background-image: url('../../images/common/arrow-top.png');
-                }
                 &.contacts {
                     cursor: default;
                 }
@@ -274,10 +268,14 @@ table, tr, td {
 
                 &.public-actions {
                     .action {
+                        .icon {
+                            width: 20px;
+                            height: 20px;
+                        }
+
                         cursor: pointer;
                         display: inline-block;
-                        padding: 4px;
-                        margin: 8px 0;
+                        padding: 9px 20px;
 
                         .icon.plus {
                             .opacity(0.3);
@@ -300,9 +298,9 @@ table, tr, td {
                         }
 
                         &.selected {
-                            background-color: #597DA3;
-
                             .icon {
+                                background-color: #597DA3;
+
                                 &.arrow {
                                     background-image: url('../../images/common/select-white.png');
                                 }
@@ -412,6 +410,7 @@ table, tr, td {
         top: 0;
         left: 0;
         width: 128px;
+        height: 100%;
         border: none;
         padding-right: 37px;
         padding-left: 4px;
@@ -467,18 +466,6 @@ table, tr, td {
     }
 }
 
-#global-loader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
-    z-index: 999;
-    text-align: center;
-    line-height: 300px;
-    font-size: 14px;
-}
 #go-to-top {
     display: none;
     position: fixed;
@@ -581,6 +568,7 @@ table, tr, td {
     }
 
     .clear-search {
+        display: none;
         position: absolute;
         top: 0;
         right: 2px;
@@ -588,7 +576,7 @@ table, tr, td {
         cursor: pointer;
         padding: 4px;
         opacity: 0.4;
-        
+
         &:hover {
             opacity: 1;
         }
@@ -718,20 +706,23 @@ table, tr, td {
 }
 
 .header {
-    .button-wrap {
-        .inline-block;
-        float: right;
-        margin-top: 7px;
+    position: relative;
+
+    .controls {
+        width: 500px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 39px;
     }
 
     .under {
         height: 5px;
         width: 100%;
-        clear: both;
     }
 
     .actions {
-        .inline-block;
+        display: none;
         .user-select(none);
         float: right;
         margin-right: -1px;
@@ -746,6 +737,17 @@ table, tr, td {
             }
         }
     }
+}
+
+.login-info, .button-wrap {
+    opacity: 0;
+    .transition(opacity 1s ease-out);
+}
+
+.button-wrap {
+    .inline-block;
+    float: right;
+    margin-top: 7px;
 }
 
 .login-info {
@@ -791,6 +793,7 @@ table, tr, td {
 .tab-bar {
     .inline-block;
     width: 460px;
+    height: 34px;
     padding-bottom: 0 !important;
 }
 

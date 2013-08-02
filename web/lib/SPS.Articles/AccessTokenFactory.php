@@ -53,9 +53,19 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
+                )
+                ,'version' => array(
+                      'name'        => 'version'
+                    , 'type'        => TYPE_INTEGER
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                'vkIdIn' => array(
+                      'name'          => 'vkId'
+                    , 'type'          => TYPE_STRING
+                    , 'searchType'    => SEARCHTYPE_ARRAY
+                )
+            )
             , 'templates' => array()
         );
 

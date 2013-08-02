@@ -920,7 +920,7 @@
             }
 
 
-
+//            echo $cmd->GetQuery(), '<br>';
             $ds        = $cmd->Execute();
             $structure = self::GetObjectTree( $ds->Columns );
             $result    = array();

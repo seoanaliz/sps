@@ -83,6 +83,23 @@ var Eventlist = {
             }
         });
     },
+    delete_external_post: function (postId, groupId, callback) {
+        $.ajax({
+            url: controlsRoot + 'delete-external-post/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                postId: postId,
+                groupId: groupId,
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                if (data && data.success) {
+                    callback(true);
+                }
+            }
+        });
+    },
     leftcolumn_clear_post_text: function(post_id, callback){
         $.ajax({
             url: controlsRoot + 'article-clear-text/',

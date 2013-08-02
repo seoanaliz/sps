@@ -231,13 +231,25 @@ var LeftPanelWidget = Event.extend({
         var $multiSelect = this.$multiSelect;
         var $wall = this.$wall;
 
-        $wall.delegate('.post > .delete', 'click', function(){
-            var $elem = $(this).closest('.post'),
-                pid = $elem.data('id'),
-                gid = $elem.data('group');
-            Events.fire('leftcolumn_deletepost', pid, function(state){
+        function manageExternalPost(method, postId, ownerId) {
+            var Def = new Deferred();
+            (method in {'delete': 1, 'restore': 1}) && VK.Api.call('wall.' + method, {owner_id: ownerId, post_id: postId}, function (resp) {
+                if (resp.response) {
+                    Def.fireSuccess();
+                }
+            });
+            return Def;
+        }
+
+        $wall.delegate('.post > .delete', 'click', function() {
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
+            var groupId = $post.data('group');
+            var isExternal = $post.hasClass('external');
+            
+            var handleDelete = function(state){
                 if (state) {
-                    var deleteMessageId = 'deleted-post-' + pid;
+                    var deleteMessageId = 'deleted-post-' + postId;
                     var $deleteMessage = $('#' + deleteMessageId);
                     var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
@@ -245,17 +257,25 @@ var LeftPanelWidget = Event.extend({
                         $deleteMessage.show();
                     } else {
                         // иначе добавляем
-                        $elem.before($(
-                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
+                        $post.before($(
+                            '<div id="' + deleteMessageId + '" class="bb post deleted-post '+ (isExternal ? 'external' : 'internal') +'" data-group="' + groupId + '" data-id="' + postId + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
                             '</div>'
                         ));
                     }
 
-                    $elem.hide();
+                    $post.hide();
                 }
-            });
+            };
+
+            if (isExternal) {
+                // Удаление поста на сервере Вконтакте
+                manageExternalPost('delete', postId, -Elements.currentExternalId()).success(function () {handleDelete(true);});
+            } else {
+                // Обычное наше удаление
+                Events.fire('leftcolumn_deletepost', postId, handleDelete);
+            }
         });
 
         $wall.delegate('.post .ignore', 'click', function() {
@@ -267,13 +287,19 @@ var LeftPanelWidget = Event.extend({
             });
         });
 
-        $wall.delegate('.post .recover', 'click', function() {
-            var elem = $(this).closest(".post"),
-                pid = elem.data("id");
-            Events.fire('leftcolumn_recoverpost', pid, function(state){
+        $wall.delegate('.post.internal .recover', 'click', function() {
+            var $elem = $(this).closest('.post');
+            Events.fire('leftcolumn_recoverpost', $elem.data('id'), function(state){
                 if (state) {
-                    elem.hide().next().show();
+                    $elem.hide().next().show();
                 }
+            });
+        });
+
+        $wall.delegate('.post.external .recover', 'click', function() {
+            var $elem = $(this).closest('.post');
+            manageExternalPost('restore', $elem.data('id'), -Elements.currentExternalId()).success(function () {
+                $elem.hide().next().show();
             });
         });
 
@@ -1580,7 +1606,7 @@ var LeftPanelWidget = Event.extend({
                                     $input = $menu.find('input');
                                     $input.focus();
                                     $input.keydown(function(e) {
-                                        if (e.keyCode == KEY.ENTER) {
+                                        if (e.keyCode === KEY.ENTER) {
                                             var newUserGroupModel = new UserGroupModel();
                                             newUserGroupModel.name($input.val());
                                             Control.fire('add_list', {

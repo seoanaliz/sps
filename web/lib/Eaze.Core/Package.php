@@ -80,6 +80,53 @@ class Package {
      * @var bool
      */
     private static $isWindows = false;
+    
+    /**
+     * Get With Package Compiled Constant value
+     * @return bool
+     */
+    public static function WithPackageCompile() {
+        if ( !self::$DisablePackageCompile && defined( Package::WithPackageCompile ) ) {
+            if ( WITH_PACKAGE_COMPILE ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get Compiled Filename from Cache
+     * @param string $type system | uri | mdtUri
+     * @param bool   $withRealPath
+     * @return string
+     */
+    public static function GetCompiledFilename( $type, $withRealPath = false ) {
+        $fileType = $type;
+        switch( $type ) {
+            case 'uri':
+                $fileType = md5( self::$CurrentUri );
+                break;
+            case 'system':
+                $fileType = 'system';
+                break;
+        }
+
+        $result = sprintf( 'package_%s.php', $fileType );
+        if ( $withRealPath ) {
+            $result = __ROOT__ . '/' . CONFPATH_CACHE . '/' . $result;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get ClassMap filename with real path
+     * @return string
+     */
+    public static function getClassMapFilename() {
+        return sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, self::ClassMap );
+    }
 
     /**
      * Begin URI
@@ -97,8 +144,7 @@ class Package {
         }
     }
 
-
-    /**
+        /**
          * Load ClassMap from file
          * @return array system|classes|files
          */
@@ -127,42 +173,6 @@ class Package {
 
             return $result;
         }
-
-
-        /**
-         * Get ClassMap filename with real path
-         * @return string
-         */
-        private static function getClassMapFilename() {
-            return sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, self::ClassMap );
-        }
-
-
-        /**
-     * Get Compiled Filename from Cache
-         * @param string $type system | uri | mdtUri
-     * @param bool   $withRealPath
-     * @return string
-     */
-    public static function GetCompiledFilename( $type, $withRealPath = false ) {
-            $fileType = $type;
-            switch( $type ) {
-                case 'uri':
-                    $fileType = md5( self::$CurrentUri );
-                    break;
-                case 'system':
-                    $fileType = 'system';
-                    break;
-            }
-
-            $result = sprintf( 'package_%s.php', $fileType );
-        if ( $withRealPath ) {
-            $result = __ROOT__ . '/' . CONFPATH_CACHE . '/' . $result;
-        }
-
-        return $result;
-    }
-
 
     /**
      * Include System Package File
@@ -543,22 +553,6 @@ class Package {
      */
     public static function GetPackageCompiledFlagFile() {
         return sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
-    }
-
-
-
-    /**
-     * Get With Package Compiled Constant value
-     * @return bool
-     */
-    public static function WithPackageCompile() {
-        if ( !self::$DisablePackageCompile && defined( Package::WithPackageCompile ) ) {
-            if ( WITH_PACKAGE_COMPILE ) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
 

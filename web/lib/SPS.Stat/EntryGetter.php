@@ -110,7 +110,7 @@ class EntryGetter {
                 'vk_id'     =>  $vkPublic->vk_id,
                 'quantity'  =>  $vkPublic->quantity,
                 'name'      =>  $vkPublic->name,
-                'ava'       =>  $vkPublic->ava,
+                'ava'       =>  trim($vkPublic->ava),
                 'group_id'  =>  $groups_ids,
                 'admins'    =>  array(),
                 'diff_abs'  =>  $vkPublic->$diff_abs,

@@ -32,5 +32,8 @@
 
         /** @var string */
         public $active;
+
+        /** @var int */
+        public $id;
     }
 ?>

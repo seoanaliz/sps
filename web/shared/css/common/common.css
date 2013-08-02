@@ -486,7 +486,7 @@ input[disabled] {
 .icon {
   width: 1em;
   height: 1em;
-  background-position: center;
+  background-position: 50%;
   background-repeat: no-repeat;
   display: inline-block;
   zoom: 1;
@@ -498,10 +498,6 @@ input[disabled] {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  -webkit-transition: .2s opacity;
-  -moz-transition: .2s opacity;
-  -o-transition: .2s opacity;
-  transition: .2s opacity;
 }
 .icon.plus {
   background-image: url('../../images/common/add.png');
@@ -512,7 +508,8 @@ input[disabled] {
 .icon.arrow {
   background-image: url('../../images/common/arrow.png');
 }
-.icon.arrow-top {
+.icon.arrow-top,
+.icon.arrow.top {
   background-image: url('../../images/common/arrow-top.png');
 }
 .icon.hart {
