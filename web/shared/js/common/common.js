@@ -368,7 +368,7 @@ function windowOpen(url, windowName) {
                               }  
                         }};
                     });
-                    var result = processThumbs(381, 254, attachments, {wide: false});
+                    var result = process(381, 254, attachments, {wide: false});
                     $wrap.css({
                         'width': result.width * coef + 'px',
                         'height': result.height * coef + 'px'
@@ -384,7 +384,7 @@ function windowOpen(url, windowName) {
                         .closest('.image-wrap').css({
                             'width': thumb.width * coef,
                             'height': thumb.height * coef,
-                            'margin-right': thumb.lastColumn ? '0' : margin + 'px',
+                            'margin-right': thumb.lastCol ? '0' : margin + 'px',
                             'margin-bottom': thumb.lastRow ? '0' : margin + 'px'
                         });
                     });
@@ -395,7 +395,7 @@ function windowOpen(url, windowName) {
         }
     };
 
-    function processThumbs(maxW, maxH, attachments, opts){
+    function process(maxW, maxH, attachments, opts){
         var oi = function(o) {
             return o === 'n' ? 1 : o === 'q' ? 2 : 0;
         }, sum = function(a) {
@@ -434,25 +434,16 @@ function windowOpen(url, windowName) {
         var avg_ratio = ratios.length > 0 ? sum(ratios) / ratios.length : 1.0;
         var max_w, max_h, margin_w = wide ? 6 : 3, margin_h = margin_w;
 
-        if (opts.force) {
-            max_w = maxW;
-            max_h = maxH;
+        if (wide) {
+            max_w = 537;
+            max_h = 310;
         } else {
-            if (wide) {
-                max_w = 537;
-                max_h = 310;
+            if (maxW >= 381) {
+                max_w = 381;
+                max_h = cnt == 1 ? 361 : 237;
             } else {
-                if (maxW >= 381) {
-                    max_w = 381;
-                    max_h = cnt == 1 ? 361 : 237;
-                } else {
-                    max_w = 337;
-                    max_h = cnt == 1 ? 320 : 210;
-                }
-            }
-            if (maxW < max_w) {
-                max_w = maxW;
-                max_h = maxH;
+                max_w = 337;
+                max_h = cnt == 1 ? 320 : 210;
             }
         }
 
@@ -461,7 +452,7 @@ function windowOpen(url, windowName) {
         var thumbs_height = 0;
 
         if (cnt == 1) {
-            var opt = {lastColumn: 1, lastRow: 1, single: 1};
+            var opt = {lastCol: 1, lastRow: 1, single: 1};
             if (thumbs[0].thumb) {
                 thumbs_width = 279;
                 thumbs_height = 185;
@@ -472,11 +463,11 @@ function windowOpen(url, windowName) {
                 thumbs_height = max_h;
                 thumbs_width = Math.min(thumbs_height * ratios[0], max_w);
             }
-            var t = compute(thumbs[0], thumbs_width, thumbs_height, opt);
+            var t = calculate(thumbs[0], thumbs_width, thumbs_height, opt);
             if (!t.unsized && (t.image.width < thumbs_width || t.image.height < thumbs_height)) {
                 thumbs_width = t.image.width;
                 thumbs_height = t.image.height;
-                t = compute(thumbs[0], thumbs_width, thumbs_height, opt);
+                t = calculate(thumbs[0], thumbs_width, thumbs_height, opt);
             }
             result[0] = t;
         }
@@ -487,8 +478,8 @@ function windowOpen(url, windowName) {
                     if (avg_ratio > 1.4 * max_ratio && (ratios[1] - ratios[0]) < 0.2) {
                         var w = max_w;
                         var h = Math.min(w / ratios[0], w / ratios[1], (max_h - margin_h) / 2.0);
-                        result[0] = compute(thumbs[0], w, h, {lastColumn: 1});
-                        result[1] = compute(thumbs[1], w, h, {lastColumn: 1, lastRow: 1});
+                        result[0] = calculate(thumbs[0], w, h, {lastCol: 1});
+                        result[1] = calculate(thumbs[1], w, h, {lastCol: 1, lastRow: 1});
 
                         thumbs_width = max_w;
                         thumbs_height = 2 * h + margin_h;
@@ -500,8 +491,8 @@ function windowOpen(url, windowName) {
                 case 'qq':
                     w = (max_w - margin_w) / 2;
                     h = Math.min(w / ratios[0], w / ratios[1], max_h);
-                    result[0] = compute(thumbs[0], w, h, {lastRow: 1});
-                    result[1] = compute(thumbs[1], w, h, {lastRow: 1, lastColumn: 1});
+                    result[0] = calculate(thumbs[0], w, h, {lastRow: 1});
+                    result[1] = calculate(thumbs[1], w, h, {lastRow: 1, lastCol: 1});
 
                     thumbs_width = max_w;
                     thumbs_height = h;
@@ -510,8 +501,8 @@ function windowOpen(url, windowName) {
                     var w0 = intval((max_w - margin_w) / ratios[1] / (1 / ratios[0] + 1 / ratios[1]));
                     var w1 = max_w - w0 - margin_w;
                     var h = Math.min(max_h, w0 / ratios[0], w1 / ratios[1]);
-                    result[0] = compute(thumbs[0], w0, h, {lastRow: 1});
-                    result[1] = compute(thumbs[1], w1, h, {lastColumn: 1, lastRow: 1});
+                    result[0] = calculate(thumbs[0], w0, h, {lastRow: 1});
+                    result[1] = calculate(thumbs[1], w1, h, {lastCol: 1, lastRow: 1});
 
                     thumbs_width = max_w;
                     thumbs_height = h;
@@ -520,33 +511,33 @@ function windowOpen(url, windowName) {
             if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients == 'www') {
                 var w = max_w;
                 var h_cover = Math.min(w / ratios[0], (max_h - margin_h) * 0.66);
-                result[0] = compute(thumbs[0], w, h_cover, {lastColumn: 1});
+                result[0] = calculate(thumbs[0], w, h_cover, {lastCol: 1});
                 if (orients === 'www') {
                     var w = intval(max_w - margin_w) / 2;
                     var h = Math.min(max_h - h_cover - margin_h, w / ratios[1], w / ratios[2]);
-                    result[1] = compute(thumbs[1], w, h, {lastRow: 1});
-                    result[2] = compute(thumbs[2], max_w - w - margin_w, h, {lastColumn: 1, lastRow: 1});
+                    result[1] = calculate(thumbs[1], w, h, {lastRow: 1});
+                    result[2] = calculate(thumbs[2], max_w - w - margin_w, h, {lastCol: 1, lastRow: 1});
                 } else {
                     var w0 = intval(((max_w - margin_w) / ratios[2]) / (1 / ratios[1] + 1 / ratios[2]));
                     var w1 = max_w - w0 - margin_w;
                     var h = Math.min(max_h - h_cover - margin_h, w0 / ratios[2], w1 / ratios[1]);
 
-                    result[1] = compute(thumbs[1], w0, h, {lastRow: 1});
-                    result[2] = compute(thumbs[2], w0, h, {lastRow: 1, lastColumn: 1});
+                    result[1] = calculate(thumbs[1], w0, h, {lastRow: 1});
+                    result[2] = calculate(thumbs[2], w0, h, {lastRow: 1, lastCol: 1});
                 }
                 thumbs_width = max_w;
                 thumbs_height = h_cover + h + margin_h;
             } else {
                 var h = max_h;
                 var w_cover = intval(Math.min(h * ratios[0], (max_w - margin_w) * 0.75));
-                result[0] = compute(thumbs[0], w_cover, h, {lastRow: 1});
+                result[0] = calculate(thumbs[0], w_cover, h, {lastRow: 1});
 
                 var h1 = ratios[1] * (max_h - margin_h) / (ratios[2] + ratios[1]);
                 var h0 = max_h - h1 - margin_h;
                 var w = Math.min(max_w - w_cover - margin_w, intval(h1 * ratios[2]), intval(h0 * ratios[1]));
 
-                result[1] = compute(thumbs[1], w, h0, {lastColumn: 1});
-                result[2] = compute(thumbs[2], w, h1, {lastColumn: 1, lastRow: 1});
+                result[1] = calculate(thumbs[1], w, h0, {lastCol: 1});
+                result[2] = calculate(thumbs[2], w, h1, {lastCol: 1, lastRow: 1});
 
                 var thumbs_width = w_cover + w + margin_w;
                 var thumbs_height = max_h;
@@ -555,7 +546,7 @@ function windowOpen(url, windowName) {
             if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients == 'wwww') {
                 var w = max_w;
                 var h_cover = Math.min(w / ratios[0], (max_h - margin_h) * 0.66);
-                result[0] = compute(thumbs[0], w, h_cover, {lastColumn: 1});
+                result[0] = calculate(thumbs[0], w, h_cover, {lastCol: 1});
 
                 var h = (max_w - 2 * margin_w) / (ratios[1] + ratios[2] + ratios[3]);
                 var w0 = intval(h * ratios[1]);
@@ -563,16 +554,16 @@ function windowOpen(url, windowName) {
                 var w2 = w - w0 - w1 - (2 * margin_w);
                 var h = Math.min(max_h - h_cover - margin_h, h);
 
-                result[1] = compute(thumbs[1], w0, h, {lastRow: 1});
-                result[2] = compute(thumbs[2], w1, h, {lastRow: 1});
-                result[3] = compute(thumbs[3], w2, h, {lastColumn: 1, lastRow: 1});
+                result[1] = calculate(thumbs[1], w0, h, {lastRow: 1});
+                result[2] = calculate(thumbs[2], w1, h, {lastRow: 1});
+                result[3] = calculate(thumbs[3], w2, h, {lastCol: 1, lastRow: 1});
 
                 thumbs_width = max_w;
                 thumbs_height = h_cover + h + margin_h;
             } else {
                 var h = max_h;
                 var w_cover = Math.min(h * ratios[0], (max_w - margin_w) * 0.66);
-                result[0] = compute(thumbs[0], w_cover, h, {lastRow: 1});
+                result[0] = calculate(thumbs[0], w_cover, h, {lastRow: 1});
 
                 var w = (max_h - 2 * margin_h) / (1 / ratios[1] + 1 / ratios[2] + 1 / ratios[3]);
                 var h0 = intval(w / ratios[1]);
@@ -580,9 +571,9 @@ function windowOpen(url, windowName) {
                 var h2 = h - h0 - h1 - (2 * margin_h);
                 var w = Math.min(max_w - w_cover - margin_w, w);
 
-                result[1] = compute(thumbs[1], w, h0, {lastColumn: 1});
-                result[2] = compute(thumbs[2], w, h1, {lastColumn: 1});
-                result[3] = compute(thumbs[3], w, h2, {lastColumn: 1, lastRow: 1});
+                result[1] = calculate(thumbs[1], w, h0, {lastCol: 1});
+                result[2] = calculate(thumbs[2], w, h1, {lastCol: 1});
+                result[3] = calculate(thumbs[3], w, h2, {lastCol: 1, lastRow: 1});
 
                 thumbs_width = w_cover + w + margin_w;
                 thumbs_height = max_h;
@@ -605,7 +596,7 @@ function windowOpen(url, windowName) {
             tries[(first_line = cnt) + ''] = [multiThumbsHeight(ratios_cropped, max_w, margin_w)];
 
             for (first_line = 1; first_line <= cnt - 1; first_line++) {
-                tries[first_line + ',' + (secont_line = cnt - first_line)] = [
+                tries[first_line + ',' + (second_line = cnt - first_line)] = [
                     multiThumbsHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
                     multiThumbsHeight(ratios_cropped.slice(first_line), max_w, margin_w)
                 ];
@@ -668,12 +659,12 @@ function windowOpen(url, windowName) {
                     var thumb_opts = opts;
                     if (last_column == j) {
                         var thumb_width = Math.ceil(width_remains);
-                        thumb_opts.lastColumn = true;
+                        thumb_opts.lastCol = true;
                     } else {
                         thumb_width = intval(thumb_ratio * line_height);
                         width_remains -= thumb_width + margin_w;
                     }
-                    result[result.length] = compute(thumb, thumb_width, line_height, thumb_opts);
+                    result[result.length] = calculate(thumb, thumb_width, line_height, thumb_opts);
                 }
             }
 
@@ -689,11 +680,11 @@ function windowOpen(url, windowName) {
         return ratio;
     }
 
-    function compute(t, w, h, opt) {
+    function calculate(t, w, h, opt) {
         var res = {
             width: intval(w),
             height: intval(h),
-            lastColumn: opt.lastColumn,
+            lastCol: opt.lastCol,
             lastRow: opt.lastRow,
             single: opt.single,
             image: getSize(t, w, h, opt.single),
@@ -787,7 +778,7 @@ function windowOpen(url, windowName) {
         return newObj;
     }
 
-    $.fn[PLUGIN_NAME] = function(method) {
+    $.fn[PLUGIN_NAME] = function() {
         return methods.init.apply(this, arguments);
     };
 })(jQuery);
