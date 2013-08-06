@@ -48,7 +48,7 @@
 *    6-23     *       *       *         sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/PublicsParser/ > /dev/null
 
 *       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/get-badoo/ > /dev/null
-*       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/update-badoo/ > /dev/null
+#*       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/update-badoo/ > /dev/null
 
 */5     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/inst-postchecker/ > /dev/null
 *       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/inst-wallchecker/ > /dev/null
