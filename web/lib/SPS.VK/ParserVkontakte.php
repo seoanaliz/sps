@@ -286,9 +286,11 @@
 
             }
 
-
-
-            return self::get_photo_urls( $result_posts_array );
+            $posts = self::get_photo_urls( $result_posts_array );
+            if( !is_array($posts )) {
+                throw new Exception ('failed to load posts' );
+            }
+            return $posts;
         }
 
         public static function get_photo_urls( $posts )

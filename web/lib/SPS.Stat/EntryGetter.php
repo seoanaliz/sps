@@ -50,11 +50,12 @@ class EntryGetter {
 
         $search     =   array(
              '_quantityLE'  =>  $quant_max ? $quant_max : 100000000
-            ,'_quantityGE'  =>  $quant_min ? $quant_min : 30000
+            ,'_quantityGE'  =>  $quant_min ? $quant_min : 20000
             ,'page'         =>  round( $offset/( $limit ? $limit : 25))
             ,'pageSize'     =>  $limit ? $limit : 25
             ,'sh_in_main'   =>  true
             ,'is_page'      =>  true
+            ,'active'       =>  true
         );
 
         //поиск по названию - глобальный
