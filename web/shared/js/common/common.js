@@ -331,7 +331,459 @@ function windowOpen(url, windowName) {
 
 // Композиция картин
 (function($) {
-    var PLUGIN_NAME="imageComposition";var CLASS_LOADING="image-compositing";var methods={init:function(){return this.each(function(){var c=$(this);var f=c.width()/381;var e=3*f;var d=c.find("img");var b=d.length;c.addClass(CLASS_LOADING);var a=0;d.each(function(){var i=$(this);var j=i.attr("src");var h=new Image();h.onload=function(){a++;i.data("sizes",["",h.width,h.height]);if(a>=b){g()}};h.src=j});function g(){var i=d.map(function(){return{type:"photo",photo:{sizes:{orig:$(this).data("sizes")}}}});var h=process(381,254,i,{wide:false});c.css({width:h.width*f+"px",height:h.height*f+"px"});$.each(h.thumbs,function(k,j){var l=cropImage(j,j.width,j.height);$(d[k]).css({width:l.width*f+"px",height:l.height*f+"px","margin-left":l.marginLeft*f+"px","margin-top":l.marginTop*f+"px"}).closest(".image-wrap").css({width:j.width*f,height:j.height*f,"margin-right":j.lastCol?"0":e+"px","margin-bottom":j.lastRow?"0":e+"px"})});c.removeClass(CLASS_LOADING)}})}};function process(z,G,m,B){var V=function(h){return h==="."?2:0},r=function(h){var i=0;$.each(h,function(j,t){i+=t});return i},a=function(i){var h=[];$.each(i,function(t,j){h[h.length]=t});return h},aa=function(i,h,j){return(h-(i.length-1)*j)/r(i)};var aq=B.wide;var M=[],v=[];$.each(m,function(i,h){M[M.length]=h.photo});var c="",ai=[0,0,0,0],o=[],y=M.length;$.each(M,function(h,j){var w=getRatio(j);var i=w>1.2?"-":w<0.8?"|":".";c+=i;ai[V(i)]++;o[o.length]=w});var L=o.length>0?r(o)/o.length:1;var ag,ar,D=aq?6:3,W=D;if(aq){ag=537;ar=310}else{if(z>=381){ag=381;ar=y==1?361:237}else{ag=337;ar=y==1?320:210}}var e=ag/ar;var O=0;var f=0;if(y==1){var s={lastCol:1,lastRow:1};if(M[0].thumb){O=279;f=185}else{if(o[0]>=1*e){O=ag;f=Math.min(O/o[0],ar)}else{f=ar;O=Math.min(f*o[0],ag)}}var ab=calculate(M[0],O,f,s);if(!ab.unsized&&(ab.image.width<O||ab.image.height<f)){O=ab.image.width;f=ab.image.height;ab=calculate(M[0],O,f,s)}v[0]=ab}else{if(y==2){switch(c){case"--":if(L>1.4*e&&(o[1]-o[0])<0.2){var Z=ag;var ak=Math.min(Z/o[0],Z/o[1],(ar-W)/2);v[0]=calculate(M[0],Z,ak,{lastCol:1});v[1]=calculate(M[1],Z,ak,{lastCol:1,lastRow:1});O=ag;f=2*ak+W;break}case"||":case".|":case"|.":case"..":Z=(ag-D)/2;ak=Math.min(Z/o[0],Z/o[1],ar);v[0]=calculate(M[0],Z,ak,{lastRow:1});v[1]=calculate(M[1],Z,ak,{lastRow:1,lastCol:1});O=ag;f=ak;break;default:var S=intval((ag-D)/o[1]/(1/o[0]+1/o[1]));var R=ag-S-D;var ak=Math.min(ar,S/o[0],R/o[1]);v[0]=calculate(M[0],S,ak,{lastRow:1});v[1]=calculate(M[1],R,ak,{lastCol:1,lastRow:1});O=ag;f=ak}}else{if(y==3){if((o[0]>1.2*e||L>1.5*e)&&c==="---"){var Z=ag;var an=Math.min(Z/o[0],(ar-W)*0.66);v[0]=calculate(M[0],Z,an,{lastCol:1});if(c==="---"){var Z=intval(ag-D)/2;var ak=Math.min(ar-an-W,Z/o[1],Z/o[2]);v[1]=calculate(M[1],Z,ak,{lastRow:1});v[2]=calculate(M[2],ag-Z-D,ak,{lastCol:1,lastRow:1})}else{var S=intval(((ag-D)/o[2])/(1/o[1]+1/o[2]));var R=ag-S-D;var ak=Math.min(ar-an-W,S/o[2],R/o[1]);v[1]=calculate(M[1],S,ak,{lastRow:1});v[2]=calculate(M[2],S,ak,{lastRow:1,lastCol:1})}O=ag;f=an+ak+W}else{var ak=ar;var ap=intval(Math.min(ak*o[0],(ag-D)*0.75));v[0]=calculate(M[0],ap,ak,{lastRow:1});var E=o[1]*(ar-W)/(o[2]+o[1]);var F=ar-E-W;var Z=Math.min(ag-ap-D,intval(E*o[2]),intval(F*o[1]));v[1]=calculate(M[1],Z,F,{lastCol:1});v[2]=calculate(M[2],Z,E,{lastCol:1,lastRow:1});var O=ap+Z+D;var f=ar}}else{if(y==4){if((o[0]>1.2*e||L>1.5*e)&&c==="----"){var Z=ag;var an=Math.min(Z/o[0],(ar-W)*0.66);v[0]=calculate(M[0],Z,an,{lastCol:1});var ak=(ag-2*D)/(o[1]+o[2]+o[3]);var S=intval(ak*o[1]);var R=intval(ak*o[2]);var Q=Z-S-R-(2*D);var ak=Math.min(ar-an-W,ak);v[1]=calculate(M[1],S,ak,{lastRow:1});v[2]=calculate(M[2],R,ak,{lastRow:1});v[3]=calculate(M[3],Q,ak,{lastCol:1,lastRow:1});O=ag;f=an+ak+W}else{var ak=ar;var ap=Math.min(ak*o[0],(ag-D)*0.66);v[0]=calculate(M[0],ap,ak,{lastRow:1});var Z=(ar-2*W)/(1/o[1]+1/o[2]+1/o[3]);var F=intval(Z/o[1]);var E=intval(Z/o[2]);var C=ak-F-E-(2*W);var Z=Math.min(ag-ap-D,Z);v[1]=calculate(M[1],Z,F,{lastCol:1});v[2]=calculate(M[2],Z,E,{lastCol:1});v[3]=calculate(M[3],Z,C,{lastCol:1,lastRow:1});O=ap+Z+D;f=ar}}else{var U=[];if(L>1.1){$.each(o,function(h,i){U[U.length]=Math.max(1,i)})}else{$.each(o,function(h,i){U[U.length]=Math.min(1,i)})}var Y={};var l,k,X;Y[(l=y)+""]=[aa(U,ag,D)];for(l=1;l<=y-1;l++){Y[l+","+(k=y-l)]=[aa(U.slice(0,l),ag,D),aa(U.slice(l),ag,D)]}for(l=1;l<=y-2;l++){for(k=1;k<=y-l-1;k++){Y[l+","+k+","+(X=y-l-k)]=[aa(U.slice(0,l),ag,D),aa(U.slice(l,l+k),ag,D),aa(U.slice(l+k),ag,D)]}}var P=null;var q=0;var g=0;var d;for(var ae in Y){var af=Y[ae];var ao=r(af)+W*(af.length-1);var n=Math.abs(ao-ar);if(ae.indexOf(",")!=-1){var J=ae.split(",");for(var aj=0;aj<J.length;aj++){J[aj]=intval(J[aj])}if(J[0]>J[1]||J[2]&&J[1]>J[2]){n+=50;n*=1.5}}if(P==null||n<q){P=ae;q=n;d=ao}}var p=clone(M);var A=clone(U);var ad=P.split(",");var x=Y[P];var N=ad.length-1;for(var aj=0;aj<ad.length;aj++){var K=parseInt(ad[aj]);var I=p.splice(0,K);var b=x.shift();var u=I.length-1;var B={};if(N==aj){B.lastRow=true}var H=ag;for(var ah=0;ah<I.length;ah++){var ac=I[ah];var T=A.shift();var am=B;if(u==ah){var al=Math.ceil(H);am.lastCol=true}else{al=intval(T*b);H-=al+D}v[v.length]=calculate(ac,al,b,am)}}O=ag;f=d}}}}return{width:intval(O),height:intval(f),thumbs:v}}function getRatio(a){var b=a.sizes.orig;var c=b[1]==0||b[2]==0?1:b[1]/b[2];return c}function calculate(d,a,e,c){var b={width:intval(a),height:intval(e),lastCol:c.lastCol,lastRow:c.lastRow,image:getSize(d,a,e)};b.ratio=b.image.width/b.image.height;return b}function getSize(a,b,h){if(!a){return{}}var c=!!a.thumb;var g=c?a.thumb.sizes:a.sizes;var i=window.devicePixelRatio||1;var e=g.orig||{};var f=(e[1]||1)/(e[2]||1);var k=0;if(f>b/h){k=h;if(f>1){k*=f}}else{k=b;if(f<1){k/=f}}h/=i;b/=i;var d="orig";var j=g[d];return{src:j[0],width:j[1],height:j[2]}}function cropImage(a,b,j){var i=a.single;var e=a.image;var f=b;var c=j;var h=0;var g=0;if(e.width&&e.height){var d=e.width/e.height;if(d<b/j){if(i&&e.width<b){b=e.width;j=Math.min(j,e.height)}f=b;c=f/d;if(c>j){g=-intval((c-j)/3)}}else{if(i&&e.height<j){j=e.height;b=Math.min(b,e.width)}c=j;f=c*d;if(f>b){h=-intval((f-b)/3)}}}return{width:f,height:c,marginLeft:h,marginTop:a.isAlbum&&a.single?0:g}}function clone(d,c){var a=$.isArray(d)?[]:{};for(var b in d){if($.browser.webkit&&(b==="layerX"||b==="layerY")){continue}if(c&&typeof(d[b])==="object"&&b!=="prototype"){a[b]=clone(d[b])}else{a[b]=d[b]}}return a}$.fn[PLUGIN_NAME]=function(){return methods.init.apply(this,arguments)};
+    var PLUGIN_NAME = 'imageComposition';
+    var CLASS_LOADING = 'image-compositing';
+
+    var methods = {
+        init: function() {
+            return this.each(function() {
+                var $wrap = $(this);
+                var coef = $wrap.width() / 380;
+                var margin = 3 * coef;
+                var $images = $wrap.find('img');
+                var imagesNum = $images.length;
+
+                $wrap.addClass(CLASS_LOADING);
+
+                var loadedImages = 0;
+                $images.each(function() {
+                    var $originalImage = $(this);
+                    var src = $originalImage.attr('src');
+                    var img = new Image();
+                    img.onload = function() {
+                        loadedImages++;
+                        $originalImage.data('sizes', ['', img.width, img.height]);
+                        if (loadedImages >= imagesNum) {
+                            handleImagesLoad();
+                        }
+                    };
+                    img.src = src;
+                });
+
+                function handleImagesLoad() {
+                    var imagesData = $images.map(function () {
+                        return {type: 'photo', photo: {
+                              sizes: {
+                                  orig: $(this).data('sizes')
+                              }  
+                        }};
+                    });
+                    var result = process(imagesData, {wide: false});
+                    
+//                    var $slot = $wrap.closest('.slot');
+//                    if ($slot.hasClass('gridLine_23588'))
+//                        log('result:', result);
+                    
+                    $wrap.css({
+                        'width': result.width * coef + 'px',
+                        'height': result.height * coef + 'px'
+                    });
+                    $.each(result.thumbs, function (i, thumb) {
+                        var crop = cropImage(thumb, thumb.width, thumb.height);
+                        $($images[i]).css({
+                            'width': crop.width * coef + 'px',
+                            'height': crop.height * coef + 'px',
+                            'margin-left': crop.marginLeft * coef + 'px',
+                            'margin-top': crop.marginTop * coef + 'px'
+                        })
+                        .closest('.image-wrap').css({
+                            'width': thumb.width * coef,
+                            'height': thumb.height * coef,
+                            'margin-right': thumb.lastCol ? '0' : margin + 'px',
+                            'margin-bottom': thumb.lastRow ? '0' : margin + 'px'
+                        });
+                    });
+                    $wrap.removeClass(CLASS_LOADING);
+                }
+            });
+        }
+    };
+
+    function process(attachments, opts){
+        var sum = function(a) {
+            var sum = 0;
+            $.each(a, function(k, f) {
+                sum += f;
+            });
+            return sum;
+        }, getKeys = function(obj) {
+            var keys = [];
+            $.each(obj, function(k, v) {
+                keys[keys.length] = k;
+            });
+            return keys;
+        }, multiHeight = function(ratios, width, margin) {
+            return (width - (ratios.length - 1) * margin) / sum(ratios);
+        };
+
+        var wide = opts.wide;
+        var thumbs = [], result = [];
+        $.each(attachments, function(k, a) {
+            thumbs[thumbs.length] = a['photo'];
+        });
+
+        var orients = '', ratios = [],
+                cnt = thumbs.length;
+
+        $.each(thumbs, function(k, t) {
+            var ratio = getRatio(t);
+            var orient = ratio > 1.2 ? '-' : ratio < 0.8 ? '|' : '.';
+            orients += orient;
+            ratios[ratios.length] = ratio;
+        });
+
+        var avg_ratio = ratios.length > 0 ? sum(ratios) / ratios.length : 1.0;
+        var max_w, max_h, margin_w = wide ? 6 : 3, margin_h = margin_w;
+
+//        if (wide) {
+//            max_w = 537;
+//            max_h = 310;
+//        } else {
+//            if (maxW >= 381) {
+                max_w = 380;
+                max_h = 237;
+//            } else {
+//                max_w = 337;
+//                max_h = cnt == 1 ? 225 : 210;
+//            }
+//        }
+//        if (maxW < max_w) {
+//            max_w = maxW;
+//            max_h = maxH;
+//        }
+
+        var max_ratio = max_w / max_h;
+        var thumbs_width = 0;
+        var thumbs_height = 0;
+
+        if (cnt == 1) {
+            var opt = {lastCol: 1, lastRow: 1};
+            if (thumbs[0].thumb) {
+                thumbs_width = 278;
+                thumbs_height = 185;
+            } else if (ratios[0] >= 1.0 * max_ratio) {
+                thumbs_width = max_w;
+                thumbs_height = Math.min(thumbs_width / ratios[0], max_h);
+            } else {
+                thumbs_height = max_h;
+                thumbs_width = Math.min(thumbs_height * ratios[0], max_w);
+            }
+            var t = calculate(thumbs[0], thumbs_width, thumbs_height, opt);
+            if (!t.unsized && (t.image.width < thumbs_width || t.image.height < thumbs_height)) {
+                thumbs_width = t.image.width;
+                thumbs_height = t.image.height;
+                t = calculate(thumbs[0], thumbs_width, thumbs_height, opt);
+            }
+            result[0] = t;
+        }
+
+        else if (cnt == 2)
+            switch (orients) {
+                case '--':
+                    if (avg_ratio > 1.4 * max_ratio && (ratios[1] - ratios[0]) < 0.2) {
+                        var w = max_w;
+                        var h = Math.min(w / ratios[0], w / ratios[1], (max_h - margin_h) / 2.0);
+                        result[0] = calculate(thumbs[0], w, h, {lastCol: 1});
+                        result[1] = calculate(thumbs[1], w, h, {lastCol: 1, lastRow: 1});
+
+                        thumbs_width = max_w;
+                        thumbs_height = 2 * h + margin_h;
+                        break;
+                    }
+                case '||':
+                case '.|':
+                case '|.':
+                case '..':
+                    w = (max_w - margin_w) / 2;
+                    h = Math.min(w / ratios[0], w / ratios[1], max_h);
+                    result[0] = calculate(thumbs[0], w, h, {lastRow: 1});
+                    result[1] = calculate(thumbs[1], w, h, {lastRow: 1, lastCol: 1});
+
+                    thumbs_width = max_w;
+                    thumbs_height = h;
+                    break;
+                default:
+                    var w0 = intval((max_w - margin_w) / ratios[1] / (1 / ratios[0] + 1 / ratios[1]));
+                    var w1 = max_w - w0 - margin_w;
+                    var h = Math.min(max_h, w0 / ratios[0], w1 / ratios[1]);
+                    result[0] = calculate(thumbs[0], w0, h, {lastRow: 1});
+                    result[1] = calculate(thumbs[1], w1, h, {lastCol: 1, lastRow: 1});
+
+                    thumbs_width = max_w;
+                    thumbs_height = h;
+            }
+        else if (cnt == 3) {
+            if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients === '---') {
+                var w = max_w;
+                var h_cover = Math.min(w / ratios[0], (max_h - margin_h) * 0.66);
+                result[0] = calculate(thumbs[0], w, h_cover, {lastCol: 1});
+                if (orients === '---') {
+                    var w = intval(max_w - margin_w) / 2;
+                    var h = Math.min(max_h - h_cover - margin_h, w / ratios[1], w / ratios[2]);
+                    result[1] = calculate(thumbs[1], w, h, {lastRow: 1});
+                    result[2] = calculate(thumbs[2], max_w - w - margin_w, h, {lastCol: 1, lastRow: 1});
+                } else {
+                    var w0 = intval(((max_w - margin_w) / ratios[2]) / (1 / ratios[1] + 1 / ratios[2]));
+                    var w1 = max_w - w0 - margin_w;
+                    var h = Math.min(max_h - h_cover - margin_h, w0 / ratios[2], w1 / ratios[1]);
+
+                    result[1] = calculate(thumbs[1], w0, h, {lastRow: 1});
+                    result[2] = calculate(thumbs[2], w0, h, {lastRow: 1, lastCol: 1});
+                }
+                thumbs_width = max_w;
+                thumbs_height = h_cover + h + margin_h;
+            } else {
+                var h = max_h;
+                var w_cover = intval(Math.min(h * ratios[0], (max_w - margin_w) * 0.75));
+                result[0] = calculate(thumbs[0], w_cover, h, {lastRow: 1});
+
+                var h1 = ratios[1] * (max_h - margin_h) / (ratios[2] + ratios[1]);
+                var h0 = max_h - h1 - margin_h;
+                var w = Math.min(max_w - w_cover - margin_w, intval(h1 * ratios[2]), intval(h0 * ratios[1]));
+
+                result[1] = calculate(thumbs[1], w, h0, {lastCol: 1});
+                result[2] = calculate(thumbs[2], w, h1, {lastCol: 1, lastRow: 1});
+
+                var thumbs_width = w_cover + w + margin_w;
+                var thumbs_height = max_h;
+            }
+        } else if (cnt == 4) {
+            if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients === '----') {
+                var w = max_w;
+                var h_cover = Math.min(w / ratios[0], (max_h - margin_h) * 0.66);
+                result[0] = calculate(thumbs[0], w, h_cover, {lastCol: 1});
+
+                var h = (max_w - 2 * margin_w) / (ratios[1] + ratios[2] + ratios[3]);
+                var w0 = intval(h * ratios[1]);
+                var w1 = intval(h * ratios[2]);
+                var w2 = w - w0 - w1 - (2 * margin_w);
+                var h = Math.min(max_h - h_cover - margin_h, h);
+
+                result[1] = calculate(thumbs[1], w0, h, {lastRow: 1});
+                result[2] = calculate(thumbs[2], w1, h, {lastRow: 1});
+                result[3] = calculate(thumbs[3], w2, h, {lastCol: 1, lastRow: 1});
+
+                thumbs_width = max_w;
+                thumbs_height = h_cover + h + margin_h;
+            } else {
+                var h = max_h;
+                var w_cover = Math.min(h * ratios[0], (max_w - margin_w) * 0.66);
+                result[0] = calculate(thumbs[0], w_cover, h, {lastRow: 1});
+
+                var w = (max_h - 2 * margin_h) / (1 / ratios[1] + 1 / ratios[2] + 1 / ratios[3]);
+                var h0 = intval(w / ratios[1]);
+                var h1 = intval(w / ratios[2]);
+                var h2 = h - h0 - h1 - (2 * margin_h);
+                var w = Math.min(max_w - w_cover - margin_w, w);
+
+                result[1] = calculate(thumbs[1], w, h0, {lastCol: 1});
+                result[2] = calculate(thumbs[2], w, h1, {lastCol: 1});
+                result[3] = calculate(thumbs[3], w, h2, {lastCol: 1, lastRow: 1});
+
+                thumbs_width = w_cover + w + margin_w;
+                thumbs_height = max_h;
+            }
+        } else {
+            var ratios_cropped = [];
+            if (avg_ratio > 1.1) {
+                $.each(ratios, function(k, ratio) {
+                    ratios_cropped[ratios_cropped.length] = Math.max(1.0, ratio);
+                })
+            } else {
+                $.each(ratios, function(k, ratio) {
+                    ratios_cropped[ratios_cropped.length] = Math.min(1.0, ratio);
+                });
+            }
+
+            var tries = {};
+
+            var first_line, second_line, third_line;
+            tries[(first_line = cnt) + ''] = [multiHeight(ratios_cropped, max_w, margin_w)];
+
+            for (first_line = 1; first_line <= cnt - 1; first_line++) {
+                tries[first_line + ',' + (second_line = cnt - first_line)] = [
+                    multiHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
+                    multiHeight(ratios_cropped.slice(first_line), max_w, margin_w)
+                ];
+            }
+
+            for (first_line = 1; first_line <= cnt - 2; first_line++) {
+                for (second_line = 1; second_line <= cnt - first_line - 1; second_line++) {
+                    tries[first_line + ',' + second_line + ',' + (third_line = cnt - first_line - second_line)] = [
+                        multiHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
+                        multiHeight(ratios_cropped.slice(first_line, first_line + second_line), max_w, margin_w),
+                        multiHeight(ratios_cropped.slice(first_line + second_line), max_w, margin_w)
+                    ];
+                }
+            }
+
+            var opt_conf = null;
+            var opt_diff = 0;
+            var opt_height = 0;
+            var opt_h;
+            for (var conf in tries) {
+                var heights = tries[conf];
+                var conf_h = sum(heights) + margin_h * (heights.length - 1);
+                var conf_diff = Math.abs(conf_h - max_h);
+
+                if (conf.indexOf(',') != -1) {
+                    var conf_nums = conf.split(',');
+                    for (var i = 0; i < conf_nums.length; i++)
+                        conf_nums[i] = intval(conf_nums[i]);
+                    if (conf_nums[0] > conf_nums[1] || conf_nums[2] && conf_nums[1] > conf_nums[2]) {
+                        conf_diff += 50;
+                        conf_diff *= 1.5;
+                    }
+                }
+                if (opt_conf == null || conf_diff < opt_diff) {
+                    opt_conf = conf;
+                    opt_diff = conf_diff;
+                    opt_h = conf_h;
+                }
+            }
+
+            var thumbs_remain = clone(thumbs);
+            var ratios_remain = clone(ratios_cropped);
+            var chunks = opt_conf.split(',');
+            var opt_heights = tries[opt_conf];
+            var last_row = chunks.length - 1;
+
+            for (var i = 0; i < chunks.length; i++) {
+                var line_chunks_num = parseInt(chunks[i]);
+                var line_thumbs = thumbs_remain.splice(0, line_chunks_num);
+                var line_height = opt_heights.shift();
+                var last_column = line_thumbs.length - 1;
+                var opts = {};
+                if (last_row == i) {
+                    opts.lastRow = true;
+                }
+                var width_remains = max_w;
+                for (var j = 0; j < line_thumbs.length; j++) {
+                    var thumb = line_thumbs[j];
+                    var thumb_ratio = ratios_remain.shift();
+                    var thumb_opts = opts;
+                    if (last_column == j) {
+                        var thumb_width = Math.ceil(width_remains);
+                        thumb_opts.lastCol = true;
+                    } else {
+                        thumb_width = intval(thumb_ratio * line_height);
+                        width_remains -= thumb_width + margin_w;
+                    }
+                    result[result.length] = calculate(thumb, thumb_width, line_height, thumb_opts);
+                }
+            }
+
+            thumbs_width = max_w;
+            thumbs_height = opt_h;
+        }
+        return {width: intval(thumbs_width), height: intval(thumbs_height), thumbs: result};
+    }
+
+    function getRatio(thumb){
+        var t = thumb.sizes['orig'];
+        var ratio = t[1] == 0 || t[2] == 0 ? 1 : t[1] / t[2];
+        return ratio;
+    }
+
+    function calculate(t, w, h, opt) {
+        var res = {
+            width: intval(w),
+            height: intval(h),
+            lastCol: opt.lastCol,
+            lastRow: opt.lastRow,
+            image: getSize(t, w, h)
+        };
+
+        res.ratio = res.image.width / res.image.height;
+
+        return res;
+    }
+
+    function getSize(thumb, width, height) {
+        if (!thumb)
+            return {};
+
+        var isAlbum = !!thumb.thumb;
+        var image_sizes = isAlbum ? thumb.thumb.sizes : thumb.sizes;
+        var pixel_ratio = window.devicePixelRatio || 1;
+        var x_size = image_sizes['orig'] || {};
+        var ratio = (x_size[1] || 1) / (x_size[2] || 1);
+        var min_s = 0;
+
+        if (ratio > width / height) {
+            min_s = height;
+            if (ratio > 1.0) {
+                min_s *= ratio;
+            }
+        } else {
+            min_s = width;
+            if (ratio < 1.0) {
+                min_s /= ratio;
+            }
+        }
+        height /= pixel_ratio;
+        width /= pixel_ratio;
+
+        var photo_type = 'orig';
+
+        var size = image_sizes[photo_type];
+        return {src: size[0], width: size[1], height: size[2]};
+    }
+
+    function cropImage(thumb, width, height) {
+        var single = thumb.single;
+        var image_size = thumb.image;
+        var img_w = width;
+        var img_h = height;
+        var x = 0;
+        var y = 0;
+
+        if (image_size.width && image_size.height) {
+            var img_ratio = image_size.width / image_size.height;
+
+            if (img_ratio < width / height) {
+                if (single && image_size.width < width) {
+                    width = image_size.width;
+                    height = Math.min(height, image_size.height);
+                }
+                img_w = width;
+                img_h = img_w / img_ratio;
+                if (img_h > height) {
+                    y = -intval((img_h - height) / 3);
+                }
+            } else {
+                if (single && image_size.height < height) {
+                    height = image_size.height;
+                    width = Math.min(width, image_size.width);
+                }
+                img_h = height;
+                img_w = img_h * img_ratio;
+                if (img_w > width) {
+                    x = -intval((img_w - width) / 3);
+                }
+            }
+        }
+
+        return {width: img_w, height: img_h, marginLeft: x, marginTop: thumb.isAlbum && thumb.single ? 0 : y};
+    }
+
+    function clone(obj, req) {
+        var newObj = $.isArray(obj) ? [] : {};
+        for (var i in obj) {
+            if ($.browser.webkit && (i === 'layerX' || i === 'layerY'))
+                continue;
+            if (req && typeof(obj[i]) === 'object' && i !== 'prototype') {
+                newObj[i] = clone(obj[i]);
+            } else {
+                newObj[i] = obj[i];
+            }
+        }
+        return newObj;
+    }
+
+    $.fn[PLUGIN_NAME] = function() {
+        return methods.init.apply(this, arguments);
+    };
 })(jQuery);
 
 // Попап
