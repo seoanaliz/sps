@@ -67,11 +67,7 @@ var QueueWidget = Event.extend({
                     Elements.initDroppable();
                     Elements.initImages($page);
                     Elements.initLinks($page);
-                    $page.find('.post .images').imageComposition();
                     $page.find('.post.blocked').draggable('disable');
-                    setTimeout(function () {
-                        $page.find('.expanded-post .images-ready').imageComposition();
-                    }, 200);
                 } else {
                     t.$queue.empty();
                 }
@@ -114,11 +110,7 @@ var QueueWidget = Event.extend({
                 Elements.initDroppable();
                 Elements.initImages($loadedPage);
                 Elements.initLinks($loadedPage);
-                $loadedPage.find('.post .images').imageComposition();
                 $loadedPage.find('.post.blocked').draggable('disable');
-                setTimeout(function () {
-                    $page.find('.expanded-post .images-ready').imageComposition();
-                }, 200);
                 Def.fireSuccess($loadedPage);
             }
         });
@@ -517,11 +509,7 @@ var QueueWidget = Event.extend({
         Elements.initDraggable($page);
         Elements.initImages($page);
         Elements.initLinks($page);
-        $page.find('.post .images').imageComposition();
         $page.find('.post.blocked').draggable('disable');
-        setTimeout(function () {
-            $page.find('.expanded-post .images-ready').imageComposition();
-        }, 200);
     },
 
     /**
