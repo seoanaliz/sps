@@ -361,14 +361,14 @@ function windowOpen(url, windowName) {
                 });
 
                 function handleImagesLoad() {
-                    var attachments = $images.map(function () {
+                    var imagesData = $images.map(function () {
                         return {type: 'photo', photo: {
                               sizes: {
-                                  x: $(this).data('sizes')
+                                  orig: $(this).data('sizes')
                               }  
                         }};
                     });
-                    var result = process(381, 254, attachments, {wide: false});
+                    var result = process(381, 254, imagesData, {wide: false});
                     $wrap.css({
                         'width': result.width * coef + 'px',
                         'height': result.height * coef + 'px'
@@ -397,7 +397,7 @@ function windowOpen(url, windowName) {
 
     function process(maxW, maxH, attachments, opts){
         var oi = function(o) {
-            return o === 'n' ? 1 : o === 'q' ? 2 : 0;
+            return o === '.' ? 2 : 0;
         }, sum = function(a) {
             var sum = 0;
             $.each(a, function(k, f) {
@@ -410,7 +410,7 @@ function windowOpen(url, windowName) {
                 keys[keys.length] = k;
             });
             return keys;
-        }, multiThumbsHeight = function(ratios, width, margin) {
+        }, multiHeight = function(ratios, width, margin) {
             return (width - (ratios.length - 1) * margin) / sum(ratios);
         };
 
@@ -425,7 +425,7 @@ function windowOpen(url, windowName) {
 
         $.each(thumbs, function(k, t) {
             var ratio = getRatio(t);
-            var orient = ratio > 1.2 ? 'w' : ratio < 0.8 ? 'v' : 'q';
+            var orient = ratio > 1.2 ? '-' : ratio < 0.8 ? '|' : '.';
             orients += orient;
             orients_cnt[oi(orient)]++;
             ratios[ratios.length] = ratio;
@@ -452,7 +452,7 @@ function windowOpen(url, windowName) {
         var thumbs_height = 0;
 
         if (cnt == 1) {
-            var opt = {lastCol: 1, lastRow: 1, single: 1};
+            var opt = {lastCol: 1, lastRow: 1};
             if (thumbs[0].thumb) {
                 thumbs_width = 279;
                 thumbs_height = 185;
@@ -474,7 +474,7 @@ function windowOpen(url, windowName) {
 
         else if (cnt == 2)
             switch (orients) {
-                case 'ww':
+                case '--':
                     if (avg_ratio > 1.4 * max_ratio && (ratios[1] - ratios[0]) < 0.2) {
                         var w = max_w;
                         var h = Math.min(w / ratios[0], w / ratios[1], (max_h - margin_h) / 2.0);
@@ -485,10 +485,10 @@ function windowOpen(url, windowName) {
                         thumbs_height = 2 * h + margin_h;
                         break;
                     }
-                case 'vv':
-                case 'qv':
-                case 'vq':
-                case 'qq':
+                case '||':
+                case '.|':
+                case '|.':
+                case '..':
                     w = (max_w - margin_w) / 2;
                     h = Math.min(w / ratios[0], w / ratios[1], max_h);
                     result[0] = calculate(thumbs[0], w, h, {lastRow: 1});
@@ -508,11 +508,11 @@ function windowOpen(url, windowName) {
                     thumbs_height = h;
             }
         else if (cnt == 3) {
-            if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients == 'www') {
+            if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients === '---') {
                 var w = max_w;
                 var h_cover = Math.min(w / ratios[0], (max_h - margin_h) * 0.66);
                 result[0] = calculate(thumbs[0], w, h_cover, {lastCol: 1});
-                if (orients === 'www') {
+                if (orients === '---') {
                     var w = intval(max_w - margin_w) / 2;
                     var h = Math.min(max_h - h_cover - margin_h, w / ratios[1], w / ratios[2]);
                     result[1] = calculate(thumbs[1], w, h, {lastRow: 1});
@@ -543,7 +543,7 @@ function windowOpen(url, windowName) {
                 var thumbs_height = max_h;
             }
         } else if (cnt == 4) {
-            if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients == 'wwww') {
+            if ((ratios[0] > 1.2 * max_ratio || avg_ratio > 1.5 * max_ratio) && orients === '----') {
                 var w = max_w;
                 var h_cover = Math.min(w / ratios[0], (max_h - margin_h) * 0.66);
                 result[0] = calculate(thumbs[0], w, h_cover, {lastCol: 1});
@@ -593,21 +593,21 @@ function windowOpen(url, windowName) {
             var tries = {};
 
             var first_line, second_line, third_line;
-            tries[(first_line = cnt) + ''] = [multiThumbsHeight(ratios_cropped, max_w, margin_w)];
+            tries[(first_line = cnt) + ''] = [multiHeight(ratios_cropped, max_w, margin_w)];
 
             for (first_line = 1; first_line <= cnt - 1; first_line++) {
                 tries[first_line + ',' + (second_line = cnt - first_line)] = [
-                    multiThumbsHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
-                    multiThumbsHeight(ratios_cropped.slice(first_line), max_w, margin_w)
+                    multiHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
+                    multiHeight(ratios_cropped.slice(first_line), max_w, margin_w)
                 ];
             }
 
             for (first_line = 1; first_line <= cnt - 2; first_line++) {
                 for (second_line = 1; second_line <= cnt - first_line - 1; second_line++) {
                     tries[first_line + ',' + second_line + ',' + (third_line = cnt - first_line - second_line)] = [
-                        multiThumbsHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
-                        multiThumbsHeight(ratios_cropped.slice(first_line, first_line + second_line), max_w, margin_w),
-                        multiThumbsHeight(ratios_cropped.slice(first_line + second_line), max_w, margin_w)
+                        multiHeight(ratios_cropped.slice(0, first_line), max_w, margin_w),
+                        multiHeight(ratios_cropped.slice(first_line, first_line + second_line), max_w, margin_w),
+                        multiHeight(ratios_cropped.slice(first_line + second_line), max_w, margin_w)
                     ];
                 }
             }
@@ -675,7 +675,7 @@ function windowOpen(url, windowName) {
     }
 
     function getRatio(thumb){
-        var t = thumb.sizes['x'];
+        var t = thumb.sizes['orig'];
         var ratio = t[1] == 0 || t[2] == 0 ? 1 : t[1] / t[2];
         return ratio;
     }
@@ -686,9 +686,7 @@ function windowOpen(url, windowName) {
             height: intval(h),
             lastCol: opt.lastCol,
             lastRow: opt.lastRow,
-            single: opt.single,
-            image: getSize(t, w, h, opt.single),
-            orig: t
+            image: getSize(t, w, h)
         };
 
         res.ratio = res.image.width / res.image.height;
@@ -696,14 +694,14 @@ function windowOpen(url, windowName) {
         return res;
     }
 
-    function getSize(thumb, width, height, single) {
+    function getSize(thumb, width, height) {
         if (!thumb)
             return {};
 
         var isAlbum = !!thumb.thumb;
         var image_sizes = isAlbum ? thumb.thumb.sizes : thumb.sizes;
         var pixel_ratio = window.devicePixelRatio || 1;
-        var x_size = image_sizes['x'] || {};
+        var x_size = image_sizes['orig'] || {};
         var ratio = (x_size[1] || 1) / (x_size[2] || 1);
         var min_s = 0;
 
@@ -721,7 +719,7 @@ function windowOpen(url, windowName) {
         height /= pixel_ratio;
         width /= pixel_ratio;
 
-        var photo_type = 'x';
+        var photo_type = 'orig';
 
         var size = image_sizes[photo_type];
         return {src: size[0], width: size[1], height: size[2]};
