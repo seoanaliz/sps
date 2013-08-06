@@ -745,7 +745,7 @@ i {
 }
 .right-panel .images {
   margin-top: 5px;
-  width: 330px;
+  width: 300px;
   height: 150px;
   overflow: hidden;
 }
@@ -761,7 +761,6 @@ i {
   background-color: #fff;
   text-align: center;
   overflow: hidden;
-  outline: 3px solid #fff;
 }
 .right-panel .images > * {
   position: relative;
@@ -1493,10 +1492,6 @@ i {
 }
 .post:hover {
   background-color: #fff;
-}
-.post:hover .post-image,
-.post:hover .img {
-  outline-color: #fff !important;
 }
 .post:hover .image-compositing:after {
   background-color: #fff;

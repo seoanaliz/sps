@@ -332,6 +332,7 @@ function windowOpen(url, windowName) {
 // Композиция картин
 (function($) {
     var PLUGIN_NAME = 'imageComposition';
+    var CLASS_LOADING = 'image-compositing';
 
     var methods = {
         init: function() {
@@ -340,61 +341,59 @@ function windowOpen(url, windowName) {
                 var coef = $wrap.width() / 381;
                 var margin = 3 * coef;
                 var $images = $wrap.find('img');
-                var attachments = $images.map(function () {
-                    var $image = $(this);
-                    var photo = {
-                        sizes: extrapolate($image.width(), $image.height())
+                var imagesNum = $images.length;
+
+                $wrap.addClass(CLASS_LOADING); 
+
+                var loadedImages = 0;
+                $images.each(function() {
+                    var $originalImage = $(this);
+                    var src = $originalImage.attr('src');
+                    var img = new Image();
+                    img.onload = function() {
+                        loadedImages++;
+                        $originalImage.data('sizes', ['', img.width, img.height]);
+                        if (loadedImages >= imagesNum) {
+                            handleImagesLoad();
+                        }
                     };
-                    return {type: 'photo', photo: photo};
+                    img.src = src;
                 });
-                var result = processThumbs(381, 254, attachments, {wide: false});
-                $wrap.css({
-                    'width': result.width * coef + 'px',
-                    'height': result.height * coef + 'px'
-                });
-                $.each(result.thumbs, function (i, thumb) {
-                    var crop = cropImage(thumb, thumb.width, thumb.height);
-                    $($images[i]).css({
-                        'width': crop.width * coef + 'px',
-                        'height': crop.height * coef + 'px',
-                        'margin-left': crop.marginLeft * coef + 'px',
-                        'margin-top': crop.marginTop * coef + 'px'
-                    })
-                    .closest('.image-wrap').css({
-                        'width': thumb.width * coef,
-                        'height': thumb.height * coef,
-                        'margin-right': thumb.lastColumn ? '0' : margin + 'px',
-                        'margin-bottom': thumb.lastRow ? '0' : margin + 'px'
-//                        height: 340
-//                        image: Object
-//                        lastColumn: 1
-//                        lastRow: 1
-//                        orig: Object
-//                        ratio: 0.8178807947019867
-//                        single: 1
-//                        width: 278
+
+                function handleImagesLoad() {
+                    var attachments = $images.map(function () {
+                        return {type: 'photo', photo: {
+                              sizes: {
+                                  x: $(this).data('sizes')
+                              }  
+                        }};
                     });
-                });
+                    var result = processThumbs(381, 254, attachments, {wide: false});
+                    $wrap.css({
+                        'width': result.width * coef + 'px',
+                        'height': result.height * coef + 'px'
+                    });
+                    $.each(result.thumbs, function (i, thumb) {
+                        var crop = cropImage(thumb, thumb.width, thumb.height);
+                        $($images[i]).css({
+                            'width': crop.width * coef + 'px',
+                            'height': crop.height * coef + 'px',
+                            'margin-left': crop.marginLeft * coef + 'px',
+                            'margin-top': crop.marginTop * coef + 'px'
+                        })
+                        .closest('.image-wrap').css({
+                            'width': thumb.width * coef,
+                            'height': thumb.height * coef,
+                            'margin-right': thumb.lastColumn ? '0' : margin + 'px',
+                            'margin-bottom': thumb.lastRow ? '0' : margin + 'px'
+                        });
+                    });
+                }
+
+                $wrap.removeClass(CLASS_LOADING);
             });
         }
     };
-
-    function extrapolate(width, height) {
-        // url, width, height
-        return {
-            x: ['', width, height]
-        };
-//                            m: Array[3] // -max130-
-//                            o: Array[3] // 130x
-//                            p: Array[3] // 200x
-//                            q: Array[3] // 320x
-//                            r: Array[3] // 510x
-//                            s: Array[3] // -max75-
-//                            w: Array[3] // orig || -max2560w || -max2048h-
-//                            x: Array[3] // orig || -max604-
-//                            y: Array[3] // orig || -max807- 
-//                            z: Array[3] // orig || -max1280w- ||  -max1024h-
-    }
 
     function processThumbs(maxW, maxH, attachments, opts){
         var oi = function(o) {
