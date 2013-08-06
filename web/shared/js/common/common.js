@@ -336,8 +336,9 @@ function windowOpen(url, windowName) {
     var methods = {
         init: function() {
             return this.each(function() {
-                var margin = '6px';
                 var $wrap = $(this);
+                var coef = $wrap.width() / 381;
+                var margin = 3 * coef;
                 var $images = $wrap.find('img');
                 var attachments = $images.map(function () {
                     var $image = $(this);
@@ -346,25 +347,24 @@ function windowOpen(url, windowName) {
                     };
                     return {type: 'photo', photo: photo};
                 });
-                var result = processThumbs($wrap.width(), Math.round($wrap.width() * 2 / 3) , attachments, {wide: true});
-                log('imageComposition result:', result);
+                var result = processThumbs(381, 254, attachments, {wide: false});
                 $wrap.css({
-                    'width': result.width + 'px',
-                    'height': result.height + 'px'
+                    'width': result.width * coef + 'px',
+                    'height': result.height * coef + 'px'
                 });
                 $.each(result.thumbs, function (i, thumb) {
                     var crop = cropImage(thumb, thumb.width, thumb.height);
                     $($images[i]).css({
-                        'width': Math.round(crop.width) + 'px',
-                        'height': Math.round(crop.height) + 'px',
-                        'margin-left': crop.marginLeft + 'px',
-                        'margin-top': crop.marginTop + 'px'
+                        'width': crop.width * coef + 'px',
+                        'height': crop.height * coef + 'px',
+                        'margin-left': crop.marginLeft * coef + 'px',
+                        'margin-top': crop.marginTop * coef + 'px'
                     })
                     .closest('.image-wrap').css({
-                        'width': thumb.width,
-                        'height': thumb.height,
-                        'margin-right': thumb.lastColumn ? '0' : margin,
-                        'margin-bottom': thumb.lastRow ? '0' : margin
+                        'width': thumb.width * coef,
+                        'height': thumb.height * coef,
+                        'margin-right': thumb.lastColumn ? '0' : margin + 'px',
+                        'margin-bottom': thumb.lastRow ? '0' : margin + 'px'
 //                        height: 340
 //                        image: Object
 //                        lastColumn: 1
