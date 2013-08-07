@@ -92,10 +92,12 @@ function authInfo(response) {
             'user: API.getProfiles({fields: "photo"})[0]' +
         '};';
         VK.Api.call('execute', {code: code}, function(answer) {
+            var userData = null;
             if (answer && answer.response) {
                 $.extend(cur.dataUser, answer.response.user);
-                handleUserLoggedIn(answer.response.user);
+                userData = answer.response.user;
             }
+            handleUserLoggedIn(userData);
         });
     }
 }
@@ -118,14 +120,19 @@ function makeVkButton() {
 
 function handleUserLoggedIn(userData) {
     var $loginInfo = $('.login-info');
-    $loginInfo.html('<a class="logout" href="/logout/?to=' + encodeURIComponent(location.pathname) + '">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
-    var name = userData.first_name + ' ' + userData.last_name;
-    $('.username', $loginInfo)
-            .attr('href', 'http://vk.com/id' + userData.uid)
-            .attr('title', name)
-            .find('span')
-            .text(name);
-    $('.userpic', $loginInfo).attr('src', userData.photo);
+    var buttonCode = '<a class="logout" href="/logout/?to=' + encodeURIComponent(location.pathname) + '">Выйти</a>';
+    if (userData) {
+        $loginInfo.html(buttonCode + '<a class="username"><img class="userpic" alt="" /><span></span></a>');
+        var name = userData.first_name + ' ' + userData.last_name;
+        $('.username', $loginInfo)
+                .attr('href', 'http://vk.com/id' + userData.uid)
+                .attr('title', name)
+                .find('span')
+                .text(name);
+        $('.userpic', $loginInfo).attr('src', userData.photo);
+    } else {
+        $loginInfo.html(buttonCode);
+    }
     $loginInfo.css({opacity: 1});
 }
 
