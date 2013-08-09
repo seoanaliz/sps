@@ -58,6 +58,9 @@
             <action name="getEntries">
                 <path>controls/stat/getEntries</path>
             </action>
+            <action name="setCpp">
+                <path>controls/stat/setCpp</path>
+            </action>
             <action name="selectGroupAdmin">
                 <path>controls/stat/selectGroupAdmin</path>
             </action>

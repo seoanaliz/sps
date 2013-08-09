@@ -136,6 +136,20 @@ var Eventlist = {
             }
         });
     },
+    set_cpp: function(id, cost, callback) { // save cost per post
+        $.ajax({
+            url: controlsRoot + 'setCpp/',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                intId: id,
+                cpp: cost
+            },
+            success: function (resp) {
+                callback(resp);
+            }
+        });
+    },
     update_list: function(public_id, list_id, title, callback) {
         simpleAjax('setGroup', {
             groupId: list_id,

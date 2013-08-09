@@ -57,6 +57,9 @@ td {
 .table .column3 {
   width: 25%;
 }
+.table .column2-5 {
+  width: 20.8%;
+}
 .table .column2 {
   width: 16.6%;
 }
@@ -256,7 +259,6 @@ td {
 #main .left-column > .content .list-body .public {
   border-top: 1px solid #DEE5EB;
   font-weight: bold;
-  line-height: 37px;
   padding: 6px 0;
 }
 #main .left-column > .content .list-body .public.not-editable {
@@ -346,7 +348,61 @@ td {
 #main .left-column > .content .table.no-list-id .public-actions .action.selected .icon {
   opacity: 1;
 }
+.public:hover .cpp-value.editable:after {
+  opacity: 1;
+}
+.cpp-value {
+  color: #717171;
+  font-weight: normal;
+  padding: 6px 0;
+  display: block;
+  position: relative;
+}
+.cpp-value.editable {
+  cursor: pointer;
+  border-radius: 7px 0 0 7px;
+}
+.cpp-value.editable:hover {
+  background-color: #ddd;
+}
+.cpp-value.editable:hover:after {
+  background-color: #ddd;
+}
+.cpp-value.editable:after {
+  content: '';
+  width: 17px;
+  height: 100%;
+  position: absolute;
+  right: -17px;
+  top: 0;
+  background: 50% 50% url('../../images/common/edit.png') no-repeat;
+  opacity: 0;
+  border-radius: 0 7px 7px 0;
+}
+.cpp-value .edit-wrap {
+  position: relative;
+  display: block;
+  width: 103px;
+  margin-left: -13px;
+}
+.cpp-value .input {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  width: 63px;
+  margin-right: 1px;
+}
+.cpp-value .input.invalid {
+  -webkit-box-shadow: 0 0 1px 1px red inset;
+  -moz-box-shadow: 0 0 1px 1px red inset;
+  box-shadow: 0 0 1px 1px red inset;
+}
+.cpp-value .unspec {
+  color: #b4b4b4;
+}
 .right-column .item {
+  display: block;
+  text-decoration: none;
   padding: 4px 39px 4px 18px;
   cursor: pointer;
   color: #2B587A;

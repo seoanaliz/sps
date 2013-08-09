@@ -6,31 +6,44 @@ new stat_tables(); // Чтобы виделись константы
  */
 class EntryGetter {
     public function getEntriesData() {
-        list($entries, $group) = $this->getEntries();
+        list($entries, $groupId, $groupType) = $this->getEntries();
         return array(
             'list'       =>  $entries,
             'min_max'    =>  $this->get_min_max(),
-            'group_type' =>  empty($group) ? null : $group->type,
-            'groupId'    =>  empty($group) ? null : $group->group_id,
+            'group_type' =>  $groupId,
+            'groupId'    =>  $groupType,
         );
     }
 
+    static public function getUserPublics($userVkId) {
+        $userFeeds = UserFeedFactory::Get(array('vkId' => $userVkId));
+        $targetFeedIds = array();
+        foreach ($userFeeds as $userFeed) {
+            $targetFeedIds []= $userFeed->targetFeedId;
+        }
+        $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds));
+        $externalIds = array();
+        foreach ($targetFeeds as $targetFeed) {
+            $externalIds []= $targetFeed->externalId;
+        }
+        return $externalIds;
+    }
+    
     protected function getEntries()
     {
-        $user_id    =   AuthVkontakte::IsAuth();
         $group_id   =   Request::getString( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
-        $period     =   Request::getInteger( 'period' );//
+        $period     =   Request::getInteger( 'period' );
         $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
         $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
-        $mode = null;
-        if( !isset( GroupsUtility::$special_group_ids[$group_id] ) && !is_numeric($group_id)) {
+
+        if (!isset (GroupsUtility::$special_group_ids[$group_id]) && !is_numeric($group_id)) {
             $group_id = null;
-        } elseif( $group_id == GroupsUtility::Group_Id_Special_All ) {
+        } elseif ($group_id == GroupsUtility::Group_Id_Special_All) {
             $group_id = null;
         }
 
@@ -57,26 +70,40 @@ class EntryGetter {
             ,'is_page'      =>  true
             ,'active'       =>  true
         );
-
-        //поиск по названию - глобальный
-        if( $search_name ) {
-            if( mb_strlen( $search_name ) > 5) {
+        
+        
+        if ($group_id == GroupsUtility::Group_Id_Special_My) {
+            // получаем группы, которые пользователь администрирует
+            $userVkId = AuthVkontakte::IsAuth();
+            if ($userVkId) {
+                ////////////////////////////////////////////////////////////////////
+                ///                                                              ///
+                ///                                                              ///
+                ///                        ~ *` ~ *` ~                           ///
+                ///  ВНИМАНИЕ: ХАРДКОД! Никодга не выливайте на прод!  ///
+                ///                                                              ///
+                ///                                                              ///
+                ///                                                              ///
+                ////////////////////////////////////////////////////////////////////
+                $search['_vk_public_id'] = array(11556, 25006); //self::getUserPublics($userVkId);
+            }
+        } elseif ($search_name) { //поиск по названию - глобальный
+            if (mb_strlen( $search_name ) > 5) {
                 $search_name = mb_substr( $search_name, 0, ( mb_strlen( $search_name ) - 2 ));
             }
             $search['_nameIL'] = $search_name;
-        } elseif( $group_id == GroupsUtility::Group_Id_Special_All_Not ) {
+        } elseif ($group_id == GroupsUtility::Group_Id_Special_All_Not) {
             $search['inLists'] = false;
-        } elseif( $group_id ) {
-
-            $group_entries_by_group = GroupEntryFactory::Get( array(
+        } elseif ($group_id) {
+            $group_entries_by_group = GroupEntryFactory::Get(array(
                 'groupId'   =>  $group_id,
                 'sourceType'=>  Group::STAT_GROUP,
             ));
             $entry_ids = array();
-            foreach( $group_entries_by_group as $ge) {
-                $entry_ids[] = $ge->entryId;
+            foreach($group_entries_by_group as $grupEntry) {
+                $entry_ids[] = $grupEntry->entryId;
             }
-            if( !empty( $group_entries_by_group )) {
+            if (!empty($group_entries_by_group)) {
                 $search['_vk_public_id'] = $entry_ids;
             } else {
                  $result = array ();
@@ -84,26 +111,26 @@ class EntryGetter {
             }
         }
 
-        if( !isset( $without_suffixes[$sort_by]))
+        if (!isset($without_suffixes[$sort_by]))
             $sort_by .= $period_suffixes[$period];
         $sort_direction   = $sort_reverse ? ' ASC ': ' DESC ';
         $options    =   array(
             BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST,vk_public_id ' ))
         );
-        $vkPublics = VkPublicFactory::Get( $search, $options );
+        $vkPublics = VkPublicFactory::Get($search, $options);
         $diff_abs = 'diff_abs' .  $period_suffixes[$period];
         $diff_rel = 'diff_rel' .  $period_suffixes[$period];
         $visitors = 'visitors' .  $period_suffixes[$period];
         $viewers  = 'viewers'  .  $period_suffixes[$period];
         $result = array();
-        foreach ($vkPublics as $vkPublic ) {
+        foreach ($vkPublics as $vkPublic) {
             $groups_ids = array();
-            $group_entries_by_entry = GroupEntryFactory::Get( array(
+            $group_entries_by_entry = GroupEntryFactory::Get(array(
                 'entryId'   =>  $vkPublic->vk_public_id,
                 'sourceType'=>  Group::STAT_GROUP
             ));
-            foreach( $group_entries_by_entry as $ge) {
-                $groups_ids[] = $ge->groupId;
+            foreach ($group_entries_by_entry as $grupEntry) {
+                $groups_ids[] = $grupEntry->groupId;
             }
             $result[] =  array(
                 'id'        =>  $vkPublic->vk_public_id,
@@ -118,13 +145,21 @@ class EntryGetter {
                 'visitors'  =>  $vkPublic->$visitors,
                 'viewers'   =>  $vkPublic->$viewers,
                 'in_search' =>  $vkPublic->in_search == 't' ? 1 : 0,
-                'active'    =>  $vkPublic->active == 't' ? true : false
+                'active'    =>  $vkPublic->active == 't' ? true : false,
+                'cpp'       =>  $vkPublic->cpp
             );
         }
 
         end:
-        $group = isset($group_id) ? GroupFactory::GetById($group_id) : null;
-        return array($result, $group);
+        $groupType = null;
+        if ($group_id) {
+            $Group = GroupFactory::GetById($group_id);
+            if ($Group) {
+                $groupType = $Group->type;
+            }
+        }
+
+        return array($result, $group_id, $groupType);
     }
 
     private function get_row( $ds, $structure )

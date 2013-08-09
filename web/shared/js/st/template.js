@@ -15,7 +15,7 @@ var TABLE =
 
 var TABLE_HEADER =
 '<div class="row">' +
-    '<div class="column <?= cur.dataUser.isEditor ? "column4" : "column5" ?> publics">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column3" : "column4" ?> publics">' +
         '<div class="cell">' +
             '<div class="input-wrap">' +
                '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
@@ -42,6 +42,11 @@ var TABLE_HEADER =
             'прирост<span class="icon arrow"></span>' +
         '</div>' +
     '</div>' +
+    '<div class="column column1 cpp">' +
+        '<div class="cell">' +
+            '<abbr title="Cost per post">CPP</abbr><span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
     '<div class="column column1 in-search">' +
         '<div class="cell">' +
             'в поиске<span class="icon arrow">' +
@@ -59,7 +64,7 @@ var TABLE_BODY =
 
 var TABLE_ROW =
 '<div class="public row" data-id="<?=intId?>">' +
-    '<div class="column <?= cur.dataUser.isEditor ? "column4" : "column5" ?> public-info" data-id="<?=publicId?>">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column3" : "column4" ?> public-info" data-id="<?=publicId?>">' +
         '<div class="cell">' +
             '<div class="photo">' +
                 '<img src="<?=publicImg?>" alt="" />' +
@@ -91,6 +96,17 @@ var TABLE_ROW =
             '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
                 '<?=numberWithSeparator(publicGrowthNum)?> ' +
                 '<small><?=numberWithSeparator(publicGrowthPer)?>%</small>' +
+            '</span>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1">' +
+        '<div class="cell">' +
+            '<span class="cpp-value" data-cpp="<?=cpp?>">' +
+                '<? if (cpp === null || cpp === undefined || cpp === false || cpp === "") { ?>' +
+                    '<span class="unspec"></span>' +
+                '<? } else { ?>' +
+                    '<?= cpp ?>&nbsp;руб' +
+                '<? } ?>' +
             '</span>' +
         '</div>' +
     '</div>' +

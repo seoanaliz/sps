@@ -19,12 +19,10 @@ class UserFeedFactory implements IFactory
         'class' => 'UserFeed',
         'table' => 'userFeed',
         'view'  => 'userFeed',
-        //, 'flags'     => array( 'CanCache' => 'CanCache' )
-        //, 'cacheDeps' => array()
         'fields' => array(
             'vkId' => array(
-                'name' => 'vkId'
-            , 'type' => TYPE_INTEGER
+                'name' => 'vkId',
+                'type' => TYPE_INTEGER
             ),
             'targetFeedId' => array(
                 'name' => 'targetFeedId',

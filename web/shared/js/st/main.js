@@ -112,6 +112,7 @@ function makeVkButton() {
                 '&display=page' +
                 '&response_type=code';
         $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
+        $('#my-publics').attr('href', vkHref);
     }
     $loginInfo.css({opacity: 1});
 }
@@ -346,7 +347,7 @@ var List = (function() {
     }
 
     function select(id, callback) {
-        if (id === 'all' || id === 'all_not_listed') {
+        if (id === 'all' || id === 'all_not_listed' || id === 'my') {
             $actions.fadeOut(140);
         } else {
             cur.dataUser.isAdmin && $actions.fadeIn(300);
@@ -622,7 +623,6 @@ var Filter = (function() {
         if ($.isFunction(callback)) {
             callback();
         } else {
-            var id = $item.data('id');
             List.select(id, function() {
                 Table.changeList(id, $item.data('slug')).success(function() {
                     Def.fireSuccess();
@@ -710,6 +710,7 @@ var Table = (function() {
                         publicInSearch: !!publicItem.in_search,
                         publicVisitors: publicItem.visitors,
                         publicAudience: publicItem.viewers,
+                        cpp: publicItem.cpp,
                         lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                         users: users
                     });
@@ -803,6 +804,7 @@ var Table = (function() {
                         }
                     }
                     $el.removeClass('loading');
+                    initUserPublics();
                 }
         );
     }
@@ -835,6 +837,7 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    initUserPublics();
                 }
         );
     }
@@ -871,6 +874,8 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    
+                    initUserPublics();
                 }
         );
     }
@@ -890,19 +895,21 @@ var Table = (function() {
         };
 
         Events.fire('load_table', params,
-                function(data, maxPeriod, listType) {
-                    pagesLoaded = 1;
-                    currentListType = listType;
-                    currentPeriod = period;
-                    dataTable = data;
-                    if (!listType) {
-                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    } else {
-                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    }
-                    if ($.isFunction(callback))
-                        callback(data);
+            function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
+                currentListType = listType;
+                currentPeriod = period;
+                dataTable = data;
+                if (!listType) {
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                } else {
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
                 }
+                if ($.isFunction(callback))
+                    callback(data);
+                
+                initUserPublics();
+            }
         );
     }
     function setAudience(audience, callback) {
@@ -935,6 +942,8 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    
+                    initUserPublics();
                 }
         );
     }
@@ -966,6 +975,8 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    
+                    initUserPublics();
                 }
         );
     }
@@ -989,8 +1000,6 @@ var Table = (function() {
             slug: slug
         };
 
-        getTable(params, loadTableCallback);
-
         function getTable(params, callback) {
             if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
                 var data = prepareServerData(entriesPrecache);
@@ -1001,6 +1010,8 @@ var Table = (function() {
                 Events.fire('load_table', params, callback);
             }
         }
+
+        getTable(params, loadTableCallback);
 
         function loadTableCallback(data, maxPeriod, listType) {
             pagesLoaded = 1;
@@ -1029,9 +1040,77 @@ var Table = (function() {
             Filter.setSliderMin(maxPeriod[0]);
             Filter.setSliderMax(maxPeriod[1]);
             Def.fireSuccess();
+            initUserPublics();
         }
 
         return Def;
+    }
+
+    var initUserPublicsEvents = function () { // выполняется один раз, потом переназначает сама себя
+        $container.delegate('.cpp-value.editable', 'click', function () {
+            var $container = $(this);
+            $container.removeClass('editable');
+            $container.data('htmlBefore', $container.html());
+            $container.html('<span class="edit-wrap"><input class="input" type="text" />&nbsp;руб</span>');
+            $container.find('.input').bind('blur',
+                function () {
+                    cancelEditor($(this).closest('.cpp-value'));
+                }).val($container.data('cpp')).focus();
+        })
+        .delegate('.cpp-value .input', 'keyup', function (e) {
+            var $input = $(this);
+            $input.removeClass('invalid');
+            if (e.keyCode === KEY.ENTER) {
+                var $container = $input.closest('.cpp-value');
+                saveEditor($container.closest('.public').data('id'), $input.val()).success(function(result) {
+                    if (result) {
+                        if (result.success) {
+                            $container.text(result.cpp);
+                            $container.data('cpp', result.cpp);
+                            $container.addClass('editable');
+                        } else if (result.validation) {
+                            $input.addClass('invalid');
+                        }
+                    }
+                });
+            } else if (e.keyCode === KEY.ESC) {
+                cancelEditor($(this).closest('.cpp-value'));
+            }
+        });
+
+        function saveEditor(id, rawVal) {
+            var Def = new Deferred();
+            var val = $.trim(rawVal);
+            if (val) {
+                Events.fire('set_cpp', id, val, function (result) {
+                    Def.fireSuccess(result);
+                });
+            } else {
+                Def.fireSuccess(false);
+            }
+            return Def;
+        }
+
+        function cancelEditor($container) {
+            $container.html($container.data('htmlBefore'));
+            $container.addClass('editable');
+        }
+
+        initUserPublicsEvents = function() {};
+    }
+
+    /**
+     * @private
+     */
+    function initUserPublics() {
+        if (currentListId === 'my') {
+            $container.find('.cpp-value')
+                        .addClass('editable')
+                    .find('.unspec')
+                        .html('Не указано');
+
+            initUserPublicsEvents();
+        }
     }
 
     function _initEvents() {

@@ -59,10 +59,11 @@
                             </div>
                         </div>
                         <div class="list buttons">
-                            <div class="item" data-id="all">Все паблики</div>    
+                            <div class="item" data-id="all">Все паблики</div>
                             <? if ($canEditGlobalGroups) {?>
                                 <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
                             <? } ?>
+                            <a id="my-publics" href="javascript:;" class="item" data-id="my">Мои сообщества<? if (!$isAuthorized) {?> [Войти]<? } ?></a>
                         </div>
                         <? if ($hasAccessToPrivateGroups) {?>
                             <div class="title">Личные</div>
