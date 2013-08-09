@@ -347,7 +347,7 @@ var List = (function() {
     }
 
     function select(id, callback) {
-        if (id === 'all' || id === 'all_not_listed' || id === 'my') {
+        if (id === 'all' || id === 'not_listed' || id === 'my') {
             $actions.fadeOut(140);
         } else {
             cur.dataUser.isAdmin && $actions.fadeIn(300);

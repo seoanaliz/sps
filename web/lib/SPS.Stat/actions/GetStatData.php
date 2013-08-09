@@ -31,13 +31,17 @@ class GetStatData extends BaseControl
         $EntryGetter = new EntryGetter();
         $id = null;
         if ($slug) {
-            $id = $EntryGetter->getGroupIdBySlug($slug);
-            if (!$id) { // несуществующий URI
-                return 'default'; // редирект
+            if ($slug === 'my' || $slug === 'not_listed') {
+                $id = $slug;
+            } else {
+                $id = $EntryGetter->getGroupIdBySlug($slug);
+                if (!$id) { // несуществующий URI
+                    return 'default'; // редирект
+                }
             }
         }
 
-        Request::setInteger('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
+        Request::setString('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
         Response::setString('entriesPrecache', ObjectHelper::ToJSON($EntryGetter->getEntriesData()));
 
         include __DIR__ . '/controls/groups/getGroupList.php';

@@ -11,7 +11,7 @@
         const Group_Global  = 5;
 
         const Group_Id_Special_All = 'all';
-        const Group_Id_Special_All_Not = 'all_not_listed';
+        const Group_Id_Special_All_Not = 'not_listed';
         const Group_Id_Special_My = 'my'; // @author kulikov @task #18899
 
         const Fake_User_ID_Global = -1;

@@ -311,7 +311,7 @@ class EntryGetter {
         return $result->GetInteger('group_id');
     }
 
-    public static  function updateSlugs( $check_for_id = null, $show_results = true, $rename = false )
+    public static function updateSlugs( $check_for_id = null, $show_results = true, $rename = false )
     {
         $sql = 'SELECT group_id, name, slug FROM '. TABLE_STAT_GROUPS .'  WHERE
             type = ' .GroupsUtility::Group_Global . '
@@ -321,7 +321,10 @@ class EntryGetter {
 
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $found = array(
-            '' => 1 // для переименования пустого слага в '1' в цикле ниже
+            '' => 1, // для переименования пустого слага в '1' в цикле ниже
+            'my' => 1,
+            'all' => 1,
+            'not_listed' => 1
         );
         $result = $cmd->Execute();
         while ( $result->next()) {
