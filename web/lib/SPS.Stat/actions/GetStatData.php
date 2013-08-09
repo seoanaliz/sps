@@ -27,6 +27,11 @@ class GetStatData extends BaseControl
 
         $requestData = Page::$RequestData;
         $slug = isset($requestData[1]) ? $requestData[1] : null;
+        
+        if ($slug === 'my' && $rank === StatAuthority::STAT_ROLE_GUEST) {
+            Response::setString('redirect', '/stat/'.$slug);
+            return 'login'; // redirect
+        }
 
         $EntryGetter = new EntryGetter();
         $id = null;
@@ -36,7 +41,7 @@ class GetStatData extends BaseControl
             } else {
                 $id = $EntryGetter->getGroupIdBySlug($slug);
                 if (!$id) { // несуществующий URI
-                    return 'default'; // редирект
+                    return 'default'; // redirect
                 }
             }
         }

@@ -15,6 +15,9 @@
         <redirects>
             <redirect name="default" path="/stat/" />
         </redirects>
+        <redirects>
+            <redirect name="login" path="/login/?to={redirect}" />
+        </redirects>
     </action>
 
     <group name="Daemons">

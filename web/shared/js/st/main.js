@@ -112,7 +112,6 @@ function makeVkButton() {
                 '&display=page' +
                 '&response_type=code';
         $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
-        $('#my-publics').attr('href', vkHref);
     }
     $loginInfo.css({opacity: 1});
 }
@@ -187,18 +186,16 @@ var List = (function() {
                         VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
                             Events.fire('load_list', function(dataLists) {
                                 if (dataVK && dataVK.error) {
-                                    box
-                                            .setTitle('Ошибка')
-                                            .setHTML('Вы не предоставили доступ к друзьям.')
-                                            .setButtons([
+                                    box.setTitle('Ошибка')
+                                        .setHTML('Вы не предоставили доступ к друзьям.')
+                                        .setButtons([
                                         {label: 'Перелогиниться', onclick: function() {
                                                 VK.Auth.logout(function() {
                                                     location.replace('login/');
                                                 });
                                             }},
                                         {label: 'Отмена', isWhite: true}
-                                    ])
-                                            ;
+                                    ]);
                                 } else {
                                     var dataVKfriends = dataVK.response;
                                     var friends = [];
@@ -223,8 +220,7 @@ var List = (function() {
 
                                     var $users = $box.find('.users');
                                     var $lists = $box.find('.lists');
-                                    $users
-                                            .tags({
+                                    $users.tags({
                                         onadd: function(tag) {
                                             shareUsers.push(parseInt(tag.id));
                                         },
@@ -233,22 +229,18 @@ var List = (function() {
                                                 return value != tagId;
                                             });
                                         }
-                                    })
-                                            .autocomplete({
+                                    }).autocomplete({
                                         data: friends,
                                         target: $users.closest('.ui-tags'),
                                         onchange: function(item) {
                                             $(this).tags('addTag', item).val('').focus();
                                         }
-                                    })
-                                            .keydown(function(e) {
+                                    }).keydown(function(e) {
                                         if (e.keyCode == KEY.DEL && !$(this).val()) {
                                             $(this).tags('removeLastTag');
                                         }
-                                    })
-                                            ;
-                                    $lists
-                                            .tags({
+                                    });
+                                    $lists.tags({
                                         onadd: function(tag) {
                                             shareLists.push(tag.id);
                                         },
@@ -258,20 +250,20 @@ var List = (function() {
                                             });
                                         }
                                     })
-                                            .autocomplete({
+                                    .autocomplete({
                                         data: lists,
                                         target: $lists.closest('.ui-tags'),
                                         onchange: function(item) {
                                             $(this).tags('addTag', item).val('').focus();
                                         }
                                     })
-                                            .keydown(function(e) {
+                                    .keydown(function(e) {
                                         if (e.keyCode == KEY.DEL && !$(this).val()) {
                                             $(this).tags('removeLastTag');
                                         }
                                     })
-                                            .tags('addTag', {id: listId, title: listTitle})
-                                            ;
+                                    .tags('addTag', {id: listId, title: listTitle});
+
                                     $box.find('input[value=""]:first').focus();
                                 }
                             });

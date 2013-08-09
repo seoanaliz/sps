@@ -63,7 +63,7 @@
                             <? if ($canEditGlobalGroups) {?>
                                 <div class="item editor_lists" data-id="not_listed" data-slug="not_listed">Не в группе</div>
                             <? } ?>
-                            <a id="my-publics" href="javascript:;" class="item" data-id="my" data-slug="my">Мои сообщества<? if (!$isAuthorized) {?> [Войти]<? } ?></a>
+                            <div id="my-publics" class="item" data-id="my" data-slug="my">Мои сообщества<? if (!$isAuthorized) {?> [Войти]<? } ?></div>
                         </div>
                         <? if ($hasAccessToPrivateGroups) {?>
                             <div class="title">Личные</div>
