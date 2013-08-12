@@ -20,16 +20,8 @@ class WrAlarm
     {
 
 
-        set_time_limit(1000);
-        $a = VkPublicFactory::Get(array( 'page' => true ), array(BaseFactory::WithoutPages));
-        foreach( $a as $public ) {
-            $res = VkHelper::api_request('wall.get', array('count'=> 1, 'owner_id' => $public->vk_id, false));
-            if(isset( $res->error)) {
-                $public->active = false;
-                VkPublicFactory::Update( $public);
-            }
-        }
-        die();
+        set_time_limit(10000);
+  
         $this->connect = ConnectionFactory::Get( 'tst' );
         $publics = $this->get_monitoring_publs();
         $this->check_in_search( $publics );
