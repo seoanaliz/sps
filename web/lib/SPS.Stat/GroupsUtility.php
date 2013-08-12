@@ -4,7 +4,6 @@
 
     class GroupsUtility
     {
-
         const Group_Type_Default = 1;
         const Group_Shared  = 2;
         const Group_Shared_Special = 3;
@@ -12,13 +11,15 @@
         const Group_Global  = 5;
 
         const Group_Id_Special_All = 'all';
-        const Group_Id_Special_All_Not = 'all_not_listed';
+        const Group_Id_Special_All_Not = 'not_listed';
+        const Group_Id_Special_My = 'my'; // @author kulikov @task #18899
 
         const Fake_User_ID_Global = -1;
 
         public static $special_group_ids = array(
             self::Group_Id_Special_All      => 'Все',
             self::Group_Id_Special_All_Not  => 'Не в группе',
+            self::Group_Id_Special_My       => 'Мои собщества'
         );
 
         public static  $barter_watchers = array(

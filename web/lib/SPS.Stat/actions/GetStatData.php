@@ -23,23 +23,32 @@ class GetStatData extends BaseControl
         Response::setParameter('hasAccessToPrivateGroups', $hasAccessToPrivateGroups);
         Response::setParameter('canEditGlobalGroups', $canEditGlobalGroups);
         Response::setParameter('rank', ObjectHelper::ToJSON($rank));
-
+        Response::setParameter('isAuthorized', $rank > StatAuthority::STAT_ROLE_GUEST);
 
         $requestData = Page::$RequestData;
         $slug = isset($requestData[1]) ? $requestData[1] : null;
+        
+        if ($slug === 'my' && $rank === StatAuthority::STAT_ROLE_GUEST) {
+            Response::setString('redirect', '/stat/'.$slug);
+            return 'login'; // redirect
+        }
 
         $EntryGetter = new EntryGetter();
         $id = null;
         if ($slug) {
-            $id = $EntryGetter->getGroupIdBySlug($slug);
-            if (!$id) { // несуществующий URI
-                return 'default'; // редирект
+            if ($slug === 'my' || $slug === 'not_listed') {
+                $id = $slug;
+            } else {
+                $id = $EntryGetter->getGroupIdBySlug($slug);
+                if (!$id) { // несуществующий URI
+                    return 'default'; // redirect
+                }
             }
         }
 
-        Request::setInteger('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
+        Request::setString('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
         Response::setString('entriesPrecache', ObjectHelper::ToJSON($EntryGetter->getEntriesData()));
-        
+
         include __DIR__ . '/controls/groups/getGroupList.php';
         $gl = new getGroupList();
         ob_start();
