@@ -85,7 +85,7 @@ class EntryGetter {
                 ///                                                              ///
                 ///                                                              ///
                 ////////////////////////////////////////////////////////////////////
-                $search['_vk_public_id'] = array(11556, 25006); //self::getUserPublics($userVkId);
+                $search['_vk_public_id'] = self::getUserPublics($userVkId);
             }
         } elseif ($search_name) { //поиск по названию - глобальный
             if (mb_strlen( $search_name ) > 5) {
