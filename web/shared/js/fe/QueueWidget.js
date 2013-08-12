@@ -67,11 +67,7 @@ var QueueWidget = Event.extend({
                     Elements.initDroppable();
                     Elements.initImages($page);
                     Elements.initLinks($page);
-                    $page.find('.post .images').imageComposition();
                     $page.find('.post.blocked').draggable('disable');
-                    setTimeout(function () {
-                        $page.find('.expanded-post .images-ready').imageComposition();
-                    }, 200);
                 } else {
                     t.$queue.empty();
                 }
@@ -114,11 +110,7 @@ var QueueWidget = Event.extend({
                 Elements.initDroppable();
                 Elements.initImages($loadedPage);
                 Elements.initLinks($loadedPage);
-                $loadedPage.find('.post .images').imageComposition();
                 $loadedPage.find('.post.blocked').draggable('disable');
-                setTimeout(function () {
-                    $page.find('.expanded-post .images-ready').imageComposition();
-                }, 200);
                 Def.fireSuccess($loadedPage);
             }
         });
@@ -209,7 +201,41 @@ var QueueWidget = Event.extend({
 
             if (time && time != $time.text()) {
                 $time.text(time);
-                if (!$post.hasClass('new')) {
+                if ($post.hasClass('new')) {
+                    Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
+                        if (isOk && data) {
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (data.gridLineId) {
+                                    setTimeout(function () {
+                                        var $elem = $newPage.find('.slot[data-grid-id="'+ data.gridLineId +'"]');
+                                        if ($elem.length) {
+                                           var verticalPosition = $newPage.position().top + $elem.position().top;
+                                           var delta = 0; // сколько нужно скроллить, чтобы увидеть элемент: вверх "-" или вниз "+" за экран
+                                           if (verticalPosition < 0) {
+                                               delta = verticalPosition - 70;
+                                           } else if (verticalPosition > t.$queue.height()) {
+                                               delta = verticalPosition - t.$queue.height() + $elem.height() + 50;
+                                           }
+                                           if (delta !== 0) {
+                                               var newScrollTop = t.$queue.scrollTop() + delta;
+                                               if (newScrollTop < 0) {
+                                                   newScrollTop = 0;
+                                               }
+                                               t.$queue.scrollTop(newScrollTop);
+                                               t.$queue.animate({scrollTop: newScrollTop}, 300);
+                                           }
+                                        }
+                                    }, 100);
+                                }
+                            });
+                        } else {
+                            var savedTime = $time.data('time-before');
+                            if (savedTime) {
+                                $time.text(savedTime);
+                            }
+                        }
+                    });
+                } else {
                     // Редактирование времени ячейки для текущего дня
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
                         if (isOk) {
@@ -230,37 +256,6 @@ var QueueWidget = Event.extend({
                                     }
                                 }
                             });
-                        }
-                    });
-                } else {
-                    Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
-                        if (isOk && data) {
-                            t.updateSinglePage($page).success(function($newPage) {
-                                if (data.gridLineId) {
-                                    var $elem = $newPage.find('.slot[data-grid-id="'+ data.gridLineId +'"]');
-                                    if ($elem.length) {
-                                       var verticalPosition = $newPage.position().top + $elem.position().top;
-                                       var delta = 0; // сколько нужно скроллить, чтобы увидеть элемент: вверх "-" или вниз "+" за экран
-                                       if (verticalPosition < 0) {
-                                           delta = verticalPosition - 70;
-                                       } else if (verticalPosition > t.$queue.height()) {
-                                           delta = verticalPosition - t.$queue.height() + $elem.height() + 50;
-                                       }
-                                       if (delta !== 0) {
-                                           var newScrollTop = t.$queue.scrollTop() + delta;
-                                           if (newScrollTop < 0) {
-                                               newScrollTop = 0;
-                                           }
-                                           t.$queue.animate({scrollTop: newScrollTop}, 500);
-                                       }
-                                    }
-                                }
-                            });
-                        } else {
-                            var savedTime = $time.data('time-before');
-                            if (savedTime) {
-                                $time.text(savedTime);
-                            }
                         }
                     });
                 }
@@ -517,11 +512,7 @@ var QueueWidget = Event.extend({
         Elements.initDraggable($page);
         Elements.initImages($page);
         Elements.initLinks($page);
-        $page.find('.post .images').imageComposition();
         $page.find('.post.blocked').draggable('disable');
-        setTimeout(function () {
-            $page.find('.expanded-post .images-ready').imageComposition();
-        }, 200);
     },
 
     /**
