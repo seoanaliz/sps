@@ -40,7 +40,7 @@
         }
 
         public static function IsAuth() {
-            return 670456;#self::GetUserByCookie(Cookie::getString('good_' . self::$AppId));
+            return self::GetUserByCookie(Cookie::getString('good_' . self::$AppId));
         }
 
         protected static function GetUserByCookie($cookieString) {
