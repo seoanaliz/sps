@@ -470,7 +470,11 @@ sql;
 //        $likes_array  = array();
         $look_from_time = new DateTimeWrapper( date('r', time() - 600 ));
         $look_to_time   = new DateTimeWrapper( date('r', time() - 60 ));
-        $converted_posts = ParserVkontakte::post_conv( $posts );
+        try {
+            $converted_posts = ParserVkontakte::post_conv( $posts );
+        } catch (Exception $e) {
+            return false;
+        }
         foreach( $converted_posts as $post ) {
             $postDate = new DateTimeWrapper( date('r', $post['time'] ));
             //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
