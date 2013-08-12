@@ -13,12 +13,16 @@ var Configs = {
 
 var cur = {
     dataUser: {
+        isAuthorized: (window.rank > 1),
         isEditor: (window.rank > 2),
         isAdmin: (window.rank > 3)
     }
 };
 
+currentListId = 'all';
 $(document).ready(function() {
+    currentListId = entriesPrecache.groupId;
+
     (function(w) {
         var $elem = $('#go-to-top');
         $elem.click(function() {
@@ -80,7 +84,8 @@ function checkVkStatus() {
 }
 
 function makeVkButton() {
-    $('.login-info').html('<a href='+ makeVkLink(location.pathname) +' class="login">Войти</a>');
+    var redirectAfterLogin = (currentListId === 'my') ? '/stat/' : location.pathname;
+    $('.login-info').html('<a href='+ makeVkLink(redirectAfterLogin) +' class="login">Войти</a>');
     revealLoginBlock();
 }
 
@@ -669,7 +674,6 @@ var Table = (function() {
     var $container;
     var dataTable = {};
     var pagesLoaded = 0;
-    var currentListId = 0;
     var currentSearch = '';
     var currentSortBy = '';
     var currentSortReverse = false;
