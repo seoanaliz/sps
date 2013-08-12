@@ -28,8 +28,8 @@ class GetStatData extends BaseControl
         $requestData = Page::$RequestData;
         $slug = isset($requestData[1]) ? $requestData[1] : null;
         
-        if ($slug === 'my' && $rank === StatAuthority::STAT_ROLE_GUEST) {
-            Response::setString('redirect', '/stat/'.$slug);
+         if ($slug === 'my' && $rank === StatAuthority::STAT_ROLE_GUEST) {
+            Response::setString('redirect', '/stat/my');
             return 'login'; // redirect
         }
 
@@ -44,6 +44,8 @@ class GetStatData extends BaseControl
                     return 'default'; // redirect
                 }
             }
+        } else {
+            $id = 'all';
         }
 
         Request::setString('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
