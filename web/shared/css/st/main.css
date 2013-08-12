@@ -400,6 +400,9 @@ td {
 .cpp-value .unspec {
   color: #b4b4b4;
 }
+.right-column .buttons .item {
+  padding-right: 4px;
+}
 .right-column .item {
   display: block;
   text-decoration: none;
@@ -775,10 +778,10 @@ td {
   *display: inline;
   float: right;
   margin-top: 7px;
-  width: 170px;
+  min-width: 195px;
 }
 .login-info {
-  margin: 3px 7px 0 24px;
+  margin: 3px 7px 0 5px;
   display: inline-block;
   zoom: 1;
   *display: inline;

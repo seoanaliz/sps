@@ -79,6 +79,11 @@ function checkVkStatus() {
     }
 }
 
+function makeVkButton() {
+    $('.login-info').html('<a href='+ makeVkLink(location.pathname) +' class="login">Войти</a>');
+    revealLoginBlock();
+}
+
 function authInfo(response) {
     if (!response.session) {
         makeVkButton();
@@ -97,20 +102,17 @@ function authInfo(response) {
     }
 }
 
-function makeVkButton() {
-    var $loginInfo = $('.login-info');
-    if ($loginInfo.length) {
-        var vkHref = 'https://oauth.vk.com/authorize?' +
-                'client_id=' + Configs.appId +
-                '&scope=stats,groups,offline,wall,photos' +
-                'client_id=' + Configs.appId +
-                '&scope=stats,groups,offline,wall' +
-                '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
-                '&display=page' +
-                '&response_type=code';
-        $loginInfo.html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
-    }
-    revealLoginBlock();
+function makeVkLink(redirectTo) {
+    var redirectPart = redirectTo ? ('?to=' + redirectTo) : '';
+
+    return 'https://oauth.vk.com/authorize?' +
+    'client_id=' + Configs.appId +
+    '&scope=stats,groups,offline,wall,photos' +
+    'client_id=' + Configs.appId +
+    '&scope=stats,groups,offline,wall' +
+    '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/' + redirectPart) +
+    '&display=page' +
+    '&response_type=code';
 }
 
 function handleUserLoggedIn(userData) {
