@@ -6,12 +6,11 @@ new stat_tables(); // Чтобы виделись константы
  */
 class EntryGetter {
     public function getEntriesData() {
-        list($entries, $groupId, $groupType) = $this->getEntries();
+        list($entries, $groupId, $hasMore) = $this->getEntries();
         return array(
             'list'       =>  $entries,
+            'hasMore'    =>  $hasMore,
             'min_max'    =>  $this->get_min_max(),
-            'group_type' =>  $groupId,
-            'groupId'    =>  $groupType,
         );
     }
 
@@ -33,18 +32,17 @@ class EntryGetter {
     {
         $group_id   =   Request::getString( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
-        $limit      =   Request::getInteger( 'limit' );
+        $limit      =   Request::getInteger( 'limit' ) ?: 25;
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );
         $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
         $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
+        $hasMore = false; // есть ли море?
 
-        if (!isset (GroupsUtility::$special_group_ids[$group_id]) && !is_numeric($group_id)) {
-            $group_id = null;
-        } elseif ($group_id == GroupsUtility::Group_Id_Special_All) {
-            $group_id = null;
+        if (!isset(GroupsUtility::$special_group_ids[$group_id])) {
+            $group_id = (int) $group_id;
         }
 
         $period_suffixes = array(
@@ -61,18 +59,17 @@ class EntryGetter {
         }
         $without_suffixes  = array( 'quantity' => true, 'in_search' => true );
 
-        $search     =   array(
+        $search = array(
              '_quantityLE'  =>  $quant_max ? $quant_max : 100000000
             ,'_quantityGE'  =>  $quant_min ? $quant_min : 20000
-            ,'page'         =>  round( $offset/( $limit ? $limit : 25))
-            ,'pageSize'     =>  $limit ? $limit : 25
+            ,'limit'        =>  $limit + 1
+            ,'offset'       =>  $offset
             ,'sh_in_main'   =>  true
             ,'is_page'      =>  true
             ,'active'       =>  true
         );
-        
-        
-        if ($group_id == GroupsUtility::Group_Id_Special_My) {
+
+        if ($group_id === GroupsUtility::Group_Id_Special_My) {
             // получаем группы, которые пользователь администрирует
             $userVkId = AuthVkontakte::IsAuth();
             if ($userVkId) {
@@ -92,9 +89,9 @@ class EntryGetter {
                 $search_name = mb_substr( $search_name, 0, ( mb_strlen( $search_name ) - 2 ));
             }
             $search['_nameIL'] = $search_name;
-        } elseif ($group_id == GroupsUtility::Group_Id_Special_All_Not) {
+        } elseif ($group_id === GroupsUtility::Group_Id_Special_All_Not) {
             $search['inLists'] = false;
-        } elseif ($group_id) {
+        } elseif ($group_id !== GroupsUtility::Group_Id_Special_All) {
             $group_entries_by_group = GroupEntryFactory::Get(array(
                 'groupId'   =>  $group_id,
                 'sourceType'=>  Group::STAT_GROUP,
@@ -118,6 +115,10 @@ class EntryGetter {
             BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST,vk_public_id ' ))
         );
         $vkPublics = VkPublicFactory::Get($search, $options);
+        if (count($vkPublics) > $limit) {
+            $vkPublics = array_slice($vkPublics, 0, $limit);
+            $hasMore = true;
+        }
         $diff_abs = 'diff_abs' .  $period_suffixes[$period];
         $diff_rel = 'diff_rel' .  $period_suffixes[$period];
         $visitors = 'visitors' .  $period_suffixes[$period];
@@ -151,15 +152,7 @@ class EntryGetter {
         }
 
         end:
-        $groupType = null;
-        if ($group_id) {
-            $Group = GroupFactory::GetById($group_id);
-            if ($Group) {
-                $groupType = $Group->type;
-            }
-        }
-
-        return array($result, $group_id, $groupType);
+        return array($result, $group_id, $hasMore);
     }
 
     private function get_row( $ds, $structure )

@@ -310,7 +310,9 @@
             $query      .= self::PrepareGetOrCountFields( $searchArray, $mapping, $options, $conn );
             $query      .= self::GetOrderByString( $options, $conn );
 
-            if ( BaseFactory::CanPages( $mapping, $options ) ) {
+            if (isset($searchArray['limit'])) {
+                $query .=  " LIMIT @limit OFFSET @offset ";
+            } else if ( BaseFactory::CanPages( $mapping, $options ) ) {
                 $query .=  " LIMIT @pageSize OFFSET @pageOffset ";
             }
 
