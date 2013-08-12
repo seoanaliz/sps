@@ -762,19 +762,20 @@ td {
   border: none;
 }
 .login-info,
-.button-wrap {
+#button-wrap {
   opacity: 0;
   -webkit-transition: opacity 1s ease-out;
   -moz-transition: opacity 1s ease-out;
   -o-transition: opacity 1s ease-out;
   transition: opacity 1s ease-out;
 }
-.button-wrap {
+#button-wrap {
   display: inline-block;
   zoom: 1;
   *display: inline;
   float: right;
   margin-top: 7px;
+  width: 170px;
 }
 .login-info {
   margin: 3px 7px 0 24px;

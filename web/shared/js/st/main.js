@@ -4,11 +4,11 @@
 
 var Configs = {
     appId: vk_appId,
-    maxRows: 10000,
-    tableLoadOffset: 20,
+    loginBlockReady: false,
+    shareButtonReady: false,
+    tableLoadOffset: 25,
     controlsRoot: controlsRoot,
-    eventsDelay: 0,
-    etc: null
+    activeElement: document.body
 };
 
 var cur = {
@@ -33,7 +33,6 @@ $(document).ready(function() {
         });
     })(window);
 
-    Configs.activeElement = document.body;
     document.body.addEventListener && document.body.addEventListener('focus', function() {
         Configs.activeElement = document.activeElement;
     }, true);
@@ -44,10 +43,6 @@ $(document).ready(function() {
             Table.init();
         });
     });
-
-    setTimeout(function () {
-        $('.header .button-wrap').css({opacity: 1});
-    }, 1800);
 
     checkVkStatus();
 });
@@ -113,9 +108,9 @@ function makeVkButton() {
                 '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
                 '&display=page' +
                 '&response_type=code';
-        $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
+        $loginInfo.html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
     }
-    $loginInfo.css({opacity: 1});
+    revealLoginBlock();
 }
 
 function handleUserLoggedIn(userData) {
@@ -132,7 +127,7 @@ function handleUserLoggedIn(userData) {
 
         function show() {
             $('.userpic', $loginInfo).attr('src', userData.photo);
-            $loginInfo.css({opacity: 1});
+            revealLoginBlock();
         }
 
         var img = new Image();
@@ -141,13 +136,16 @@ function handleUserLoggedIn(userData) {
         img.src = userData.photo;
     } else {
         $loginInfo.html(buttonCode);
-        $loginInfo.css({opacity: 1});
+        revealLoginBlock();
     }
+}
 
-    var img = new Image();
-    img.onload = show;
-    img.onerror = show;
-    img.src = userData.photo;
+function revealLoginBlock() {
+    Configs.loginBlockReady = true;
+    $('.login-info').css({opacity: 1});
+    if (Configs.shareButtonReady) {
+        document.getElementById('button-wrap').style.opacity = 1;
+    }
 }
 
 function changeState(listId, slug, doReplace) {
