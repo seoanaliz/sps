@@ -9,13 +9,10 @@
 
     //удалить группу, обычную - для юзера, general - для всех юзеров
     class deleteGroup {
-
         /**
          * Entry Point
          */
-
         public function Execute() {
-
             $user_id  = AuthVkontakte::IsAuth();
             $group_id = Request::getString ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
@@ -36,7 +33,6 @@
                 $default_group = GroupsUtility::get_default_group( $user_id, $source  );
                 $group_ids = explode( ',', $group_id  );
                 foreach( $group_ids as $group_id ) {
-
                     $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
                     if ( !$group )
                         continue;
@@ -47,10 +43,9 @@
                     } elseif ( $group && $group->created_by == $user_id ) {
                         //жесткое удаление группы, только создавший
                         GroupsUtility::delete_group( $group, $default_group );
-                    }
-                      else {
-                          //отписываем человека от группы
-                          GroupsUtility::dismiss_from_group( $group, $user_id );
+                    } else {
+                        //отписываем человека от группы
+                        GroupsUtility::dismiss_from_group( $group, $user_id );
                     }
                 }
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
@@ -90,6 +85,7 @@
                         'vkId'          =>  $user_id
                     ));
                     GroupUserFactory::AddRange($NewGroupUsers);
+                    GroupFactory::Update($group);
                     $res = true;
                 }
 
@@ -98,14 +94,8 @@
 
             if ( statUsers::is_Sadmin( $user_id )) {
                 $res = $m_class::delete_group( $group_id );
-            }
-//            elseif ( !$general ) {
-//                $res = $m_class::extricate_group( $group_id, $user_id );
-//
-//            }
-            else {
+            } else {
                 die( ObjectHelper::ToJSON(array('response' => false)));
-
             }
 
             if ( $res ) {
@@ -113,9 +103,6 @@
             }
 
             die( ObjectHelper::ToJSON(array('response' => false)));
-        }
-
-        private function remove_inLists_state( $group_id ) {
         }
     }
 ?>
