@@ -125,8 +125,16 @@ function handleUserLoggedIn(userData) {
             .attr('title', name)
             .find('span')
             .text(name);
-    $('.userpic', $loginInfo).attr('src', userData.photo);
-    $loginInfo.css({opacity: 1});
+
+    function show() {
+        $('.userpic', $loginInfo).attr('src', userData.photo);
+        $loginInfo.css({opacity: 1});
+    }
+
+    var img = new Image();
+    img.onload = show;
+    img.onerror = show;
+    img.src = userData.photo;
 }
 
 function changeState(listId, slug, doReplace) {

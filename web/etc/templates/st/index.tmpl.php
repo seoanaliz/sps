@@ -15,7 +15,17 @@
             <div class="button-wrap">
                 <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
                 <script type="text/javascript">
-                    document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
+                    (function(){
+                        var elem = $('.header .button-wrap')[0];
+                        var img = new Image();
+                        img.onload = function () {
+                            setTimeout(function() {
+                               elem.style.opacity = 1; 
+                            }, 50);
+                        };
+                        img.src = 'https://vk.com/images/btns.png';
+                        elem.innerHTML = VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"});
+                    }());
                 </script>
             </div>
         </div>
