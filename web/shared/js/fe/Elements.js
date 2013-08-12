@@ -31,8 +31,11 @@ var Elements = {
 
         $block.find('.timestamp').easydate(easydateParams);
         $block.find('.date').easydate(easydateParams);
-        $block.find('.images-ready:visible').imageComposition();
-        $('#right-panel').find('.post .images').imageComposition('right');
+        $block.find('.post .images-ready:visible').imageComposition();
+        $block.find('.post .images').imageComposition();
+        setTimeout(function () {
+            $block.find('.expanded-post .images-ready').imageComposition();
+        }, 100);
     },
     initDraggable: function($elem, islog) {
         var $block = $elem.find('.post');
