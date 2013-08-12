@@ -16,7 +16,10 @@ class EntryGetter {
     }
 
     static public function getUserPublics($userVkId) {
-        $userFeeds = UserFeedFactory::Get(array('vkId' => $userVkId, '_role' => array( UserFeed::ROLE_ADMINISTRATOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_OWNER)));
+        $userFeeds = UserFeedFactory::Get(array(
+            'vkId' => $userVkId,
+            '_role' => array( UserFeed::ROLE_ADMINISTRATOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_OWNER,
+        )));
         $targetFeedIds = array();
         foreach ($userFeeds as $userFeed) {
             $targetFeedIds []= $userFeed->targetFeedId;
@@ -24,7 +27,7 @@ class EntryGetter {
         if( empty( $targetFeedIds)) {
             return array();
         }
-        $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds));
+        $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds, 'type' => TargetFeedUtility::VK ));
         $externalIds = array();
         foreach ($targetFeeds as $targetFeed) {
             $externalIds []= $targetFeed->externalId;
