@@ -146,6 +146,11 @@ class VkPublicFactory implements IFactory {
                 , 'type'         => TYPE_INTEGER
                 , 'searchType'   => SEARCHTYPE_ARRAY
             )
+            ,'_vk_id' => array(
+                  'name'         => 'vk_id'
+                , 'type'         => TYPE_STRING
+                , 'searchType'   => SEARCHTYPE_ARRAY
+            )
             ,'_quantityLE' => array(
                   'name'         => 'quantity'
                 , 'type'         => TYPE_INTEGER
