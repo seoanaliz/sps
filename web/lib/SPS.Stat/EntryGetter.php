@@ -15,12 +15,18 @@ class EntryGetter {
     }
 
     static public function getUserPublics($userVkId) {
-        $userFeeds = UserFeedFactory::Get(array('vkId' => $userVkId));
+        $userFeeds = UserFeedFactory::Get(array(
+            'vkId' => $userVkId,
+            '_role' => array( UserFeed::ROLE_ADMINISTRATOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_OWNER,
+        )));
         $targetFeedIds = array();
         foreach ($userFeeds as $userFeed) {
             $targetFeedIds []= $userFeed->targetFeedId;
         }
-        $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds));
+        if( empty( $targetFeedIds)) {
+            return array();
+        }
+        $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds, 'type' => TargetFeedUtility::VK ));
         $externalIds = array();
         foreach ($targetFeeds as $targetFeed) {
             $externalIds []= $targetFeed->externalId;
@@ -73,16 +79,7 @@ class EntryGetter {
             // получаем группы, которые пользователь администрирует
             $userVkId = AuthVkontakte::IsAuth();
             if ($userVkId) {
-                ////////////////////////////////////////////////////////////////////
-                ///                                                              ///
-                ///                                                              ///
-                ///                        ~ *` ~ *` ~                           ///
-                ///  ВНИМАНИЕ: ХАРДКОД! Никодга не выливайте на прод!  ///
-                ///                                                              ///
-                ///                                                              ///
-                ///                                                              ///
-                ////////////////////////////////////////////////////////////////////
-                $search['_vk_public_id'] = self::getUserPublics($userVkId);
+                $search['_vk_id'] = self::getUserPublics($userVkId);
             }
         } elseif ($search_name) { //поиск по названию - глобальный
             if (mb_strlen( $search_name ) > 5) {
