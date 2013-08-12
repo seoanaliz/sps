@@ -74,10 +74,10 @@
                     die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
 
-            $group_new = GroupFactory::GetById($groupId);
+
             die(ObjectHelper::ToJSON(array(
                 'success' => true,
-                'data' => array('groupId' => $group_new->group_id, 'groupName' => $group_new->name, 'slug' => $group_new->slug),
+                'data' => array('groupId' => $group->group_id, 'groupName' => $group->name, 'slug' => $group->slug),
             )));
         }
 
