@@ -102,7 +102,8 @@ var Eventlist = {
             authorsLikes: 'auth_likes_eff',
             authorsReposts: 'auth_reposts_eff',
             growthViews: 'avg_vie_grouth',
-            growthVisitors: 'abs_vis_grow'
+            growthVisitors: 'abs_vis_grow',
+            cpp: 'cpp'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,

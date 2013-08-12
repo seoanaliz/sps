@@ -1107,14 +1107,7 @@ var Table = (function() {
             inSearch: '.in-search',
             visitors: '.visitors',
             views: '.views',
-            posts: '.posts',
-            postsPerDay: '.posts-per-day',
-            authorsPosts: '.authors-posts',
-            authorsLikes: '.authors-likes',
-            authorsReposts: '.authors-reposts',
-            sbPosts: '.sb-posts',
-            sbLikes: '.sb-likes',
-            growthVisitors: '.growth-visitors'
+            cpp: '.cpp'
         };
 
         $.each(sortFields, function(sortFieldKey, sortFieldSelector) {
