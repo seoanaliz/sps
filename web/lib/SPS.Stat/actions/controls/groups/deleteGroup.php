@@ -55,7 +55,7 @@
                 }
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
             } elseif ( $type == 'Stat' ) {
-                $res = false;
+                $res   = false;
                 $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
                 if( empty( $group )) {
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
@@ -90,6 +90,7 @@
                         'vkId'          =>  $user_id
                     ));
                     GroupUserFactory::AddRange($NewGroupUsers);
+                    GroupFactory::Update($group);
                     $res = true;
                 }
 
