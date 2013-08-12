@@ -57,14 +57,13 @@ class EntryGetter {
             '7'     =>  '_week',
             '30'    =>  '_month'
         );
-
-        if( !$sort_by ) {
+        if( !$sort_by || !isset(VkPublicFactory::$mapping['fields'][$sort_by]) ) {
             $sort_by = 'diff_abs';
         }
         if ( !$period || !in_array( $period, array_keys( $period_suffixes ))) {
             $period = '1';
         }
-        $without_suffixes  = array( 'quantity' => true, 'in_search' => true );
+        $without_suffixes  = array( 'quantity' => true, 'in_search' => true, 'cpp' => true );
 
         $search = array(
              '_quantityLE'  =>  $quant_max ? $quant_max : 100000000
@@ -135,7 +134,7 @@ class EntryGetter {
                 'id'        =>  $vkPublic->vk_public_id,
                 'vk_id'     =>  $vkPublic->vk_id,
                 'quantity'  =>  $vkPublic->quantity,
-                'name'      =>  $vkPublic->name,
+                'name'      =>  trim($vkPublic->name),
                 'ava'       =>  trim($vkPublic->ava),
                 'group_id'  =>  $groups_ids,
                 'admins'    =>  array(),
