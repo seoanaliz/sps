@@ -58,8 +58,7 @@ class EntryGetter {
             '7'     =>  '_week',
             '30'    =>  '_month'
         );
-
-        if( !$sort_by || !isset(GroupFactory::$mapping['fields'][$sort_by]) ) {
+        if( !$sort_by || !isset(VkPublicFactory::$mapping['fields'][$sort_by]) ) {
             $sort_by = 'diff_abs';
         }
         if ( !$period || !in_array( $period, array_keys( $period_suffixes ))) {
