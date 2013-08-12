@@ -9,6 +9,7 @@ class EntryGetter {
         list($entries, $groupId, $hasMore) = $this->getEntries();
         return array(
             'list'       =>  $entries,
+            'groupId'    =>  $groupId,
             'hasMore'    =>  $hasMore,
             'min_max'    =>  $this->get_min_max(),
         );

@@ -1014,7 +1014,7 @@ var Table = (function() {
                 saveEditor($container.closest('.public').data('id'), $input.val()).success(function(result) {
                     if (result) {
                         if (result.success) {
-                            $container.text(result.cpp);
+                            $container.text(result.cpp + ' руб');
                             $container.data('cpp', result.cpp);
                             $container.addClass('editable');
                         } else if (result.validation) {
