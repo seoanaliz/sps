@@ -83,6 +83,7 @@
                     $posts = !empty($posts) ? $posts : array();
 
                     $this->saveFeedPosts($source, $posts);
+                    die();
                 }
             }
         }
