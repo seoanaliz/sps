@@ -192,8 +192,9 @@ var List = (function() {
     }
     function _initEvents() {
         cur.dataUser.isAdmin && $container.delegate('.actions .share', 'click', function() {
-            var listId = $('.filter > .list > .item.selected').data('id');
-            var listTitle = $('.filter > .list > .item.selected').text();
+            var $itemSelected = $('.filter .item.selected');
+            var listId = $itemSelected.data('id');
+            var listTitle = $itemSelected.text();
             var isFirstShow = true;
             var shareUsers = [];
             var shareLists = [];
@@ -234,7 +235,7 @@ var List = (function() {
                                         });
                                     }
                                     var lists = [];
-                                    for (var i in dataLists) {
+                                    for (i in dataLists) {
                                         var list = dataLists[i];
                                         lists.push({
                                             id: list.itemId,
