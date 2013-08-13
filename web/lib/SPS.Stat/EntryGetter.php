@@ -20,13 +20,14 @@ class EntryGetter {
             'vkId' => $userVkId,
             '_role' => array( UserFeed::ROLE_ADMINISTRATOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_OWNER,
         )));
+        if( empty( $userFeeds)) {
+            return array();
+        }
         $targetFeedIds = array();
         foreach ($userFeeds as $userFeed) {
             $targetFeedIds []= $userFeed->targetFeedId;
         }
-        if( empty( $targetFeedIds)) {
-            return array();
-        }
+
         $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds, 'type' => TargetFeedUtility::VK ));
         $externalIds = array();
         foreach ($targetFeeds as $targetFeed) {
@@ -34,7 +35,7 @@ class EntryGetter {
         }
         return $externalIds;
     }
-    
+
     protected function getEntries()
     {
         $group_id   =   Request::getString( 'groupId' );
@@ -79,7 +80,12 @@ class EntryGetter {
             // получаем группы, которые пользователь администрирует
             $userVkId = AuthVkontakte::IsAuth();
             if ($userVkId) {
-                $search['_vk_id'] = self::getUserPublics($userVkId);
+                $userPublicsIds = self::getUserPublics($userVkId);
+                if ( empty( $userPublicsIds )) {
+                    $result = array();
+                    goto end;
+                }
+                $search['_vk_id'] = $userPublicsIds;
             }
         } elseif ($search_name) { //поиск по названию - глобальный
             if (mb_strlen( $search_name ) > 5) {
@@ -150,15 +156,6 @@ class EntryGetter {
 
         end:
         return array($result, $group_id, $hasMore);
-    }
-
-    private function get_row( $ds, $structure )
-    {
-        $res = array();
-        foreach( $structure as $field ) {
-            $res[ $field ] = $ds->getValue( $field );
-        }
-        return $res;
     }
 
     public function get_min_max()
