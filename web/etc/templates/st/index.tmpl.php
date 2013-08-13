@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="under">
-            <? if ($canEditGlobalGroups) {?>
+            <? if ($canEditGlobalGroups) { ?>
                 <div class="actions">
                     <a class="share">Поделиться</a>
                     <a class="delete">Удалить</a>
@@ -71,12 +71,16 @@
                         </div>
                         <div class="list buttons">
                             <div class="item" data-id="all">Все паблики</div>
-                            <? if ($canEditGlobalGroups) {?>
+                            <? if ($canEditGlobalGroups) { ?>
                                 <div class="item editor_lists" data-id="not_listed" data-slug="not_listed">Не в группе</div>
                             <? } ?>
-                            <div id="my-publics" class="item" data-id="my" data-slug="my">Мои сообщества<? if (!$isAuthorized) {?> [Войти]<? } ?></div>
+                            <? if ($isAuthorized) { ?> 
+                                <div class="item" data-id="my" data-slug="my">Мои сообщества</div>
+                            <? } else { ?>
+                                <a class="item" href="<?= AuthVkontakte::makeVkLoginLink('/stat/my')?>">Мои сообщества [Войти]</a>
+                            <? } ?>
                         </div>
-                        <? if ($hasAccessToPrivateGroups) {?>
+                        <? if ($hasAccessToPrivateGroups) { ?>
                             <div class="title">Личные</div>
                             <div class="list private editor_lists">
                             </div>

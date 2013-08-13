@@ -22,7 +22,7 @@ class GetStatData extends BaseControl
 
         Response::setParameter('hasAccessToPrivateGroups', $hasAccessToPrivateGroups);
         Response::setParameter('canEditGlobalGroups', $canEditGlobalGroups);
-        Response::setParameter('rank', ObjectHelper::ToJSON($rank));
+        Response::setParameter('rank', $rank);
         Response::setParameter('isAuthorized', $rank > StatAuthority::STAT_ROLE_GUEST);
 
         $requestData = Page::$RequestData;
