@@ -134,7 +134,8 @@
 
                 $result_posts_array[] = array( 'id' => $id,    'likes'  => $likes, 'likes_tr'=> $likes_tr,
                     'retweet' => $retweet, 'time'   => $time,  'text'   => $text, 'photo'    => $photo, 'link' => '',
-                'text_links' => '', 'video' => '', 'music' => '', 'poll' => '', 'map' => '', 'doc' => '');
+                    'text_links' => '', 'video' => '', 'music' => '', 'poll' => '', 'map' => '', 'doc' => '',
+                    'createdVia'=> null );
             }
             return $result_posts_array;
         }
