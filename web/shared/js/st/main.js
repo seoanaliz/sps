@@ -1007,7 +1007,7 @@ var Table = (function() {
             $input.removeClass('invalid');
             if (e.keyCode === KEY.ENTER) {
                 var $container = $input.closest('.cpp-value');
-                saveEditor($container.closest('.public').data('id'), $input.val()).success(function(result) {
+                saveEditor($container.closest('.public').find('.public-info').data('id'), $input.val()).success(function(result) {
                     if (result) {
                         if (result.success) {
                             $container.text(result.cpp + ' руб');
