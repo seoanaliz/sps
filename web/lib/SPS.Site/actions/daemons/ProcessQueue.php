@@ -152,10 +152,15 @@ sql;
                 foreach ($articlePhotos as $photoItem) {
                     $remotePath = MediaUtility::GetArticlePhoto($photoItem);
                     $localPath  = Site::GetRealPath('temp://upl_' . md5($remotePath) . '.jpg');
+                    try {
+                        file_put_contents($localPath, file_get_contents($remotePath));
+                    } catch( Exception $Ex ) {
+                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                            'failed get photo from vk:( ' . $remotePath . ') ' . $Ex->getMessage());
+                        throw $Ex;
+                    }
+                        $post_data['photo_array'][] = $localPath;
 
-                    file_put_contents($localPath, file_get_contents($remotePath));
-
-                    $post_data['photo_array'][] = $localPath;
                 }
             }
 
