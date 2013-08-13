@@ -120,7 +120,15 @@ class VkPublicFactory implements IFactory {
         ),'inLists' => array(
               'name'        => 'viewers_month'
             , 'type'        => TYPE_BOOLEAN
-        ))
+        ),'cpp' => array(
+             'name'        => 'cpp',
+             'type'        => TYPE_INTEGER
+        ),
+        'cppChange' => array(
+             'name'        => 'cppChange',
+             'type'        => TYPE_STRING
+        )
+    )
     , 'lists'     => array()
     , 'search'    => array(
             'page' => array(
@@ -136,6 +144,11 @@ class VkPublicFactory implements IFactory {
             ,'_vk_public_id' => array(
                   'name'         => 'vk_public_id'
                 , 'type'         => TYPE_INTEGER
+                , 'searchType'   => SEARCHTYPE_ARRAY
+            )
+            ,'_vk_id' => array(
+                  'name'         => 'vk_id'
+                , 'type'         => TYPE_STRING
                 , 'searchType'   => SEARCHTYPE_ARRAY
             )
             ,'_quantityLE' => array(

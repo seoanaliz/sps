@@ -12,15 +12,26 @@
         <div class="tab-bar"></div>
         <div class="controls">
             <div class="login-info"></div>
-            <div class="button-wrap">
+            <div id="button-wrap">
                 <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
                 <script type="text/javascript">
-                    document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
+                    (function(){
+                        var elem = document.getElementById('button-wrap');
+                        var img = new Image();
+                        img.onload = function () {
+                            Configs.shareButtonReady = true;
+                            if (Configs.loginBlockReady) {
+                                elem.style.opacity = 1;
+                            }
+                        };
+                        img.src = 'https://vk.com/images/btns.png';
+                        elem.innerHTML = VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"});
+                    }());
                 </script>
             </div>
         </div>
         <div class="under">
-            <? if ($canEditGlobalGroups) {?>
+            <? if ($canEditGlobalGroups) { ?>
                 <div class="actions">
                     <a class="share">Поделиться</a>
                     <a class="delete">Удалить</a>
@@ -59,12 +70,17 @@
                             </div>
                         </div>
                         <div class="list buttons">
-                            <div class="item" data-id="all">Все паблики</div>    
-                            <? if ($canEditGlobalGroups) {?>
-                                <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
+                            <div class="item" data-id="all">Все паблики</div>
+                            <? if ($canEditGlobalGroups) { ?>
+                                <div class="item editor_lists" data-id="not_listed" data-slug="not_listed">Не в группе</div>
+                            <? } ?>
+                            <? if ($isAuthorized) { ?> 
+                                <div class="item" data-id="my" data-slug="my">Мои сообщества</div>
+                            <? } else { ?>
+                                <a class="item" href="<?= AuthVkontakte::makeVkLoginLink('/stat/my')?>">Мои сообщества [Войти]</a>
                             <? } ?>
                         </div>
-                        <? if ($hasAccessToPrivateGroups) {?>
+                        <? if ($hasAccessToPrivateGroups) { ?>
                             <div class="title">Личные</div>
                             <div class="list private editor_lists">
                             </div>
