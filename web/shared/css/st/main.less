@@ -362,9 +362,7 @@ table, tr, td {
     position: relative;
     
     &.editable {
-        @radius: 7px;
         cursor: pointer;
-        border-radius: @radius 0 0 @radius;
 
         &:hover {
             background-color: #ddd;
@@ -383,7 +381,6 @@ table, tr, td {
             top: 0;
             background: 50% 50% url('../../images/common/edit.png') no-repeat;
             opacity: 0;
-            border-radius: 0 @radius @radius 0;
         }
     }
 

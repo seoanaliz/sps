@@ -360,7 +360,6 @@ td {
 }
 .cpp-value.editable {
   cursor: pointer;
-  border-radius: 7px 0 0 7px;
 }
 .cpp-value.editable:hover {
   background-color: #ddd;
@@ -377,7 +376,6 @@ td {
   top: 0;
   background: 50% 50% url('../../images/common/edit.png') no-repeat;
   opacity: 0;
-  border-radius: 0 7px 7px 0;
 }
 .cpp-value .edit-wrap {
   position: relative;

@@ -16,7 +16,7 @@ class setCpp {
             $cppString = trim(Request::getString('cpp'));
             $cpp = (int) $cppString;
             // если появятся дробные значения, is_numeric нужно будет заменить
-            if (!is_numeric($cppString) || $cpp < 0 || $cpp > 2147483646) {
+            if (!is_numeric($cppString) || $cpp < 0 || $cpp > 99999) {
                 $result['validation'] = '-';
             } else if ($intId) {
                // проверим, что это действительно фид пользователя
