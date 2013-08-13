@@ -20,23 +20,23 @@ class setCpp {
                 $result['validation'] = '-';
             } else if ($intId) {
                // проверим, что это действительно фид пользователя
-                $userFeed = UserFeedFactory::GetOne(array(
-                    'vkId' => $userVkId,
-                    'targetFeedId' => $intId
-                    // проверить роль?
-                ));
-                /////////////////////////////////////////////////////
-                //             ХАРДКОД, НЕКРАСИВО              //
-                /////////////////////////////////////////////////////
-                if (TRUE || $userFeed) {
-                    $vkPublic = VkPublicFactory::GetOne(array('vk_public_id' => $intId)); // можно ли сделать, не получая?
-                    $vkPublic->cpp = $cpp;
-                    $time = time();
-                    $vkPublic->cppChange = "1;$userVkId;$time"; 
-                    $updateResult = VkPublicFactory::Update($vkPublic, array(BaseFactory::WithReturningKeys => true));
-                    if ($updateResult) {
-                        $result['success'] = true;
-                        $result['cpp'] = $vkPublic->cpp;
+                $targetFeed = TargetFeedFactory::GetOne( array( 'externalId' => $intId));
+                if( $targetFeed ) {
+                    $accessUtility = new TargetFeedAccessUtility($userVkId);
+                    if ($accessUtility->moreThenAuthor( $targetFeed->targetFeedId)) {
+                        $vkPublic = new VkPublic();
+                        $vkPublic->cpp = $cpp;
+                        $time = time();
+                        $vkPublic->cppChange = "1;$userVkId;$time";
+                        $updateResult = VkPublicFactory::UpdateByMask(
+                            $vkPublic,
+                            array('cpp','cppChange'),
+                            array('vk_id' => $intId)
+                        );
+                        if ($updateResult) {
+                            $result['success'] = true;
+                            $result['cpp'] = $vkPublic->cpp;
+                        }
                     }
                 }
             }
