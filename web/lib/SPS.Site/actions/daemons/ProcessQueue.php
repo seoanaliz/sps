@@ -156,10 +156,10 @@ sql;
                         file_put_contents($localPath, file_get_contents($remotePath));
                     } catch( Exception $Ex ) {
                         AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
-                            'failed get photo from vk:( ' . $remotePath . ') ' . $Ex->getMessage());
+                            'failed get photo from vk( ' . $remotePath . '): ' . $Ex->getMessage());
                         throw $Ex;
                     }
-                        $post_data['photo_array'][] = $localPath;
+                    $post_data['photo_array'][] = $localPath;
 
                 }
             }
