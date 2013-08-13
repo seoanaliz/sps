@@ -24,27 +24,27 @@ var TABLE_HEADER =
     '</div>' +
     '<div class="column column1-5 followers">' +
         '<div class="cell">' +
-            'подписчики<span class="icon arrow"></span>' +
+            'Подписчики<span class="icon arrow"></span>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5 audience">' +
         '<div class="cell">' +
-            'охват<span class="icon arrow">' +
+            'Охват<span class="icon arrow">' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5 visitors">' +
         '<div class="cell">' +
-            'посетители<span class="icon arrow">' +
+            'Посетители<span class="icon arrow">' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5 growth">' +
         '<div class="cell">' +
-            'прирост<span class="icon arrow"></span>' +
+            'Прирост<span class="icon arrow"></span>' +
         '</div>' +
     '</div>' +
     '<div class="column column1 in-search">' +
         '<div class="cell">' +
-            'в поиске<span class="icon arrow">' +
+            'В поиске<span class="icon arrow">' +
         '</div>' +
     '</div>' +
     '<div class="column column1 cpp">' +
