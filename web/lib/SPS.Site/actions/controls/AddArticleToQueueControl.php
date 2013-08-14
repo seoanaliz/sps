@@ -236,10 +236,10 @@ class AddArticleToQueueControl extends BaseControl
     protected function createArticle( $postVkId, $targetFeed ) {
         $result = false;
         $fullPostId = '-' . $targetFeed->externalId . '_' . $postVkId;
-        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed->targetFeedId);
-        if( !$token) {
-            $token = AccessTokenUtility::getTokenForTargetFeed( $targetFeed->targetFeedId );
-        }
+        $token = AccessTokenFactory::Get( array( 'vkId' => AuthVkontakte::IsAuth()));
+        if( empty( $token ))
+            return $result;
+        $token = current( $token);
 
         try {
             $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
