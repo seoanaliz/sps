@@ -255,7 +255,7 @@ class AddArticleToQueueControl extends BaseControl
         }
 
         if( !empty($article) && ArticleFactory::Add($article, array( BaseFactory::WithReturningKeys => true ))) {
-            $articleRecord = ParserVkontakte::get_articleRecord_from_post( current($posts));
+            $articleRecord = ParserVkontakte::get_articleRecord_from_post( $posts[0]);
             $articleRecord->articleId = $article->articleId;
             if ( ArticleRecordFactory::Add( $articleRecord, array( BaseFactory::WithReturningKeys => true ))) {
                 return array(
