@@ -225,10 +225,29 @@ var RightPanelWidget = Event.extend({
         return this.getQueueWidget().updatePage($page);
     },
 
+    /**
+     * Внимание! Функция переписывает сама себя.
+     * 
+     * В первый раз скармливает в деферред прекеш данных, затем подменяет себя на Control.fire()
+     */
+    getSourceFeeds: function() {
+        var Def = new Deferred();
+        var t = this;
+
+        setTimeout(function () { // @TODO setTimeout сделан потому, что не успевший инициализироваться datepicker падает в функции Elements.calendar()
+            Def.fireSuccess(sourceFeedsPrecache);
+            sourceFeedsPrecache = null;
+        }, 10);
+
+        t.getSourceFeeds = $.proxy(Control.fire, Control);
+
+        return Def;
+    },
+
     updateDropdown: function(updateQueue) {
         var t = this;
 
-        Control.fire('get_source_list', {
+        t.getSourceFeeds('get_source_list', {
             targetFeedId: Elements.rightdd(),
             type: Elements.leftType()
         }).success(function(data) {

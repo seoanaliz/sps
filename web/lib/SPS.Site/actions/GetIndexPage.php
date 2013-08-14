@@ -1,5 +1,6 @@
 <?php
 Package::Load('SPS.Site/base');
+include __DIR__ . '/controls/GetSourceFeedsListControl.php';
 
 /**
  * GetIndexPage Action
@@ -53,17 +54,6 @@ class GetIndexPage extends BaseControl
             $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
         }
 
-        $sourceFeedIds = $SourceAccessUtility->getSourceIdsForTargetFeed($currentTargetFeedId);
-
-        Logger::Debug('$sourceFeedIds = '.print_r($sourceFeedIds, true));
-        $sourceFeeds = array();
-        if ($sourceFeedIds) {
-            $sourceFeeds = SourceFeedFactory::Get(
-                array('_sourceFeedId' => $sourceFeedIds)
-                ,array(BaseFactory::WithoutPages => true)
-            );
-        }
-
         $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
 
         // фильтры по статусам статей
@@ -80,8 +70,16 @@ class GetIndexPage extends BaseControl
                 $isShowSourceList = false;
             }
         }
+        
+        $sourceType = Cookie::getParameter('sourceType');
+        if (!$sourceType) {
+            $sourceType = reset($availableSourceTypes);
+        }
 
-        Response::setArray('sourceFeeds', $sourceFeeds);
+        $sourceFeedsPrecache = GetSourceFeedsListControl::getData($this->vkId, $currentTargetFeedId, $sourceType);
+
+        Response::setArray('sourceFeedsPrecache', $sourceFeedsPrecache); // используется во избежание дополнительного аякс-запроса при инициализации страницы
+        Response::setArray('sourceFeeds', $sourceFeedsPrecache['sourceFeeds']); // используется для наполнения (правого) дропдауна targetFeed'ов
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
         Response::setArray('targetFeeds', $targetFeeds);
         Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
