@@ -248,7 +248,7 @@ class AddArticleToQueueControl extends BaseControl
         }
         if( !empty( $posts)) {
             $article = ParserVkontakte::get_article_from_post(
-                current($posts),
+                $posts[0],
                 $targetFeed->targetFeedId
             );
             $article->isSuggested = true;
