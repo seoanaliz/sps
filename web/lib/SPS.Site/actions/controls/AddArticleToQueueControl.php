@@ -240,11 +240,15 @@ class AddArticleToQueueControl extends BaseControl
         if( empty( $token ))
             return $result;
         $token = current( $token)->accessToken;
-
-        try {
-            $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
-        } catch ( Exception $e) {
-            return $result;
+        for( $i = 0; $i < 3; $i++ ) {
+            try {
+                $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
+                break;
+            } catch ( Exception $e) {
+                sleep(0.4);
+                if( $i == 2)
+                    return $result;
+            }
         }
         if( !empty( $posts)) {
             $article = ParserVkontakte::get_article_from_post(
