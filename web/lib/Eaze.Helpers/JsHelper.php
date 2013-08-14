@@ -179,5 +179,34 @@
             self::$MaxGroups = $maxGroups;
             self::$Hostname  = $hostname;
         }
+
+        /**
+         * Как FlushVars, только сделано по-человечески
+         * @example
+         *      JsHelper::Vars('gridTypes', 'targetFeeds');
+         *   Вернёт:
+         *       <script type="text/javascript">
+         *           var gridTypes = {"content":...};
+         *           var targetFeeds = {"26":{"targetFeedId":...};
+         *       </script>
+         * @return string
+         */
+        public static function Vars() {
+            $neededKeys = array_flip(func_get_args());
+            $all = Response::getParameters();
+            $foundVars = array_intersect_key($neededKeys, $all);
+            
+            // сообщим, если не нашли какие-то из желаемых переменных
+            if (count($foundVars) !== count($neededKeys)) {
+                error_log('[Output vars] ' . __METHOD__ . '(): some values that we wanted are missing: [' . join(', ', array_keys(array_diff_key($neededKeys, $all))) . ']');
+            }
+
+            $outputParts = array ();
+            foreach ($foundVars as $name => $_) {
+                $outputParts []= "var $name = " . json_encode($all[$name]) . ';';
+            }
+
+            return $outputParts ? '<script type="text/javascript">'. "\n    " . join("\n    ", $outputParts) ."\n</script>\n"  : '';
+        }
     }
 ?>

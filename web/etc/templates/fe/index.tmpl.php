@@ -153,4 +153,5 @@
         </div>
     </div>
 </div>
+<?= JsHelper::Vars('gridTypes', 'targetFeeds'); ?>
 {increal:tmpl://fe/elements/footer.tmpl.php}
