@@ -49,7 +49,7 @@ var TABLE_HEADER =
     '</div>' +
     '<div class="column column1 cpp">' +
         '<div class="cell">' +
-            '<span title="Стоимость одной публикации">Цена</span><span class="icon arrow">' +
+            '<span title="Стоимость одной публикации">CPP</span><span class="icon arrow">' +
         '</div>' +
     '</div>' +
     '<? if (cur.dataUser.isEditor) { ?>' +
