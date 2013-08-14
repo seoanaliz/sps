@@ -239,7 +239,7 @@ class AddArticleToQueueControl extends BaseControl
         $token = AccessTokenFactory::Get( array( 'vkId' => AuthVkontakte::IsAuth()));
         if( empty( $token ))
             return $result;
-        $token = current( $token);
+        $token = current( $token)->accessToken;
 
         try {
             $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
