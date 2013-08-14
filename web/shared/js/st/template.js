@@ -15,7 +15,7 @@ var TABLE =
 
 var TABLE_HEADER =
 '<div class="row">' +
-    '<div class="column <?= cur.dataUser.isEditor ? "column3" : "column4" ?> publics">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column3" : "column3-5" ?> publics">' +
         '<div class="cell">' +
             '<div class="input-wrap">' +
                '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
@@ -64,7 +64,7 @@ var TABLE_BODY =
 
 var TABLE_ROW =
 '<div class="public row" data-id="<?=intId?>">' +
-    '<div class="column <?= cur.dataUser.isEditor ? "column3" : "column4" ?> public-info" data-id="<?=publicId?>">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column3" : "column3-5" ?> public-info" data-id="<?=publicId?>">' +
         '<div class="cell">' +
             '<div class="photo">' +
                 '<img src="<?=publicImg?>" alt="" />' +
@@ -108,7 +108,7 @@ var TABLE_ROW =
         '<div class="cell">' +
             '<span class="cpp-value" data-cpp="<?=cpp?>">' +
                 '<? if (cpp === null || cpp === undefined || cpp === false || cpp === "") { ?>' +
-                    '<span class="unspec"></span>' +
+                    '<span class="unspec">–</span>' +
                 '<? } else { ?>' +
                     '<?= cpp ?>&nbsp;руб' +
                 '<? } ?>' +
