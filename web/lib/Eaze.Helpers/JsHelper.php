@@ -181,10 +181,13 @@
         }
 
         /**
-         * Как FlushVars, только сделано по-человечески
+         * Принимает список имён переменных из Response, возвращает обёрнутый в тег <script> код,
+         * создающий в js переменные с этими же именами и значениями
+         * 
+         * Пример:
          * @example
          *      JsHelper::Vars('gridTypes', 'targetFeeds');
-         *   Вернёт:
+         * Вернёт:
          *       <script type="text/javascript">
          *           var gridTypes = {"content":...};
          *           var targetFeeds = {"26":{"targetFeedId":...};
