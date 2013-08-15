@@ -1,6 +1,7 @@
 <?php
 Package::Load('SPS.Site/base');
 include __DIR__ . '/controls/GetSourceFeedsListControl.php';
+include __DIR__ . '/controls/GetArticlesQueueTimelineControl.php';
 
 /**
  * GetIndexPage Action
@@ -70,14 +71,14 @@ class GetIndexPage extends BaseControl
                 $isShowSourceList = false;
             }
         }
-        
+
         $sourceType = Cookie::getParameter('sourceType');
         if (!$sourceType) {
             $sourceType = reset($availableSourceTypes);
         }
-
         $sourceFeedsPrecache = GetSourceFeedsListControl::getData($this->vkId, $currentTargetFeedId, $sourceType);
 
+        Response::setString('queueHtmlPrecache', $this->getArticlesQueueHtml($currentTargetFeedId));
         Response::setArray('sourceFeedsPrecache', $sourceFeedsPrecache); // используется во избежание дополнительного аякс-запроса при инициализации страницы
         Response::setArray('sourceFeeds', $sourceFeedsPrecache['sourceFeeds']); // используется для наполнения (правого) дропдауна targetFeed'ов
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
@@ -91,6 +92,25 @@ class GetIndexPage extends BaseControl
         Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
         Response::setParameter('articleStatuses', $articleStatuses);
         Response::setParameter('isShowSourceList', $isShowSourceList);
+    }
+
+    protected function getArticlesQueueHtml($targetFeedId) {
+        Request::setInteger('targetFeedId', $targetFeedId);
+
+        $today = new DateTime('today');
+        Request::setInteger('timestamp', $today->getTimestamp());
+
+        $Control = new GetArticlesQueueTimelineControl();
+        $Control->Execute();
+        ob_start();
+            $canEditQueue = Response::getBoolean('canEditQueue');
+            $repostArticleRecords = Response::getArray('repostArticleRecords');
+            $articleRecords = Response::getArray('articleRecords');
+            $articlesQueue = Response::getArray('articlesQueue');
+            $gridData = Response::getArray('gridData');
+            include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-timeline.tmpl.php');
+        $html = ob_get_clean();
+        return $html;
     }
 }
 
