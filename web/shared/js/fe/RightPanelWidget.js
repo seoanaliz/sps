@@ -214,7 +214,20 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    updateQueue: function(timestamp) {
+    /*
+     * Внимание! Функция переписывает сама себя
+     * В первый раз отдаёт прекеш, затем -- запрашивает через AJAX
+     */
+    updateQueue: function () {
+        var t = this;
+
+        t.getQueueWidget().onPageLoaded(articlesQueuePrecache);
+        articlesQueuePrecache = null;
+
+        t.updateQueue = t.updateQueueAfterInit;
+    },
+
+    updateQueueAfterInit: function(timestamp) {
         if (typeof timestamp === 'undefined') {
             this.getQueueWidget().clearCache();
         }

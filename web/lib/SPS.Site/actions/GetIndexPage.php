@@ -78,7 +78,7 @@ class GetIndexPage extends BaseControl
         }
         $sourceFeedsPrecache = GetSourceFeedsListControl::getData($this->vkId, $currentTargetFeedId, $sourceType);
 
-        Response::setString('queueHtmlPrecache', $this->getArticlesQueueHtml($currentTargetFeedId));
+        Response::setString('articlesQueuePrecache', $this->getArticlesQueueHtml($currentTargetFeedId));
         Response::setArray('sourceFeedsPrecache', $sourceFeedsPrecache); // используется во избежание дополнительного аякс-запроса при инициализации страницы
         Response::setArray('sourceFeeds', $sourceFeedsPrecache['sourceFeeds']); // используется для наполнения (правого) дропдауна targetFeed'ов
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
@@ -99,6 +99,9 @@ class GetIndexPage extends BaseControl
 
         $today = new DateTime('today');
         Request::setInteger('timestamp', $today->getTimestamp());
+
+        $targetType = Cookie::getParameter('targetTypes' . $currentTargetFeedId) ?: 'content';
+        Request::setString('type', $targetType);
 
         $Control = new GetArticlesQueueTimelineControl();
         $Control->Execute();
