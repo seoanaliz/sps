@@ -153,5 +153,5 @@
         </div>
     </div>
 </div>
-<?= JsHelper::Vars('sourceFeedsPrecache', 'articlesQueuePrecache'); ?>
+<?= JsHelper::Vars('sourceFeedsPrecache', 'articlesQueuePrecache', 'sourceArticlesPrecache'); ?>
 {increal:tmpl://fe/elements/footer.tmpl.php}

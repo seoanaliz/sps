@@ -2,6 +2,7 @@
 Package::Load('SPS.Site/base');
 include __DIR__ . '/controls/GetSourceFeedsListControl.php';
 include __DIR__ . '/controls/GetArticlesQueueTimelineControl.php';
+include __DIR__ . '/controls/GetArticlesListControl.php';
 
 /**
  * GetIndexPage Action
@@ -78,9 +79,14 @@ class GetIndexPage extends BaseControl
         }
         $sourceFeedsPrecache = GetSourceFeedsListControl::getData($this->vkId, $currentTargetFeedId, $sourceType);
 
-        Response::setString('articlesQueuePrecache', $this->getArticlesQueueHtml($currentTargetFeedId));
-        Response::setArray('sourceFeedsPrecache', $sourceFeedsPrecache); // используется во избежание дополнительного аякс-запроса при инициализации страницы
-        Response::setArray('sourceFeeds', $sourceFeedsPrecache['sourceFeeds']); // используется для наполнения (правого) дропдауна targetFeed'ов
+        $sourceArticlesPrecache = $this->getSourceArticlesPrecache($currentTargetFeedId, $sourceType, array_map(
+            function ($elem) {return $elem['id'];}, $sourceFeedsPrecache['sourceFeeds']
+        ));
+
+        Response::setString('sourceArticlesPrecache', $sourceArticlesPrecache);
+        Response::setString('articlesQueuePrecache', $this->getArticlesQueuePrecache($currentTargetFeedId));
+        Response::setArray('sourceFeedsPrecache', $sourceFeedsPrecache); // во избежание дополнительного аякс-запроса при инициализации страницы
+        Response::setArray('sourceFeeds', $sourceFeedsPrecache['sourceFeeds']); // (правый) дропдаун targetFeed'ов
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
         Response::setArray('targetFeeds', $targetFeeds);
         Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
@@ -94,13 +100,51 @@ class GetIndexPage extends BaseControl
         Response::setParameter('isShowSourceList', $isShowSourceList);
     }
 
-    protected function getArticlesQueueHtml($targetFeedId) {
+    /**
+     * HTML ленты статей-источников
+     * @return string
+     */
+    protected function getSourceArticlesPrecache($targetFeedId, $sourceType, $availableSourceFeedIds) {
+        Response::setString('sortType', 'new');
+        Response::setInteger('page', 0);
+        Response::setString('type', $sourceType);
+        Response::setInteger('targetFeedId', $targetFeedId);
+
+        $souceFeedsCookie = Cookie::getParameter('sourceFeedIds_source_' . $targetFeedId);
+        $sourceFeedIds = $souceFeedsCookie ? explode('.', $souceFeedsCookie) : $availableSourceFeedIds;
+        Response::setArray('sourceFeedIds', $sourceFeedIds);
+
+        $range = Cookie::getParameter($sourceType . 'FeedRange' . $targetFeedId);
+        $split = explode(':', $range);
+        if (count($split) === 2) {
+            list($from, $to) = $split;
+        } else {
+            $from = 50;
+            $to = 100;
+        }
+        Response::setInteger('from', $from);
+        Response::setInteger('to', $to);
+
+        $Control = new GetArticlesListControl();
+        $Control->Execute();
+        extract(Response::getParameters()); // да-да, я знаю, капитан, что так делать не нужно
+        ob_start();
+            include Template::GetCachedRealPath('tmpl://fe/elements/articles-list.tmpl.php');
+        $html = ob_get_clean();
+        return $html;
+    }
+    
+    /**
+     * HTML ленты отправки
+     * @return string
+     */
+    protected function getArticlesQueuePrecache($targetFeedId) {
         Request::setInteger('targetFeedId', $targetFeedId);
 
         $today = new DateTime('today');
         Request::setInteger('timestamp', $today->getTimestamp());
 
-        $targetType = Cookie::getParameter('targetTypes' . $currentTargetFeedId) ?: 'content';
+        $targetType = Cookie::getParameter('targetTypes' . $targetFeedId) ?: 'content';
         Request::setString('type', $targetType);
 
         $Control = new GetArticlesQueueTimelineControl();

@@ -215,14 +215,16 @@ var RightPanelWidget = Event.extend({
     },
 
     /*
-     * Внимание! Функция переписывает сама себя
+     * Переназначает сама себя
+     * @lazy
+     * 
      * В первый раз отдаёт прекеш, затем -- запрашивает через AJAX
      */
     updateQueue: function () {
         var t = this;
 
         t.getQueueWidget().onPageLoaded(articlesQueuePrecache);
-        articlesQueuePrecache = null;
+        delete articlesQueuePrecache;
 
         t.updateQueue = t.updateQueueAfterInit;
     },
@@ -239,9 +241,10 @@ var RightPanelWidget = Event.extend({
     },
 
     /**
-     * Внимание! Функция переписывает сама себя.
+     * Переназначает сама себя
+     * @lazy
      * 
-     * В первый раз скармливает в деферред прекеш данных, затем подменяет себя на Control.fire()
+     * В первый раз передаёт в деферред прекеш данных, затем подменяет себя на Control.fire()
      */
     getSourceFeeds: function() {
         var Def = new Deferred();
@@ -249,7 +252,7 @@ var RightPanelWidget = Event.extend({
 
         setTimeout(function () { // @TODO setTimeout сделан потому, что не успевший инициализироваться datepicker падает в функции Elements.calendar()
             Def.fireSuccess(sourceFeedsPrecache);
-            sourceFeedsPrecache = null;
+            delete sourceFeedsPrecache;
         }, 10);
 
         t.getSourceFeeds = $.proxy(Control.fire, Control);
