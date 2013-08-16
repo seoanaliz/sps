@@ -106,24 +106,29 @@ class GetIndexPage extends BaseControl
      */
     protected function getSourceArticlesPrecache($targetFeedId, $sourceType, $availableSourceFeedIds) {
         Request::setString('sortType', 'new');
-        Request::setInteger('page', 0);
+        Request::setString('page', 0);
         Request::setString('type', $sourceType);
-        Request::setInteger('targetFeedId', $targetFeedId);
+        Request::setString('targetFeedId', $targetFeedId);
 
         $souceFeedsCookie = Cookie::getParameter('sourceFeedIds_source_' . $targetFeedId);
         $sourceFeedIds = $souceFeedsCookie ? explode('.', $souceFeedsCookie) : $availableSourceFeedIds;
         Request::setArray('sourceFeedIds', $sourceFeedIds);
 
-        $range = Cookie::getParameter($sourceType . 'FeedRange' . $targetFeedId);
-        $split = explode(':', $range);
-        if (count($split) === 2) {
-            list($from, $to) = $split;
-        } else {
-            $from = 50;
-            $to = 100;
+        if ($sourceType === 'source') {
+            $range = Cookie::getParameter($sourceType . 'FeedRange' . $targetFeedId);
+            $split = explode(':', $range);
+            if (count($split) === 2) {
+                list($from, $to) = $split;
+            } else {
+                $from = 50;
+                $to = 100;
+            }
+            Request::setString('from', $from);
+            Request::setString('to', $to);
+        } else if ($sourceType === 'ads') {
+            Request::setString('from', 0);
+            Request::setString('to', 100);
         }
-        Request::setInteger('from', $from);
-        Request::setInteger('to', $to);
 
         $Control = new GetArticlesListControl();
         $Control->Execute();
