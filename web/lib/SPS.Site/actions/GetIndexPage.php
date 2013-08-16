@@ -105,14 +105,14 @@ class GetIndexPage extends BaseControl
      * @return string
      */
     protected function getSourceArticlesPrecache($targetFeedId, $sourceType, $availableSourceFeedIds) {
-        Response::setString('sortType', 'new');
-        Response::setInteger('page', 0);
-        Response::setString('type', $sourceType);
-        Response::setInteger('targetFeedId', $targetFeedId);
+        Request::setString('sortType', 'new');
+        Request::setInteger('page', 0);
+        Request::setString('type', $sourceType);
+        Request::setInteger('targetFeedId', $targetFeedId);
 
         $souceFeedsCookie = Cookie::getParameter('sourceFeedIds_source_' . $targetFeedId);
         $sourceFeedIds = $souceFeedsCookie ? explode('.', $souceFeedsCookie) : $availableSourceFeedIds;
-        Response::setArray('sourceFeedIds', $sourceFeedIds);
+        Request::setArray('sourceFeedIds', $sourceFeedIds);
 
         $range = Cookie::getParameter($sourceType . 'FeedRange' . $targetFeedId);
         $split = explode(':', $range);
@@ -122,8 +122,8 @@ class GetIndexPage extends BaseControl
             $from = 50;
             $to = 100;
         }
-        Response::setInteger('from', $from);
-        Response::setInteger('to', $to);
+        Request::setInteger('from', $from);
+        Request::setInteger('to', $to);
 
         $Control = new GetArticlesListControl();
         $Control->Execute();
