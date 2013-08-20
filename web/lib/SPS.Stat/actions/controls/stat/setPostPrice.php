@@ -19,6 +19,9 @@ class setPostPrice {
 
     public function Execute()
     {
+
+        print_r( EntryGetter::getUserPublics(670456)) ;
+        die();
         if( isset( $_REQUEST['from']) && isset( $_REQUEST['to'])) {
             include 'C:\wrk\sps\web\lib\SPS.Stat\actions\controls\eug_stat\eug_stat.php';
             $a = new eug_stat();

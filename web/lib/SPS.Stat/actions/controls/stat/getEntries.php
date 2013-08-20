@@ -1,6 +1,6 @@
 <?php
 /**
- * addPrice Action
+ * getEntries Action
  * @package    SPS
  * @subpackage Stat
  */

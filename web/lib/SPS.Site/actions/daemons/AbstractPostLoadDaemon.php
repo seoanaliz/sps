@@ -63,10 +63,8 @@ abstract class AbstractPostLoadDaemon {
         foreach ($posts as $post) {
             $externalId = TextHelper::ToUTF8($post['id']);
 
-//            if (in_array($externalId, $skipIds)) {
-//                continue; //пропускаем определенные
-//            }
-
+            if( !isset ($post['likes_tr'] ))
+                continue;
             $article = new Article();
             $article->sourceFeedId = $source->sourceFeedId;
             $article->externalId = $externalId;
@@ -188,9 +186,10 @@ abstract class AbstractPostLoadDaemon {
 
         foreach ($data as $photo) {
             $result[] = array(
-                'filename' => '',
-                'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
-                'url' => $photo['url'],
+                'filename'  => '',
+                'title'     => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                'url'       => $photo['url'],
+                'id'        => $photo['id'],
             );
         }
 

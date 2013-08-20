@@ -18,7 +18,10 @@ class WrAlarm
 
     public function Execute()
     {
-        set_time_limit(0);
+
+
+        set_time_limit(10000);
+  
         $this->connect = ConnectionFactory::Get( 'tst' );
         $publics = $this->get_monitoring_publs();
         $this->check_in_search( $publics );
