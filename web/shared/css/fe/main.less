@@ -350,14 +350,6 @@ i {font-style: italic;}
     margin-top: 10px;
     overflow: hidden;
 
-    .post-image {
-        background-color: #eee;
-        padding: 0;
-        outline: 3px solid #fff;
-        overflow: hidden;
-        text-align: center;
-    }
-
     & > * {
         position: relative;
         display: block;
@@ -784,7 +776,7 @@ i {font-style: italic;}
     }
     .images {
         margin-top: 5px;
-        width: 330px;
+        width: 300px;
         height: 150px;
         overflow: hidden;
 
@@ -800,7 +792,6 @@ i {font-style: italic;}
             background-color: #fff;
             text-align: center;
             overflow: hidden;
-            outline: 3px solid #fff;
         }
         & > * {
             position: relative;
@@ -936,21 +927,11 @@ i {font-style: italic;}
 
 .spinner {opacity: 0.3;}
 
-.post-image {
-    overflow-x: hidden;
-    overflow-y: hidden;
-    display: inline-block;
-    padding-right: 5px;
-    padding-bottom: 5px;
+.image-wrap {
+    display: block;
+    overflow: hidden;
+    margin: 0 6px 6px 0;
     float: left;
-
-    .first {
-        max-height: 320px;
-    }
-
-    .else {
-        max-width: 150px;
-    }
 }
 
 .editImagePopup {
@@ -1626,11 +1607,6 @@ i {font-style: italic;}
 
     &:hover {
         background-color: #fff;
-
-        .post-image,
-        .img {
-            outline-color: #fff !important;
-        }
 
         .image-compositing:after {
             background-color: #fff;

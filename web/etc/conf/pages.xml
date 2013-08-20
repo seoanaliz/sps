@@ -171,6 +171,9 @@
                 <page uri="controls://getEntries/">
                     <actions>SPS.Stat.getEntries</actions>
                 </page>
+                <page uri="controls://setCpp/">
+                    <actions>SPS.Stat.setCpp</actions>
+                </page>
                 <page uri="controls://implPublic/">
                     <actions>SPS.Stat.implEntryToGroup</actions>
                 </page>

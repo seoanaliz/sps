@@ -10,8 +10,30 @@
         public static $AuthSecret;
         
         public static $Version = 3;
-
+        
         protected static $CookieSecret = 't2MJebh87ZmYdN2i2btAXGLv+Z1NxrYcA4AgHNQMYvM=';
+
+        /**
+         * Шаблон URL вконтактовкого логина
+         *
+         * В шаблоне заменить {{redirect}} на url-encoded path страницы, например "/", "/stat/", "/stat/my" и т.п.
+         * @example str_replace('{{redirect}}', urlencode('/stat/my'), AuthVkontakte::getVkLoginUrlTpl())
+         *
+         * На самом деле, для этого уже есть готовая функция: AuthVkontakte::makeVkLoginLink('/stat/')
+         * @return string
+         */
+        public static function getVkLoginUrlTpl() {
+            return 'https://oauth.vk.com/authorize?'.
+                'client_id='. AuthVkontakte::$AppId .
+                '&scope=stats,groups,offline,wall,photos'.
+                '&redirect_uri='. urlencode(AuthVkontakte::getSiteUrl() . '/vk-login/?to=') . '{{redirect}}' .
+                '&display=page'.
+                '&response_type=code';
+        }
+
+        public static function makeVkLoginLink($redirectTo = '') {
+            return str_replace('{{redirect}}', urlencode($redirectTo), AuthVkontakte::getVkLoginUrlTpl());
+        }
 
         public static function Init( DOMNodeList $params ) {
             foreach ( $params as $param ) {
