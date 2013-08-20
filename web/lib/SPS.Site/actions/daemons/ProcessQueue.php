@@ -91,9 +91,10 @@ sql;
                 //отправка в ненаши - только с токена запланировавшего пост
                 if ( !$targetFeed->isOur ) {
                     if( isset($tokens[$articleQueue->author] )) {
-                        $tokens = array( $tokens[$articleQueue->author]);
+                        $tmp  = $tokens[0];
+                        $tokens[0] = $tokens[$articleQueue->author];
+                        $tokens[] = $tmp;
                     } else {
-                        $tokens = array();
                     }
                 } else {
                     shuffle( $tokens );
@@ -104,6 +105,7 @@ sql;
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
                         return true;
                     } catch (Exception $Ex) {
+                        Logger::Warning($Ex->getMessage());
                     }
                 }
                 $this->restartArticleQueue($articleQueue);
@@ -179,6 +181,7 @@ sql;
                     try {
                         $sender->delete_post( $article->externalId );
                     } catch( Exception $e ) {
+
                         AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
                             'cant delete post (' . $article->externalId . ' ) ' .  $e->getMessage() );
 
