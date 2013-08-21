@@ -7,20 +7,23 @@
  */
 class GetSourceFeedsListControl extends BaseControl
 {
-    /**
-     * Entry Point
-     */
-    public function Execute()
-    {
-        $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
+    public function Execute() {
+        echo ObjectHelper::ToJSON(
+            self::getData($this->vkId, Request::getInteger('targetFeedId'), Request::getString('type'))
+        );
+    }
 
-        $targetFeedId = Request::getInteger('targetFeedId');
+    /**
+     * @return array
+     */
+    static public function getData($userVkId, $targetFeedId, $type) {
+        $ArticleAccessUtility = new ArticleAccessUtility($userVkId);
+
         $targetFeed = TargetFeedFactory::GetById($targetFeedId);
         $accessibleSourceTypes = $ArticleAccessUtility->getAccessibleSourceTypes($targetFeed);
 
         $role = $ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
 
-        $type = Request::getString('type');
         if ( !isset(SourceFeedUtility::$Types[$type]) || !in_array($type, $accessibleSourceTypes)) {
             $type = reset( $accessibleSourceTypes );
         }
@@ -52,7 +55,7 @@ class GetSourceFeedsListControl extends BaseControl
                 if ($role != UserFeed::ROLE_AUTHOR) {
                     $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
                 } else {
-                    $userGroups = UserGroupFactory::GetForUserTargetFeed($targetFeedId, $this->vkId);
+                    $userGroups = UserGroupFactory::GetForUserTargetFeed($targetFeedId, $userVkId);
                 }
 
                 $showUserGroups = array();
@@ -93,7 +96,7 @@ class GetSourceFeedsListControl extends BaseControl
                     || $type == SourceFeedUtility::Ads
                     || $type == SourceFeedUtility::Albums);
 
-                $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+                $SourceAccessUtility = new SourceAccessUtility($userVkId);
 
                 $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
                 $sourceFeeds = array();
@@ -132,7 +135,7 @@ class GetSourceFeedsListControl extends BaseControl
             $authorsFilters['article_status_filter'] = array();
         }
 
-        echo ObjectHelper::ToJSON(array(
+        return array(
             'type' => $type,
             'sourceFeeds' => $sourceFeedResult,
             'accessibleSourceTypes' => $accessibleSourceTypes,
@@ -143,7 +146,7 @@ class GetSourceFeedsListControl extends BaseControl
             'showSourceList' => $showSourceList,
             'showUserGroups' => $showUserGroups,
             'authorsFilters' => $authorsFilters
-        ));
+        );
     }
 }
 

@@ -1,5 +1,8 @@
 <?php
 Package::Load('SPS.Site/base');
+include __DIR__ . '/controls/GetSourceFeedsListControl.php';
+include __DIR__ . '/controls/GetArticlesQueueTimelineControl.php';
+include __DIR__ . '/controls/GetArticlesListControl.php';
 
 /**
  * GetIndexPage Action
@@ -53,17 +56,6 @@ class GetIndexPage extends BaseControl
             $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
         }
 
-        $sourceFeedIds = $SourceAccessUtility->getSourceIdsForTargetFeed($currentTargetFeedId);
-
-        Logger::Debug('$sourceFeedIds = '.print_r($sourceFeedIds, true));
-        $sourceFeeds = array();
-        if ($sourceFeedIds) {
-            $sourceFeeds = SourceFeedFactory::Get(
-                array('_sourceFeedId' => $sourceFeedIds)
-                ,array(BaseFactory::WithoutPages => true)
-            );
-        }
-
         $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
 
         // фильтры по статусам статей
@@ -81,7 +73,20 @@ class GetIndexPage extends BaseControl
             }
         }
 
-        Response::setArray('sourceFeeds', $sourceFeeds);
+        $sourceType = Cookie::getParameter('sourceType');
+        if (!$sourceType) {
+            $sourceType = reset($availableSourceTypes);
+        }
+        $sourceFeedsPrecache = GetSourceFeedsListControl::getData($this->vkId, $currentTargetFeedId, $sourceType);
+
+        $sourceArticlesPrecache = $this->getSourceArticlesPrecache($currentTargetFeedId, $sourceType, array_map(
+            function ($elem) {return $elem['id'];}, $sourceFeedsPrecache['sourceFeeds']
+        ));
+
+        Response::setString('sourceArticlesPrecache', $sourceArticlesPrecache);
+        Response::setString('articlesQueuePrecache', $this->getArticlesQueuePrecache($currentTargetFeedId));
+        Response::setArray('sourceFeedsPrecache', $sourceFeedsPrecache); // во избежание дополнительного аякс-запроса при инициализации страницы
+        Response::setArray('sourceFeeds', $sourceFeedsPrecache['sourceFeeds']); // (правый) дропдаун targetFeed'ов
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
         Response::setArray('targetFeeds', $targetFeeds);
         Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
@@ -93,6 +98,71 @@ class GetIndexPage extends BaseControl
         Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
         Response::setParameter('articleStatuses', $articleStatuses);
         Response::setParameter('isShowSourceList', $isShowSourceList);
+    }
+
+    /**
+     * HTML ленты статей-источников
+     * @return string
+     */
+    protected function getSourceArticlesPrecache($targetFeedId, $sourceType, $availableSourceFeedIds) {
+        Request::setString('sortType', 'new');
+        Request::setString('page', 0);
+        Request::setString('type', $sourceType);
+        Request::setString('targetFeedId', $targetFeedId);
+
+        $souceFeedsCookie = Cookie::getParameter('sourceFeedIds_source_' . $targetFeedId);
+        $sourceFeedIds = $souceFeedsCookie ? explode('.', $souceFeedsCookie) : $availableSourceFeedIds;
+        Request::setArray('sourceFeedIds', $sourceFeedIds);
+
+        if ($sourceType === 'source') {
+            $range = Cookie::getParameter($sourceType . 'FeedRange' . $targetFeedId);
+            $split = explode(':', $range);
+            if (count($split) === 2) {
+                list($from, $to) = $split;
+            } else {
+                $from = 50;
+                $to = 100;
+            }
+            Request::setString('from', $from);
+            Request::setString('to', $to);
+        } else if ($sourceType === 'ads') {
+            Request::setString('from', 0);
+            Request::setString('to', 100);
+        }
+
+        $Control = new GetArticlesListControl();
+        $Control->Execute();
+        extract(Response::getParameters()); // да-да, я знаю, капитан, что так делать не нужно
+        ob_start();
+            include Template::GetCachedRealPath('tmpl://fe/elements/articles-list.tmpl.php');
+        $html = ob_get_clean();
+        return $html;
+    }
+    
+    /**
+     * HTML ленты отправки
+     * @return string
+     */
+    protected function getArticlesQueuePrecache($targetFeedId) {
+        Request::setInteger('targetFeedId', $targetFeedId);
+
+        $today = new DateTime('today');
+        Request::setInteger('timestamp', $today->getTimestamp());
+
+        $targetType = Cookie::getParameter('targetTypes' . $targetFeedId) ?: 'content';
+        Request::setString('type', $targetType);
+
+        $Control = new GetArticlesQueueTimelineControl();
+        $Control->Execute();
+        ob_start();
+            $canEditQueue = Response::getBoolean('canEditQueue');
+            $repostArticleRecords = Response::getArray('repostArticleRecords');
+            $articleRecords = Response::getArray('articleRecords');
+            $articlesQueue = Response::getArray('articlesQueue');
+            $gridData = Response::getArray('gridData');
+            include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-timeline.tmpl.php');
+        $html = ob_get_clean();
+        return $html;
     }
 }
 
