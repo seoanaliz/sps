@@ -57,8 +57,8 @@ sql;
                         }
                         break;
                     } catch(Exception $exception) {
+                        sleep(0.5);
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
-                        AuditUtility::CreateEvent('deleteErrors', 'articleQueue', $articleQueue->articleQueueId, $exception->getMessage());
                         continue;
                     }
                 }
