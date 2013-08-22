@@ -188,7 +188,8 @@ class WrTopics extends wrapper
                     diff_rel_week   =   @diff_rel_week,
                     diff_abs_month  =   @diff_abs_month,
                     diff_rel_month  =   @diff_rel_month,
-                    sh_in_main      =   @sh_in_main
+                    sh_in_main      =   @sh_in_main,
+                    active          =   @active
                  WHERE
                     vk_id = @publ_id;
                 ';
@@ -201,15 +202,17 @@ class WrTopics extends wrapper
                 ';
         }
         $cmd = new SqlCommand( $sql, $this->conn );
-        $cmd->SetInteger( '@publ_id',          $publ_id );
-        $cmd->SetInteger( '@diff_abs_week',    $diff_abs_week );
-        $cmd->SetInteger( '@diff_abs_month',   $diff_abs_month );
-        $cmd->SetFloat( '@diff_rel_week',      $diff_rel_week );
-        $cmd->SetFloat( '@diff_rel_month',     $diff_rel_month );
-        $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
-        $cmd->SetFloat( '@diff_rel',           $diff_rel );
-        $cmd->SetFloat( '@diff_abs',           $diff_abs );
-        $cmd->SetBoolean( '@sh_in_main',       $show_in_main );
+        $cmd->SetInteger( '@publ_id',           $publ_id );
+        $cmd->SetInteger( '@diff_abs_week',     $diff_abs_week );
+        $cmd->SetInteger( '@diff_abs_month',    $diff_abs_month );
+        $cmd->SetFloat(   '@diff_rel_week',     $diff_rel_week );
+        $cmd->SetFloat(   '@diff_rel_month',    $diff_rel_month );
+        $cmd->SetFloat(   '@new_quantity',      $quantity + 0.1 );
+        $cmd->SetFloat(   '@diff_rel',          $diff_rel );
+        $cmd->SetFloat(   '@diff_abs',          $diff_abs );
+        $cmd->SetBoolean( '@sh_in_main',        $show_in_main );
+        $cmd->SetBoolean( '@active',            true );
+
         $cmd->Execute();
 
     }
