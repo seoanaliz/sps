@@ -10,7 +10,7 @@ class DeletePost
     {
         set_time_limit(100);
         Logger::LogLevel(ELOG_DEBUG);
-        ConnectionFactory::BeginTransaction();
+
 
         $sql = <<<sql
                 SELECT "articleQueues".*
@@ -38,7 +38,7 @@ sql;
             $articleQueue = BaseFactory::GetObject($ds, ArticleQueueFactory::$mapping, $structure);
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             if ($targetFeed->type == TargetFeedUtility::VK) {
-
+                sleep(0.3);
                 if (empty($targetFeed) || empty($articleQueue)) {
                     continue;
                 }
@@ -58,6 +58,7 @@ sql;
                     } catch(Exception $exception) {
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
                         AuditUtility::CreateEvent('deleteErrors', 'articleQueue', $articleQueue->articleQueueId, $exception->getMessage());
+                        sleep(0.4);
                         continue;
                     }
                 }
@@ -67,9 +68,6 @@ sql;
             } else {
                 continue;
             }
-
         }
-
-        ConnectionFactory::CommitTransaction(true);
     }
 }
