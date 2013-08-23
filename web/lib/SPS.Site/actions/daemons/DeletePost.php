@@ -23,8 +23,8 @@ class DeletePost
                 AND "articleQueues"."statusId" = @status
                 AND "articleQueues"."sentAt" IS NOT NULL
                 AND "articleQueues"."externalId" IS NOT NULL
-                ORDER BY "articleQueues"."deleteAt" DESC;
-                LIMIT 15
+                ORDER BY "articleQueues"."deleteAt" DESC
+                LIMIT 15;
 sql;
         $sender = new SenderVkontakte();
 
