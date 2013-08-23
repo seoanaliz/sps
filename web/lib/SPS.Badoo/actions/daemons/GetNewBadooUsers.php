@@ -4,7 +4,7 @@ include_once('BadooParser.php');
 class GetNewBadooUsers extends BadooParser
 {
     const START_USER_ID = 330535850;
-    const USERS_RANGE   = 1000;
+    const USERS_RANGE   = 2000;
 
     /** key is  a badooUser id, value - shortname */
     public $falseArray = array();
