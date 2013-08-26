@@ -48,7 +48,7 @@ class addPublicToStat {
 
                         $result['success'] = VkPublicFactory::Add( $public );
 
-                    } elseif( $publicInfo && $publicInfo->quantity <= StatPublics::STAT_QUANTITY_LIMIT ) {
+                    } elseif( $publicInfo && $publicInfo->members_count <= StatPublics::STAT_QUANTITY_LIMIT ) {
                         $result['message'] = 'your community is too small';
                     } else {
                         $result['message'] = 'Already exsits';
