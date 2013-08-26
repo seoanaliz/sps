@@ -13,6 +13,7 @@
         const WARNING_DATA_FROM_YESTERDAY = 2;
         const WARNING_DATA_ACCURATE = 3;
 
+        const STAT_QUANTITY_LIMIT    = 30000;
 
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
