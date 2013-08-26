@@ -26,7 +26,7 @@ class addPublicToStat {
                 die( ObjectHelper::ToJSON($result));
             }
 
-            if ( $publicInfo && $publicInfo->quantity > WrTopics::STAT_QUANTITY_LIMIT ) {
+            if ( $publicInfo && $publicInfo->members_count > WrTopics::STAT_QUANTITY_LIMIT ) {
                 if ( $publicInfo ) {
                     if ( !isset( $publicInfo->admin_level) || $publicInfo->admin_level <= 1 ) {
                         $result['message'] = 'Access denied';
