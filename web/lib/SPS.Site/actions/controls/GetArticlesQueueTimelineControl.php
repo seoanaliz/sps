@@ -89,7 +89,6 @@
             if (is_null($role)){
                 return;
             }
-            Response::setBoolean('canEditQueue', $role != UserFeed::ROLE_AUTHOR);
 
             /**
              * grid
@@ -104,6 +103,7 @@
             /**
              * response
              */
+            Response::setBoolean('canEditQueue', $role != UserFeed::ROLE_AUTHOR);
             Response::setArray('repostArticleRecords', $this->repostArticleRecords);
             Response::setArray('articleRecords', $this->articleRecords);
             Response::setArray('articlesQueue', $this->articleQueues);

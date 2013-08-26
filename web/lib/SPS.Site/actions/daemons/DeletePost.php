@@ -10,7 +10,7 @@ class DeletePost
     {
         set_time_limit(100);
         Logger::LogLevel(ELOG_DEBUG);
-        ConnectionFactory::BeginTransaction();
+
 
         $sql = <<<sql
                 SELECT "articleQueues".*
@@ -23,7 +23,8 @@ class DeletePost
                 AND "articleQueues"."statusId" = @status
                 AND "articleQueues"."sentAt" IS NOT NULL
                 AND "articleQueues"."externalId" IS NOT NULL
-                ORDER BY "articleQueues"."deleteAt" DESC;
+                ORDER BY "articleQueues"."deleteAt" DESC
+                LIMIT 15;
 sql;
         $sender = new SenderVkontakte();
 
@@ -38,13 +39,14 @@ sql;
             $articleQueue = BaseFactory::GetObject($ds, ArticleQueueFactory::$mapping, $structure);
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             if ($targetFeed->type == TargetFeedUtility::VK) {
-
+                sleep(0.3);
                 if (empty($targetFeed) || empty($articleQueue)) {
                     continue;
                 }
 
 
-                $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR );
+                $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR);
+
                 $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles);
 
                 foreach ($tokens as $token ) {
@@ -56,8 +58,9 @@ sql;
                         }
                         break;
                     } catch(Exception $exception) {
+                        sleep(0.5);
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
-                        AuditUtility::CreateEvent('deleteErrors', 'articleQueue', $articleQueue->articleQueueId, $exception->getMessage());
+                        sleep(0.4);
                         continue;
                     }
                 }
@@ -67,9 +70,6 @@ sql;
             } else {
                 continue;
             }
-
         }
-
-        ConnectionFactory::CommitTransaction(true);
     }
 }
