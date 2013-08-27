@@ -116,6 +116,7 @@ var Eventlist = {
             max: params.audienceMax,
             timeFrom: params.timeFrom,
             timeTo: params.timeTo,
+            type: 'groups',
             show: 1
         }, function(dirtyData) {
             var data = Table.prepareServerData(dirtyData);

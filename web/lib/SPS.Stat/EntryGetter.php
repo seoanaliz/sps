@@ -24,6 +24,8 @@ class EntryGetter {
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );//
+        $type       =   Request::getString( 'sourcType' );
+        $is_page    =   ($type == 'page');
         $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
         $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
@@ -54,7 +56,7 @@ class EntryGetter {
             ,'page'         =>  round( $offset/( $limit ? $limit : 25))
             ,'pageSize'     =>  $limit ? $limit : 25
             ,'sh_in_main'   =>  true
-            ,'is_page'      =>  true
+            ,'is_page'      =>  $is_page
             ,'active'       =>  true
         );
 
