@@ -57,7 +57,8 @@
                 error_log('login VK API error: ' . $E->getMessage());
             }
             if (!$wasError) {
-                if (property_exists($apiAnswer, 'permissions') && property_exists($apiAnswer, 'publics')) {
+                if (property_exists($apiAnswer, 'permissions') &&
+                    ( property_exists($apiAnswer, 'publicsAdm') || property_exists($apiAnswer, 'publicsEdit'))) {
                     if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
@@ -86,10 +87,13 @@
                         unset( $k );
                         $publicsEditing = is_array( $apiAnswer->publicsAdm ) ?
                             array_flip( $apiAnswer->publicsEdit ) : array();
+
+                        $publicsEditing = array_diff_key($publicsEditing, $publicsAdministrating  );
+
                         foreach ($publicsEditing as $k => &$v) {
                             $v = UserFeed::ROLE_EDITOR;
                         }
-                        $publicRole = array_merge( $publicsAdministrating, $publicsEditing );
+                        $publicRole = $publicsAdministrating + $publicsEditing ;
                         EditorsUtility::SetTargetFeeds($vkId, $publicRole);
                     } else {
                         error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' .
