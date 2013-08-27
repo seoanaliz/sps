@@ -25,7 +25,8 @@ class EntryGetter {
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );//
         $type       =   Request::getString( 'sourcType' );
-        $is_page    =   ($type == 'page');
+        $is_page    =   !($type == 'group');
+
         $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
         $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
