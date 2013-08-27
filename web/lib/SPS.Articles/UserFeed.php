@@ -43,7 +43,7 @@ class UserFeed
     public $role;
 
     public function __construct( $vkId='', $targetFeedId='', $role='') {
-        if( $vkId && $targetFeedId && $role ) {
+        if( $vkId && $targetFeedId ) {
             $this->vkId = $vkId;
             $this->targetFeedId = $targetFeedId;
             $this->role = $role;
