@@ -1,11 +1,5 @@
 <?php
-/**
- * setCpp      Action
- * @package    SPS
- * @subpackage Stat
- * @author     kulikov
- * @task       #18899
- */
+
 class addPublicToStat {
 
     public function Execute() {

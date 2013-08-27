@@ -23,6 +23,7 @@
                     VkHelper::connect($tokenGetUrl, $setCookie = null, $usePost = null, $includeHeaderInOutput = false),
                     $array=true
                 );
+
                 if (isset($answer['user_id'])) {
                     if (isset($answer['access_token'])) {
                         self::updateUserDataFromApi($answer['user_id'], $answer['access_token']);
@@ -38,8 +39,10 @@
 
         protected static function updateUserDataFromApi($vkId, $accessToken) {
             $code = 'return {
-                "permissions": API.getUserSettings(),
-                "publics": API.groups.get({filter: "admin"})
+                "permissions":  API.getUserSettings(),
+                "publicsAdm":  API.groups.get({filter: "admin"}),
+                "publicsEdit": API.groups.get({filter: "editor"}),
+
             };';
             $wasError = false;
             try {
@@ -74,7 +77,20 @@
                             $existingToken->version     = AuthVkontakte::$Version;
                             AccessTokenFactory::Update($existingToken);
                         }
-                        EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
+                        $publicsAdministrating = is_array( $apiAnswer->publicsAdm ) ?
+                            array_flip( $apiAnswer->publicsAdm ) : array();
+                        foreach ($publicsAdministrating as $k => &$v) {
+                            $v = UserFeed::ROLE_OWNER;
+                        }
+                        unset( $v );
+                        unset( $k );
+                        $publicsEditing = is_array( $apiAnswer->publicsAdm ) ?
+                            array_flip( $apiAnswer->publicsEdit ) : array();
+                        foreach ($publicsEditing as $k => &$v) {
+                            $v = UserFeed::ROLE_EDITOR;
+                        }
+                        $publicRole = array_merge( $publicsAdministrating, $publicsEditing );
+                        EditorsUtility::SetTargetFeeds($vkId, $publicRole);
                     } else {
                         error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' .
                             (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE + VkHelper::PERM_WALL + VkHelper::PERM_PHOTO));
