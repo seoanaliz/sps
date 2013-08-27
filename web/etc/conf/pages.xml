@@ -144,9 +144,6 @@
                     <actions>SPS.Site.ParseUrlControl</actions>
                 </page>
             </pageGroup>
-            <page uri="controls://add-public-to-stat/">
-                <actions>SPS.Stat.addPublicToStat</actions>
-            </page>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">
 
@@ -159,7 +156,9 @@
                 <page uri="controls://setPostPrice/">
                     <actions>SPS.Stat.setPostPrice</actions>
                 </page>
-
+                <page uri="controls://add-public-to-stat/">
+                    <actions>SPS.Stat.addPublicToStat</actions>
+                </page>
                 <page uri="controls://setGroup/">
                     <actions>SPS.Stat.setGroup</actions>
                 </page>
