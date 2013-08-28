@@ -11,7 +11,7 @@
         //делаем новые фиды, назначаем/удаляем админа
         public static function SetTargetFeeds( $userVkId, $publicsIdRole )
         {
-            if ( !is_array( $publicsIdRole) || empty( $publicsIds ) || !$userVkId  || !is_numeric( $userVkId ))
+            if ( !is_array( $publicsIdRole) || empty( $publicsIdRole ) || !$userVkId  || !is_numeric( $userVkId ))
                 return false;
             $author = self::CheckIfRegistered($userVkId);
             if( empty($author ))
