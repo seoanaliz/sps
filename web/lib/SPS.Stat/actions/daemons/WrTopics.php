@@ -7,7 +7,6 @@ set_time_limit(13600);
 new stat_tables();
 class WrTopics extends wrapper
 {
-    const STAT_QUANTITY_LIMIT    = 30000;
     const TIME_LIMIT_WARNING     = 10800; //если разница больше этого времени - предупреждение о неточности
     const TIME_LIMIT_STOP_PARSE  = 43200; //если разница больше этого времени - данные по количеству подписчиков не обновляются
 
@@ -63,7 +62,7 @@ class WrTopics extends wrapper
             $this->double_check_quantity();
             die('Не сейчас');
         }
-        $base_publics = $this->get_id_arr( self::STAT_QUANTITY_LIMIT );
+        $base_publics = $this->get_id_arr( StatPublics::STAT_QUANTITY_LIMIT );
         $this->update_visitors();
 
 

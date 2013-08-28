@@ -23,6 +23,7 @@
                     VkHelper::connect($tokenGetUrl, $setCookie = null, $usePost = null, $includeHeaderInOutput = false),
                     $array=true
                 );
+
                 if (isset($answer['user_id'])) {
                     if (isset($answer['access_token'])) {
                         self::updateUserDataFromApi($answer['user_id'], $answer['access_token']);
@@ -38,8 +39,10 @@
 
         protected static function updateUserDataFromApi($vkId, $accessToken) {
             $code = 'return {
-                "permissions": API.getUserSettings(),
-                "publics": API.groups.get({filter: "admin"})
+                "permissions":  API.getUserSettings(),
+                "publicsAdm":  API.groups.get({filter: "admin"}),
+                "publicsEdit": API.groups.get({filter: "editor"}),
+
             };';
             $wasError = false;
             try {
@@ -54,7 +57,8 @@
                 error_log('login VK API error: ' . $E->getMessage());
             }
             if (!$wasError) {
-                if (property_exists($apiAnswer, 'permissions') && property_exists($apiAnswer, 'publics')) {
+                if (property_exists($apiAnswer, 'permissions') &&
+                    ( property_exists($apiAnswer, 'publicsAdm') || property_exists($apiAnswer, 'publicsEdit'))) {
                     if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
@@ -74,7 +78,23 @@
                             $existingToken->version     = AuthVkontakte::$Version;
                             AccessTokenFactory::Update($existingToken);
                         }
-                        EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
+                        $publicsAdministrating = is_array( $apiAnswer->publicsAdm ) ?
+                            array_flip( $apiAnswer->publicsAdm ) : array();
+                        foreach ($publicsAdministrating as $k => &$v) {
+                            $v = UserFeed::ROLE_OWNER;
+                        }
+                        unset( $v );
+                        unset( $k );
+                        $publicsEditing = is_array( $apiAnswer->publicsAdm ) ?
+                            array_flip( $apiAnswer->publicsEdit ) : array();
+
+                        $publicsEditing = array_diff_key($publicsEditing, $publicsAdministrating  );
+
+                        foreach ($publicsEditing as $k => &$v) {
+                            $v = UserFeed::ROLE_EDITOR;
+                        }
+                        $publicRole = $publicsAdministrating + $publicsEditing ;
+                        EditorsUtility::SetTargetFeeds($vkId, $publicRole);
                     } else {
                         error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' .
                             (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE + VkHelper::PERM_WALL + VkHelper::PERM_PHOTO));
