@@ -305,7 +305,7 @@
                 }
             }
             if( empty( $photo_ids))
-                return false;
+                return $posts;
             $params = array(
                 'photos'        =>  implode(',', array_keys( $photo_ids )),
                 'photo_sizes'   =>  1
