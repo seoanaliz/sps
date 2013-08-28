@@ -9,16 +9,16 @@
 
 
         //делаем новые фиды, назначаем/удаляем админа
-        public static function SetTargetFeeds( $userVkId, $publicsIds )
+        public static function SetTargetFeeds( $userVkId, $publicsIdRole )
         {
-            if(  !is_array( $publicsIds) || empty( $publicsIds ) || !$userVkId  || !is_numeric( $userVkId ))
+            if ( !is_array( $publicsIdRole) || empty( $publicsIds ) || !$userVkId  || !is_numeric( $userVkId ))
                 return false;
             $author = self::CheckIfRegistered($userVkId);
             if( empty($author ))
                 return false;
-            $publicInfo = StatPublics::get_publics_info( $publicsIds );
+            $publicInfo = StatPublics::get_publics_info( array_keys( $publicsIdRole) );
 
-            $targetFeeds    = TargetFeedFactory::Get(array('_externalId' => $publicsIds ));
+            $targetFeeds    = TargetFeedFactory::Get(array('_externalId' => array_keys($publicsIdRole )));
             $targetFeeds    = ArrayHelper::Collapse($targetFeeds, 'externalId', 0);
             $userFeeds      = UserFeedFactory::Get( array('vkId' => $userVkId ));
             $userFeeds      = ArrayHelper::Collapse($userFeeds, 'targetFeedId', 0);
@@ -28,7 +28,7 @@
             $confirmedTargetFeedIds = array();
 
             //делаем новый список фидов, где юзер - админ или редактор
-            foreach ( $publicsIds as $publicId => $role ) {
+            foreach ( $publicsIdRole as $publicId => $role ) {
                 if ( !isset( $targetFeeds[$publicId]) && isset( $publicInfo[ $publicId ])) {
 
                     $targetFeed = new TargetFeed();
