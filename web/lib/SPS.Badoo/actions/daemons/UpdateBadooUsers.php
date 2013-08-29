@@ -5,7 +5,7 @@ include_once('BadooParser.php');
 class UpdateBadooUsers extends BadooParser
 {
     const PARSE_INTERVAL_SECONDS = 86400;
-    const USERS_RANGE   = 8000;
+    const USERS_RANGE   = 11000;
 
     public function Execute() {
         $start = microtime(1);
