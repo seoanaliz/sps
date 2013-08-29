@@ -131,7 +131,7 @@ class EntryGetter {
             $groups_ids = array();
 
             $available_groups = GroupUserFactory::Get( array(
-                'VkIdIn'    =>  array( $userVkId, GroupsUtility::Fake_User_ID_Global ),
+                'vkIdIn'    =>  array( AuthVkontakte::IsAuth(), GroupsUtility::Fake_User_ID_Global ),
                 'sourceType'=>  Group::STAT_GROUP
             ));
             $available_groups = ArrayHelper::Collapse($available_groups, 'groupId', false);
