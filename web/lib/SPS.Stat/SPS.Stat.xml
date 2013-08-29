@@ -82,6 +82,10 @@
             <action name="GetPublicGrowth">
                 <path>controls/stat/GetPublicGrowthAction</path>
             </action>
+            <action name="addPublicToStat">
+                <path>controls/stat/addPublicToStat</path>
+            </action>
+
         </group>
 
         <group name="Barter">
@@ -118,7 +122,6 @@
             <action name="approveNewUser">
                 <path>controls/newUsers/ApproveNewUserControl</path>
             </action>
-
         </group>
 
         <group name="Groups">
@@ -147,63 +150,7 @@
                 <path>controls/messager/saveAt</path>
             </action>
         </group>
-        <group name="Messenger">
-            <action name="getPublicMarks">
-                <path>controls/publics/getPublicsMarks</path>
-            </action>
-        </group>
-        <group name="Messenger">
-           <action name="getDialogsList">
-                <path>controls/messager/getDialogsList</path>
-            </action>
-            <action name="findTemplate">
-                <path>controls/messager/findTemplate</path>
-            </action>
-            <action name="addTemplate">
-                <path>controls/messager/addTemplate</path>
-            </action>
-            <action name="deleteTemplate">
-                <path>controls/messager/deleteTemplate</path>
-            </action>
-            <action name="getTemplates">
-                <path>controls/messager/getTemplates</path>
-            </action>
-            <action name="getDialog">
-                <path>controls/messager/getDialog</path>
-            </action>
-            <action name="addDialog">
-                <path>controls/messager/addDialog</path>
-            </action>
-            <action name="writeMes">
-                <path>controls/messager/writeMes</path>
-            </action>
-            <action name="toggleReadRead">
-                <path>controls/messager/toggleReadRead</path>
-            </action>
-            <action name="markMes">
-                <path>controls/messager/markMes</path>
-            </action>
-            <action name="getOnline">
-                <path>controls/messager/getOnline</path>
-            </action>
-            <action name="setStatus">
-                <path>controls/messager/setStatus</path>
-            </action>
-            <action name="watchDog">
-                <path>controls/messager/watchDog</path>
-            </action>
-            <action name="getGroupDialogs">
-                <path>controls/messager/getGroupDialogs</path>
-            </action>
-            <action name="getFriends">
-                <path>controls/messager/getFriends</path>
-            </action>
-            <action name="manageFriend">
-                <path>controls/messager/manageFriend</path>
-            </action>
-        </group>
     </group>
-
     <group name="group">
         <action name="GetGroupList">
             <path>groups/GetGroupListAction</path>

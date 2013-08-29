@@ -5,6 +5,7 @@
  * @var $availableSourceTypes array
  * @var $articleStatuses array
  * @var $availableArticleStatuses array
+ * @var $sourceFeedsPrecache array
  */
 ?>
 {increal:tmpl://fe/elements/header.tmpl.php}
@@ -18,7 +19,7 @@
 
                 <div class="type-selector">
                     <? $isFirst=0;
-                    foreach($sourceTypes as $sourceType => $sourceTypeTitle):
+                    foreach ($sourceTypes as $sourceType => $sourceTypeTitle) {
                         $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
                         $sourceTypeClass = "sourceType" .( $isFirst == 0 && $sourceTypeAvailable ? ' active ' : ' ' );
                         ?>
@@ -32,15 +33,14 @@
                             ?>
                            id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                         <?
-
-                    endforeach;
+                    }
                     ?>
                 </div>
 
                 <select multiple="multiple" id="source-select" data-classes="hidden" style="display: none;">
                     <?
                     foreach ($sourceFeeds as $sourceFeed) {
-                        ?><option value="{$sourceFeed.sourceFeedId}">{$sourceFeed.title}</option><?
+                        ?><option value="<?= $sourceFeed['id'] ?>"><?=$sourceFeed['title']?></option><?
                     }
                     ?>
                 </select>
@@ -153,4 +153,5 @@
         </div>
     </div>
 </div>
+<?= JsHelper::Vars('sourceFeedsPrecache', 'articlesQueuePrecache', 'sourceArticlesPrecache'); ?>
 {increal:tmpl://fe/elements/footer.tmpl.php}

@@ -991,7 +991,11 @@ var Table = (function() {
         return Def;
     }
 
-    var initUserPublicsEvents = function () { // выполняется один раз, потом переназначает сама себя
+    /**
+     * Переназначает сама себя
+     * @lazy
+     */
+    var initUserPublicsEvents = function () {
         $container.delegate('.cpp-value.editable', 'click', function () {
             var $container = $(this);
             $container.removeClass('editable');

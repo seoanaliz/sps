@@ -9,16 +9,16 @@
 
 
         //делаем новые фиды, назначаем/удаляем админа
-        public static function SetTargetFeeds( $userVkId, $publicsIds )
+        public static function SetTargetFeeds( $userVkId, $publicsIdRole )
         {
-            if(  !is_array( $publicsIds) || empty( $publicsIds ) || !$userVkId  || !is_numeric( $userVkId ))
+            if ( !is_array( $publicsIdRole) || empty( $publicsIdRole ) || !$userVkId  || !is_numeric( $userVkId ))
                 return false;
             $author = self::CheckIfRegistered($userVkId);
             if( empty($author ))
                 return false;
-            $publicInfo = StatPublics::get_publics_info( $publicsIds );
+            $publicInfo = StatPublics::get_publics_info( array_keys( $publicsIdRole) );
 
-            $targetFeeds    = TargetFeedFactory::Get(array('_externalId' => $publicsIds ));
+            $targetFeeds    = TargetFeedFactory::Get(array('_externalId' => array_keys($publicsIdRole )));
             $targetFeeds    = ArrayHelper::Collapse($targetFeeds, 'externalId', 0);
             $userFeeds      = UserFeedFactory::Get( array('vkId' => $userVkId ));
             $userFeeds      = ArrayHelper::Collapse($userFeeds, 'targetFeedId', 0);
@@ -27,9 +27,9 @@
             //массив подтвержденных пабликов.
             $confirmedTargetFeedIds = array();
 
-            //делаем новый список фидов, где юзер - админ
-            foreach( $publicsIds as $publicId ) {
-                if( !isset( $targetFeeds[$publicId]) && isset( $publicInfo[ $publicId ])) {
+            //делаем новый список фидов, где юзер - админ или редактор
+            foreach ( $publicsIdRole as $publicId => $role ) {
+                if ( !isset( $targetFeeds[$publicId]) && isset( $publicInfo[ $publicId ])) {
 
                     $targetFeed = new TargetFeed();
                     $targetFeed->externalId  =  $publicId;
@@ -46,16 +46,16 @@
                     TargetFeedFactory::Add( $targetFeed, array( BaseFactory::WithReturningKeys => true));
                     $targetFeeds[ $publicId ] = $targetFeed;
                 }
-                if( !isset($targetFeeds[ $publicId ]))
+                if ( !isset($targetFeeds[ $publicId ]))
                     continue;
-                $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_OWNER );
+                $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, $role );
                 $confirmedTargetFeedIds[] = $targetFeeds[ $publicId ]->targetFeedId;
             }
 
-            //добавляем в список те паблики, где юзер был и остался автором
-            if( is_array( $userFeeds)) {
+            //добавляем в список те паблики, где юзер был и остался автором/сб администратором
+            if ( is_array( $userFeeds)) {
                 foreach( $userFeeds as $targetFeedId => $userFeed ) {
-                    if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR ))
+                    if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_ADMINISTRATOR ))
                         && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
                         $newUserFeeds[] = new UserFeed( $userVkId, $targetFeedId, $userFeed->role );
                     }
