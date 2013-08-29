@@ -81,7 +81,7 @@ sql;
                 if (empty($targetFeed)  || empty($articleRecord)) {
                     return false;
                 }
-//                $roles = array();
+                $roles = array();
 
                 //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
 //                if ( !$targetFeed->isOur ) {
@@ -91,7 +91,7 @@ sql;
                 if ( $articleQueue->author ) {
                     $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author, 'version' =>AuthVkontakte::$Version ));
                 }
-//                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
 //                if ( !$targetFeed->isOur ) {
 //                    if ( isset( $tokens[$articleQueue->author] )) {
@@ -106,7 +106,7 @@ sql;
 
                 foreach ($tokens as $token) {
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token->accessToken, $article);
                         return true;
                     } catch (Exception $Ex) {
                         Logger::Warning($Ex->getMessage());
