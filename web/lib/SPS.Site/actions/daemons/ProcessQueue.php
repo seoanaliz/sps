@@ -81,15 +81,15 @@ sql;
                 if (empty($targetFeed)  || empty($articleRecord)) {
                     return false;
                 }
-                $roles = array();
+//                $roles = array();
 
                 //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
-                if ( !$targetFeed->isOur ) {
-                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
-                }
-                $tokens = array();
+//                if ( !$targetFeed->isOur ) {
+//                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
+//                }
+//                $tokens = array();
                 if ( $articleQueue->author ) {
-                    $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author ));
+                    $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author, 'version' =>AuthVkontakte::$Version ));
                 }
 //                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
