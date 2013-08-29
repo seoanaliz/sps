@@ -87,7 +87,10 @@ sql;
                 if ( !$targetFeed->isOur ) {
                     $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
                 }
-                $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author ));
+                $tokens = array();
+                if ( $articleQueue->author ) {
+                    $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author ));
+                }
 //                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
 //                if ( !$targetFeed->isOur ) {
