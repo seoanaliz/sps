@@ -84,14 +84,14 @@ sql;
                 $roles = array();
 
                 //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
-                if ( !$targetFeed->isOur ) {
-                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
-                }
-                $tokens = array();
+//                if ( !$targetFeed->isOur ) {
+//                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
+//                }
+//                $tokens = array();
                 if ( $articleQueue->author ) {
-                    $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author ));
+                    $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author, 'version' =>AuthVkontakte::$Version ));
                 }
-//                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
+                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
 //                if ( !$targetFeed->isOur ) {
 //                    if ( isset( $tokens[$articleQueue->author] )) {
@@ -106,7 +106,7 @@ sql;
 
                 foreach ($tokens as $token) {
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token->accessToken, $article);
                         return true;
                     } catch (Exception $Ex) {
                         Logger::Warning($Ex->getMessage());
