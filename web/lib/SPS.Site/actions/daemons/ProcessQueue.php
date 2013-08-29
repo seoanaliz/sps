@@ -87,7 +87,7 @@ sql;
 //                if ( !$targetFeed->isOur ) {
 //                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
 //                }
-//                $tokens = array();
+                $tokens = array();
                 if ( $articleQueue->author ) {
                     $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author, 'version' =>AuthVkontakte::$Version ));
                 }
