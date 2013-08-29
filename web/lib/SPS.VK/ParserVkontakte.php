@@ -184,7 +184,7 @@
 
             $posts = self::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
-
+            $text = preg_replace('/\[([^|]+)(\|)([^|]+)]/', '@$1($3)', $text);
             return $posts;
         }
 
