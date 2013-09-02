@@ -82,12 +82,14 @@
             if (empty($Author))
                 return $result;
 
-            if ( $Author->postFromBots ) {
+            if ( $Author->postFromBot ) {
                 $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeedId ));
                 if (empty($userFeeds))
                     return $result;
                 $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId');
-                $botAuthors =  AuthorFactory::Get( array('_authorId' => array( array_keys($userFeeds)), '' ));
+                $botAuthors =  AuthorFactory::Get( array(
+                    '_authorId' => array( array_keys($userFeeds)),
+                    'isBot' =>true ));
                 if (empty($botAuthors))
                     return $result;
                 $botAuthors =  ArrayHelper::Collapse( $botAuthors, 'vkId');
