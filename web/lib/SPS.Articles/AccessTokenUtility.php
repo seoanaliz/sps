@@ -86,17 +86,19 @@
                 $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeedId ));
                 if (empty($userFeeds))
                     return $result;
-                $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId');
-                $botAuthors =  AuthorFactory::Get( array(
-                    '_authorId' => array( array_keys($userFeeds)),
-                    'isBot' =>true ));
+                $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId', $convertToArray = false);
+                $botAuthors =  AuthorFactory::Get(
+                    array('_vkId	' =>  array_keys($userFeeds),
+                        'isBot' => true
+                    ));
                 if (empty($botAuthors))
                     return $result;
-                $botAuthors =  ArrayHelper::Collapse( $botAuthors, 'vkId');
+                $botAuthors =  ArrayHelper::Collapse( $botAuthors, 'vkId', $convertToArray = false);
                 $tokens     =  AccessTokenFactory::Get(array(
                     'vkIdIn' => array_keys( $botAuthors ),
                     'version' => AuthVkontakte::$Version
                 ));
+
                 shuffle( $tokens );
                 $result = $tokens;
             } else {
@@ -107,4 +109,5 @@
             }
             return $result;
         }
+
     }
