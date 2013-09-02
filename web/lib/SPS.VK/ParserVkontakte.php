@@ -184,7 +184,6 @@
 
             $posts = self::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
-
             return $posts;
         }
 

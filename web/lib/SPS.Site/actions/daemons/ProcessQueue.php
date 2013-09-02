@@ -87,11 +87,11 @@ sql;
 //                if ( !$targetFeed->isOur ) {
 //                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
 //                }
-//                $tokens = array();
+                $tokens = array();
                 if ( $articleQueue->author ) {
                     $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author, 'version' =>AuthVkontakte::$Version ));
                 }
-                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
+                //$tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
                 //отправка в ненаши - только с токена запланировавшего пост
 //                if ( !$targetFeed->isOur ) {
 //                    if ( isset( $tokens[$articleQueue->author] )) {

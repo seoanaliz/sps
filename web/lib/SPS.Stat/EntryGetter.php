@@ -129,10 +129,19 @@ class EntryGetter {
         $result = array();
         foreach ($vkPublics as $vkPublic) {
             $groups_ids = array();
-            $group_entries_by_entry = GroupEntryFactory::Get(array(
-                'entryId'   =>  $vkPublic->vk_public_id,
+
+            $available_groups = GroupUserFactory::Get( array(
+                'vkIdIn'    =>  array( AuthVkontakte::IsAuth(), GroupsUtility::Fake_User_ID_Global ),
                 'sourceType'=>  Group::STAT_GROUP
             ));
+            $available_groups = ArrayHelper::Collapse($available_groups, 'groupId', false);
+            $available_groups = array_keys( $available_groups );
+            $group_entries_by_entry = GroupEntryFactory::Get(array(
+                'entryId'   =>  $vkPublic->vk_public_id,
+                'sourceType'=>  Group::STAT_GROUP,
+                'groupIdIn' =>  $available_groups
+            ));
+
             foreach ($group_entries_by_entry as $grupEntry) {
                 $groups_ids[] = $grupEntry->groupId;
             }
