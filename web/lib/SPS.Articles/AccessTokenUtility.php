@@ -27,7 +27,8 @@
             return $access_token;
         }
 
-        public static function getAllTokens( $targetFeedId, $version = 0, $roles = array()) {
+        public static function getAllTokens( $targetFeedId, $version = 0, $roles = array())
+        {
             $result = array();
             if( empty( $roles )) {
                 $roles = array( UserFeed::ROLE_EDITOR );
@@ -73,6 +74,40 @@
             if (!empty( $publisher->vk_token ))
                 return $publisher->vk_token;
             return false;
+        }
+
+        public static function getTokens( $authorVkId, $targetFeed ) {
+            $result = array();
+            $Author = AuthorFactory::GetOne(array('vkId' => ($authorVkId)));
+            if (empty($Author))
+                return $result;
+
+            if ( $Author->postFromBot && $targetFeed->isOur ) {
+                $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeed->targetFeedId ));
+                if (empty($userFeeds))
+                    return $result;
+                $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId', $convertToArray = false);
+                $botAuthors =  AuthorFactory::Get(
+                    array('_vkId	' =>  array_keys($userFeeds),
+                        'isBot' => true
+                    ));
+                if (empty($botAuthors))
+                    return $result;
+                $botAuthors =  ArrayHelper::Collapse( $botAuthors, 'vkId', $convertToArray = false);
+                $tokens     =  AccessTokenFactory::Get(array(
+                    'vkIdIn' => array_keys( $botAuthors ),
+                    'version' => AuthVkontakte::$Version
+                ));
+
+                shuffle( $tokens );
+                $result = $tokens;
+            } else {
+                $result = AccessTokenFactory::Get(array(
+                    'vkId' => $authorVkId,
+                    'version' => AuthVkontakte::$Version
+                ));
+            }
+            return $result;
         }
 
     }

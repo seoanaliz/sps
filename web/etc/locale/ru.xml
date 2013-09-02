@@ -49,6 +49,7 @@
     <null><![CDATA[Значение не может быть пустым]]></null>
     <periodVal><![CDATA[Шаг сетки может быть от 10 до 180 минут]]></periodVal>
     <unique><![CDATA[Такое значение уже есть в базе]]></unique>
+    <onlyOne><![CDATA[Только одно из состояний возможно]]></onlyOne>
   </errors>
   <vt>
     <grid>
@@ -488,6 +489,8 @@
       <avatar><![CDATA[Аватар]]></avatar>
       <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
       <statusId><![CDATA[Статус]]></statusId>
+      <isBot><![CDATA[Бот]]></isBot>
+      <postFromBot><![CDATA[Отправлять посты с ботов]]></postFromBot>
     </author>
     <editor>
       <deleteString><![CDATA[Вы действительно хотите удалить админа?]]></deleteString>

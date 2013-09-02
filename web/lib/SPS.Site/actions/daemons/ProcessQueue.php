@@ -83,26 +83,10 @@ sql;
                 }
                 $roles = array();
 
-                //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
-//                if ( !$targetFeed->isOur ) {
-//                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
-//                }
-//                $tokens = array();
+                $tokens = array();
                 if ( $articleQueue->author ) {
-                    $tokens = AccessTokenFactory::Get( array( 'vkId' => $articleQueue->author, 'version' =>AuthVkontakte::$Version ));
+                  $tokens = AccessTokenUtility::getTokens( $articleQueue->author, $targetFeed);
                 }
-                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
-                //отправка в ненаши - только с токена запланировавшего пост
-//                if ( !$targetFeed->isOur ) {
-//                    if ( isset( $tokens[$articleQueue->author] )) {
-//                        $tokens  = array($tokens[$articleQueue->author] );
-//                    } else {
-//                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
-//                                'Не найден токен для vk.com/id' . $articleQueue->author . ' в паблик vk.com/public' . $targetFeed->externalId );
-//                    }
-//                } else {
-//                    shuffle( $tokens );
-//                }
 
                 foreach ($tokens as $token) {
                     try {

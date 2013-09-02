@@ -51,6 +51,14 @@ class AuthorFactory extends BaseModelFactory
                 'type' => TYPE_INTEGER,
                 'nullable' => 'CheckEmpty',
                 'foreignKey' => 'Status',
+            ),
+            'isBot' => array(
+                'name' => 'isBot',
+                'type' => TYPE_BOOLEAN,
+            ),
+            'postFromBot' => array(
+                'name' => 'postFromBot',
+                'type' => TYPE_BOOLEAN,
             )),
         'lists' => array(),
         'search' => array(
