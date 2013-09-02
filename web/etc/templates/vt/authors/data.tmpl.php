@@ -25,6 +25,14 @@
             <label>{lang:vt.author.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
         </div>
+        <div data-row="isBot" class="row">
+            <label>{lang:vt.author.isBot}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[isBot]', null,'isBot', null, $object->isBot  ) ?>
+        </div>
+        <div data-row="postFromBot" class="row">
+            <label>{lang:vt.author.postFromBot}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[postFromBot]', null,'postFromBot', null, $object->postFromBot  ) ?>
+        </div>
 	</div>
 </div>
 <script type="text/javascript">
