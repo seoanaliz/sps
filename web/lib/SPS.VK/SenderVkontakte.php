@@ -189,7 +189,6 @@
             if ( $text && $text[0] == '@')
                 $text = ' ' . $text;
             $text = preg_replace('/\[([^|]+)(\|)([^|]+)]/', '@$1($3)', $text);
-                
             return $text;
         }
 
