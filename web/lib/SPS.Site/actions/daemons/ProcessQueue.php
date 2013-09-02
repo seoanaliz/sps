@@ -85,7 +85,7 @@ sql;
 
                 $tokens = array();
                 if ( $articleQueue->author ) {
-                  $tokens = AccessTokenUtility::getTokens( $articleQueue->author, $targetFeed->targetFeedId);
+                  $tokens = AccessTokenUtility::getTokens( $articleQueue->author, $targetFeed);
                 }
 
                 foreach ($tokens as $token) {
