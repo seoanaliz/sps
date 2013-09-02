@@ -40,7 +40,7 @@
         public $isBot;
 
         /**  @var boolean */
-        public $postFromBots;
+        public $postFromBot;
 
         public function FullName() {
             return trim(FormHelper::RenderToForm($this->firstName . ' ' . $this->lastName));
