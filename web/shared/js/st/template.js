@@ -107,10 +107,10 @@ var TABLE_ROW =
     '<div class="column column1">' +
         '<div class="cell">' +
             '<span class="cpp-value" data-cpp="<?=cpp?>">' +
-                '<? if (cpp === null || cpp === undefined || cpp === false || cpp === "") { ?>' +
-                    '<span class="unspec">–</span>' +
-                '<? } else { ?>' +
+                '<? if (cpp) { ?>' +
                     '<?= cpp ?>&nbsp;руб' +
+                '<? } else { ?>' +
+                    '<span class="unspec">–</span>' +
                 '<? } ?>' +
             '</span>' +
         '</div>' +
