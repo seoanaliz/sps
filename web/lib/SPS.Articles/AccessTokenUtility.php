@@ -27,7 +27,8 @@
             return $access_token;
         }
 
-        public static function getAllTokens( $targetFeedId, $version = 0, $roles = array()) {
+        public static function getAllTokens( $targetFeedId, $version = 0, $roles = array())
+        {
             $result = array();
             if( empty( $roles )) {
                 $roles = array( UserFeed::ROLE_EDITOR );
@@ -75,4 +76,33 @@
             return false;
         }
 
+        public static function getTokens( $authorVkId, $targetFeedId ) {
+            $result = array();
+            $Author = AuthorFactory::GetOne(array('vkId' => ($authorVkId)));
+            if (empty($Author))
+                return $result;
+
+            if ( $Author->postFromBots ) {
+                $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeedId ));
+                if (empty($userFeeds))
+                    return $result;
+                $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId');
+                $botAuthors =  AuthorFactory::Get( array('_authorId' => array( array_keys($userFeeds)), '' ));
+                if (empty($botAuthors))
+                    return $result;
+                $botAuthors =  ArrayHelper::Collapse( $botAuthors, 'vkId');
+                $tokens     =  AccessTokenFactory::Get(array(
+                    'vkIdIn' => array_keys( $botAuthors ),
+                    'version' => AuthVkontakte::$Version
+                ));
+                shuffle( $tokens );
+                $result = $tokens;
+            } else {
+                $result = AccessTokenFactory::Get(array(
+                    'vkId' => $authorVkId,
+                    'version' => AuthVkontakte::$Version
+                ));
+            }
+            return $result;
+        }
     }
