@@ -1014,7 +1014,11 @@ var Table = (function() {
                 saveEditor($container.closest('.public').find('.public-info').data('id'), $input.val()).success(function(result) {
                     if (result) {
                         if (result.success) {
-                            $container.text(result.cpp + ' руб');
+                            if (result.cpp) {
+                                $container.text(result.cpp + ' руб');
+                            } else {
+                                $container.html('<span class="unspec">Не указано</span>');
+                            }
                             $container.data('cpp', result.cpp);
                             $container.addClass('editable');
                         } else if (result.validation) {
