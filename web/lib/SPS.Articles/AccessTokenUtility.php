@@ -76,14 +76,14 @@
             return false;
         }
 
-        public static function getTokens( $authorVkId, $targetFeedId ) {
+        public static function getTokens( $authorVkId, $targetFeed ) {
             $result = array();
             $Author = AuthorFactory::GetOne(array('vkId' => ($authorVkId)));
             if (empty($Author))
                 return $result;
 
-            if ( $Author->postFromBot ) {
-                $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeedId ));
+            if ( $Author->postFromBot && $targetFeed->isOur ) {
+                $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeed->targetFeedId ));
                 if (empty($userFeeds))
                     return $result;
                 $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId', $convertToArray = false);
