@@ -78,18 +78,19 @@
 
         public static function getTokens( $authorVkId, $targetFeed ) {
             $result = array();
-            $Author = AuthorFactory::GetOne(array('vkId' => ($authorVkId)));
+            $Author = AuthorFactory::GetOne(array('vkId' => $authorVkId));
             if (empty($Author))
                 return $result;
-
-            if ( $Author->postFromBot && $targetFeed->isOur ) {
+            if ( $Author->postFromBot == 1  && $targetFeed->isOur == 1 ) {
                 $userFeeds  =  UserFeedFactory::Get(array( 'targetFeedId' => $targetFeed->targetFeedId ));
-                if (empty($userFeeds))
-                    return $result;
                 $userFeeds  =  ArrayHelper::Collapse( $userFeeds, 'vkId', $convertToArray = false);
+                $vkIds = array_keys($userFeeds);
+                if (empty($vkIds))
+                    return $result;
                 $botAuthors =  AuthorFactory::Get(
-                    array('_vkId	' =>  array_keys($userFeeds),
-                        'isBot' => true
+                    array(
+                        'vkIdIn' => $vkIds,
+                        'isBot' =>  true
                     ));
                 if (empty($botAuthors))
                     return $result;
@@ -102,10 +103,11 @@
                 shuffle( $tokens );
                 $result = $tokens;
             } else {
-                $result = AccessTokenFactory::Get(array(
+                $result = AccessTokenFactory::GetOne(array(
                     'vkId' => $authorVkId,
                     'version' => AuthVkontakte::$Version
                 ));
+                $result = array($result);
             }
             return $result;
         }
