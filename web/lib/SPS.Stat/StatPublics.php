@@ -13,6 +13,7 @@
         const WARNING_DATA_FROM_YESTERDAY = 2;
         const WARNING_DATA_ACCURATE = 3;
 
+        const STAT_QUANTITY_LIMIT    = 30000;
 
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
@@ -875,6 +876,29 @@
             echo $cmd->GetQuery();
             $ds->Next();
             return $ds->Next() ? $ds->GetDateTime( 'max' ) : DateTimeWrapper::Now() ;
+        }
+
+
+        //возвращает информацию о паблике по ссылке, shrotname'у или id
+        public static function getPublicInfo( $piblicId, $user_token )
+        {
+            $search = array( '/(.+club)(\d{1,22})$/', '/(.+public)(\d{1,22})$/', '/(.+)\/([^\/]+)$/' );
+
+            $url = parse_url( $piblicId );
+            $url = ltrim( $url['path'], '/' );
+            $public_id = preg_replace( $search, '$2', $url );
+
+            $params = array(
+                'filter'        =>  'admin,editor',
+                'group_id'      =>  $public_id,
+                'fields'        =>  'members_count,contacts',
+                'access_token'  =>  $user_token
+            );
+            $result = VkHelper::api_request( 'groups.getById', $params );
+            if ( is_array( $result )) {
+                return $result[0];
+            }
+            return false;
         }
     }
 ?>

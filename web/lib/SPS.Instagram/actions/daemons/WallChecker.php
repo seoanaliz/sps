@@ -42,7 +42,7 @@ class WallChecker
                     continue;
                 }
 
-                $check = InstObservedPostFactory::GetById( $post_id );
+                $check = InstObservedPostFactory::GetById( $post_id[0] );
                 if( $check )
                     continue;
 

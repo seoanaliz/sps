@@ -36,6 +36,12 @@
         /** @var Status */
         public $status;
 
+        /**  @var boolean */
+        public $isBot;
+
+        /**  @var boolean */
+        public $postFromBot;
+
         public function FullName() {
             return trim(FormHelper::RenderToForm($this->firstName . ' ' . $this->lastName));
         }

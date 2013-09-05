@@ -45,12 +45,12 @@
             , 'lists'     => array()
             , 'search'    => array(
                 'vkIdIn' => array(
-                    'name'         => 'vkIdIn'
+                      'name'         => 'vkId'
                     , 'type'       => TYPE_STRING
                     , 'searchType' => SEARCHTYPE_ARRAY
                 )
                 ,'groupIdIn' => array(
-                    'name'         => 'groupIdIn'
+                    'name'         => 'groupId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
                 ))

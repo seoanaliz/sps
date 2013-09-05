@@ -214,7 +214,22 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    updateQueue: function(timestamp) {
+    /*
+     * Переназначает сама себя
+     * @lazy
+     * 
+     * В первый раз отдаёт прекеш, затем -- запрашивает через AJAX
+     */
+    updateQueue: function () {
+        var t = this;
+
+        t.getQueueWidget().onPageLoaded(articlesQueuePrecache);
+        delete articlesQueuePrecache;
+
+        t.updateQueue = t.updateQueueAfterInit;
+    },
+
+    updateQueueAfterInit: function(timestamp) {
         if (typeof timestamp === 'undefined') {
             this.getQueueWidget().clearCache();
         }
@@ -225,10 +240,30 @@ var RightPanelWidget = Event.extend({
         return this.getQueueWidget().updatePage($page);
     },
 
+    /**
+     * Переназначает сама себя
+     * @lazy
+     * 
+     * В первый раз передаёт в деферред прекеш данных, затем подменяет себя на Control.fire()
+     */
+    getSourceFeeds: function() {
+        var Def = new Deferred();
+        var t = this;
+
+        setTimeout(function () { // @TODO setTimeout сделан потому, что не успевший инициализироваться datepicker падает в функции Elements.calendar()
+            Def.fireSuccess(sourceFeedsPrecache);
+            delete sourceFeedsPrecache;
+        }, 10);
+
+        t.getSourceFeeds = $.proxy(Control.fire, Control);
+
+        return Def;
+    },
+
     updateDropdown: function(updateQueue) {
         var t = this;
 
-        Control.fire('get_source_list', {
+        t.getSourceFeeds('get_source_list', {
             targetFeedId: Elements.rightdd(),
             type: Elements.leftType()
         }).success(function(data) {

@@ -69,12 +69,10 @@ if(!empty($jsFilesAdds)) {
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<?= LocaleLoader::$HtmlEncoding ?>" />
     <script type="text/javascript">
-        document.documentElement.id = "js";
-        var root = '{web:/}';
         var controlsRoot = '{web:controls://}';
-        var vk_appId = <?= AuthVkontakte::$AppId ?>;
-        var hostname = '<?= Site::$Host->GetHostname() ?>';
-        rank = <?= $rank ?>;
+        var vk_appId = <?= ObjectHelper::ToJSON(AuthVkontakte::$AppId) ?>;
+        var rank = <?= ObjectHelper::ToJSON($rank) ?>;
+        var vkLoginUrlTpl = <?= ObjectHelper::ToJSON(AuthVkontakte::getVkLoginUrlTpl()) ?>;
     </script>
 
     <title><?=$__pageTitle?></title>
