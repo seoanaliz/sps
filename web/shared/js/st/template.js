@@ -88,10 +88,14 @@ var TABLE_ROW =
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
-            '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
-                '<?=numberWithSeparator(publicGrowthNum)?> ' +
-                '<small><?=numberWithSeparator(publicGrowthPer)?>%</small>' +
-            '</span>' +
+            '<?if (publicGrowthNum == null ) {?>'+
+                '<span class="icon delete"></span>' +
+            '<?} else {?>' +
+                '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
+                    '<?=numberWithSeparator(publicGrowthNum)?> ' +
+                    '<small><?=numberWithSeparator(publicGrowthPer)?>%</small>' +
+                '</span>' +
+            '<?}?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1">' +
