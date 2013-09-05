@@ -36,6 +36,7 @@ class SaveTargetFeedAction extends BaseSaveAction  {
                 UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
                 UserFeed::ROLE_OWNER => 'Владелец',
                 UserFeed::ROLE_EDITOR => 'Редактор',
+                UserFeed::ROLE_AUTHOR => 'Автор',
             ) );
             return $result;
         }
@@ -45,6 +46,7 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
             UserFeed::ROLE_OWNER => 'Владелец',
             UserFeed::ROLE_EDITOR => 'Редактор',
+            UserFeed::ROLE_AUTHOR => 'Автор',
         ));
         return $result;
     }
