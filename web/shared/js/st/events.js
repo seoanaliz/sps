@@ -102,7 +102,8 @@ var Eventlist = {
             authorsLikes: 'auth_likes_eff',
             authorsReposts: 'auth_reposts_eff',
             growthViews: 'avg_vie_grouth',
-            growthVisitors: 'abs_vis_grow'
+            growthVisitors: 'abs_vis_grow',
+            cpp: 'cpp'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,
@@ -134,6 +135,20 @@ var Eventlist = {
                 if (resp.success) {
                     callback(resp.data);
                 }
+            }
+        });
+    },
+    set_cpp: function(id, cost, callback) { // save cost per post
+        $.ajax({
+            url: controlsRoot + 'setCpp/',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                intId: id,
+                cpp: cost
+            },
+            success: function (resp) {
+                callback(resp);
             }
         });
     },

@@ -5,6 +5,7 @@ var QueueWidget = Event.extend({
         t.initAutoload();
 
         // наивное решение проблемы скролла ленты отправки в начальном положении #18695
+        // скроллим ленту на 1 пиксел вниз, тогда скролл вверх работает
         var handleFirstLoad = function () {
             t.off('changeCurrentPage', handleFirstLoad);
 
@@ -49,44 +50,17 @@ var QueueWidget = Event.extend({
      */
     update: function(timestamp) {
         var t = this;
-        var targetFeedId = Elements.rightdd();
         timestamp = timestamp || Elements.calendar();
         var isPageChanged = t.getPageTimestamp(t.getCurrentPage()) != timestamp;
         var deferred = new Deferred();
 
-        if (!targetFeedId) {
+        if (!Elements.rightdd()) {
             setTimeout(function() {
                 deferred.fireError('targetFeedId does not exist!');
             }, 0);
         } else {
-            t.loadPages(timestamp).success(function(data) {
-                if (data) {
-                    var $page = $(data);
-                    t.$queue.html($page);
-                    Elements.initDraggable($page);
-                    Elements.initDroppable();
-                    Elements.initImages($page);
-                    Elements.initLinks($page);
-                    $page.find('.post.blocked').draggable('disable');
-                } else {
-                    t.$queue.empty();
-                }
-
-                $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
-                t.trigger('changeCurrentPage', $page);
-
-//todo scroll
-                if (isPageChanged) {
-                    t.$queue.data('cancelEvent', true).scrollTop(0);
-                }
-
-                if (Elements.rightType() == 'all') {
-                    $('.queue-title.add-button').hide();
-                } else {
-                    $('.queue-title.add-button').show();
-                }
-
-                t.clearCache();
+            t.loadPages(timestamp).success(function (data) {
+                t.onPageLoaded(data, isPageChanged);
                 deferred.fireSuccess(data);
             }).error(function(error) {
                 deferred.fireError(error);
@@ -94,6 +68,36 @@ var QueueWidget = Event.extend({
         }
 
         return deferred;
+    },
+
+    onPageLoaded: function (data, isPageChanged) {
+        var t = this;
+        if (data) {
+            var $page = $(data);
+            t.$queue.html($page);
+            Elements.initDraggable($page);
+            Elements.initDroppable();
+            Elements.initImages($page);
+            Elements.initLinks($page);
+            $page.find('.post.blocked').draggable('disable');
+        } else {
+            t.$queue.empty();
+        }
+
+        $.cookie('currentTargetFeedId', Elements.rightdd(), {expires: 7, path: '/', secure: false});
+        t.trigger('changeCurrentPage', $page);
+
+        if (isPageChanged) {
+            t.$queue.data('cancelEvent', true).scrollTop(0);
+        }
+
+        if (Elements.rightType() == 'all') {
+            $('.queue-title.add-button').hide();
+        } else {
+            $('.queue-title.add-button').show();
+        }
+
+        t.clearCache();
     },
 
     /**

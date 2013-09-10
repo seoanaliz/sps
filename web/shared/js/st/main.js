@@ -4,21 +4,25 @@
 
 var Configs = {
     appId: vk_appId,
-    maxRows: 10000,
-    tableLoadOffset: 20,
+    loginBlockReady: false,
+    shareButtonReady: false,
+    tableLoadOffset: 25,
     controlsRoot: controlsRoot,
-    eventsDelay: 0,
-    etc: null
+    activeElement: document.body
 };
 
 var cur = {
     dataUser: {
+        isAuthorized: (window.rank > 1),
         isEditor: (window.rank > 2),
         isAdmin: (window.rank > 3)
     }
 };
 
+currentListId = 'all';
 $(document).ready(function() {
+    currentListId = entriesPrecache.groupId;
+
     (function(w) {
         var $elem = $('#go-to-top');
         $elem.click(function() {
@@ -33,7 +37,6 @@ $(document).ready(function() {
         });
     })(window);
 
-    Configs.activeElement = document.body;
     document.body.addEventListener && document.body.addEventListener('focus', function() {
         Configs.activeElement = document.activeElement;
     }, true);
@@ -44,10 +47,6 @@ $(document).ready(function() {
             Table.init();
         });
     });
-
-    setTimeout(function () {
-        $('.header .button-wrap').css({opacity: 1});
-    }, 1800);
 
     checkVkStatus();
 });
@@ -84,6 +83,12 @@ function checkVkStatus() {
     }
 }
 
+function makeVkButton() {
+    var redirectAfterLogin = (currentListId === 'my') ? '/stat/' : location.pathname;
+    $('.login-info').html('<a href='+ makeVkLoginLink(redirectAfterLogin) +' class="login">Войти</a>');
+    revealLoginBlock();
+}
+
 function authInfo(response) {
     if (!response.session) {
         makeVkButton();
@@ -102,20 +107,8 @@ function authInfo(response) {
     }
 }
 
-function makeVkButton() {
-    var $loginInfo = $('.login-info');
-    if ($loginInfo.length) {
-        var vkHref = 'https://oauth.vk.com/authorize?' +
-                'client_id=' + Configs.appId +
-                '&scope=stats,groups,offline,wall,photos' +
-                'client_id=' + Configs.appId +
-                '&scope=stats,groups,offline,wall' +
-                '&redirect_uri=' + encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
-                '&display=page' +
-                '&response_type=code';
-        $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
-    }
-    $loginInfo.css({opacity: 1});
+function makeVkLoginLink(redirectTo) {
+    return vkLoginUrlTpl.replace('{{redirect}}', encodeURIComponent(redirectTo || ''));
 }
 
 function handleUserLoggedIn(userData) {
@@ -125,15 +118,32 @@ function handleUserLoggedIn(userData) {
         $loginInfo.html(buttonCode + '<a class="username"><img class="userpic" alt="" /><span></span></a>');
         var name = userData.first_name + ' ' + userData.last_name;
         $('.username', $loginInfo)
-                .attr('href', 'http://vk.com/id' + userData.uid)
-                .attr('title', name)
-                .find('span')
-                .text(name);
-        $('.userpic', $loginInfo).attr('src', userData.photo);
+            .attr('href', 'http://vk.com/id' + userData.uid)
+            .attr('title', name)
+            .find('span')
+            .text(name);
+
+        function show() {
+            $('.userpic', $loginInfo).attr('src', userData.photo);
+            revealLoginBlock();
+        }
+
+        var img = new Image();
+        img.onload = show;
+        img.onerror = show;
+        img.src = userData.photo;
     } else {
         $loginInfo.html(buttonCode);
+        revealLoginBlock();
     }
-    $loginInfo.css({opacity: 1});
+}
+
+function revealLoginBlock() {
+    Configs.loginBlockReady = true;
+    $('.login-info').css({opacity: 1});
+    if (Configs.shareButtonReady) {
+        document.getElementById('button-wrap').style.opacity = 1;
+    }
 }
 
 function changeState(listId, slug, doReplace) {
@@ -173,8 +183,9 @@ var List = (function() {
     }
     function _initEvents() {
         cur.dataUser.isAdmin && $container.delegate('.actions .share', 'click', function() {
-            var listId = $('.filter > .list > .item.selected').data('id');
-            var listTitle = $('.filter > .list > .item.selected').text();
+            var $itemSelected = $('.filter .item.selected');
+            var listId = $itemSelected.data('id');
+            var listTitle = $itemSelected.text();
             var isFirstShow = true;
             var shareUsers = [];
             var shareLists = [];
@@ -193,18 +204,16 @@ var List = (function() {
                         VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
                             Events.fire('load_list', function(dataLists) {
                                 if (dataVK && dataVK.error) {
-                                    box
-                                            .setTitle('Ошибка')
-                                            .setHTML('Вы не предоставили доступ к друзьям.')
-                                            .setButtons([
+                                    box.setTitle('Ошибка')
+                                        .setHTML('Вы не предоставили доступ к друзьям.')
+                                        .setButtons([
                                         {label: 'Перелогиниться', onclick: function() {
                                                 VK.Auth.logout(function() {
                                                     location.replace('login/');
                                                 });
                                             }},
                                         {label: 'Отмена', isWhite: true}
-                                    ])
-                                            ;
+                                    ]);
                                 } else {
                                     var dataVKfriends = dataVK.response;
                                     var friends = [];
@@ -217,7 +226,7 @@ var List = (function() {
                                         });
                                     }
                                     var lists = [];
-                                    for (var i in dataLists) {
+                                    for (i in dataLists) {
                                         var list = dataLists[i];
                                         lists.push({
                                             id: list.itemId,
@@ -229,8 +238,7 @@ var List = (function() {
 
                                     var $users = $box.find('.users');
                                     var $lists = $box.find('.lists');
-                                    $users
-                                            .tags({
+                                    $users.tags({
                                         onadd: function(tag) {
                                             shareUsers.push(parseInt(tag.id));
                                         },
@@ -239,22 +247,18 @@ var List = (function() {
                                                 return value != tagId;
                                             });
                                         }
-                                    })
-                                            .autocomplete({
+                                    }).autocomplete({
                                         data: friends,
                                         target: $users.closest('.ui-tags'),
                                         onchange: function(item) {
                                             $(this).tags('addTag', item).val('').focus();
                                         }
-                                    })
-                                            .keydown(function(e) {
+                                    }).keydown(function(e) {
                                         if (e.keyCode == KEY.DEL && !$(this).val()) {
                                             $(this).tags('removeLastTag');
                                         }
-                                    })
-                                            ;
-                                    $lists
-                                            .tags({
+                                    });
+                                    $lists.tags({
                                         onadd: function(tag) {
                                             shareLists.push(tag.id);
                                         },
@@ -264,20 +268,20 @@ var List = (function() {
                                             });
                                         }
                                     })
-                                            .autocomplete({
+                                    .autocomplete({
                                         data: lists,
                                         target: $lists.closest('.ui-tags'),
                                         onchange: function(item) {
                                             $(this).tags('addTag', item).val('').focus();
                                         }
                                     })
-                                            .keydown(function(e) {
+                                    .keydown(function(e) {
                                         if (e.keyCode == KEY.DEL && !$(this).val()) {
                                             $(this).tags('removeLastTag');
                                         }
                                     })
-                                            .tags('addTag', {id: listId, title: listTitle})
-                                            ;
+                                    .tags('addTag', {id: listId, title: listTitle});
+
                                     $box.find('input[value=""]:first').focus();
                                 }
                             });
@@ -353,7 +357,7 @@ var List = (function() {
     }
 
     function select(id, callback) {
-        if (id === 'all' || id === 'all_not_listed') {
+        if (id === 'all' || id === 'not_listed' || id === 'my') {
             $actions.fadeOut(140);
         } else {
             cur.dataUser.isAdmin && $actions.fadeIn(300);
@@ -629,7 +633,6 @@ var Filter = (function() {
         if ($.isFunction(callback)) {
             callback();
         } else {
-            var id = $item.data('id');
             List.select(id, function() {
                 Table.changeList(id, $item.data('slug')).success(function() {
                     Def.fireSuccess();
@@ -663,7 +666,6 @@ var Table = (function() {
     var $container;
     var dataTable = {};
     var pagesLoaded = 0;
-    var currentListId = 0;
     var currentSearch = '';
     var currentSortBy = '';
     var currentSortReverse = false;
@@ -681,91 +683,37 @@ var Table = (function() {
     }
     function prepareServerData(dirtyData) {
         var clearList = [];
-        var clearPeriod = [];
-        var clearListType = 0;
-
-        if (dirtyData.min_max) {
-            clearPeriod = [
-                dirtyData.min_max.min,
-                dirtyData.min_max.max
-            ];
-        }
-        if (dirtyData.group_type == 2) {
-            clearListType = 1;
-        }
-        if (!clearListType) {
-            if ($.isArray(dirtyData.list)) {
-                $.each(dirtyData.list, function(i, publicItem) {
-                    var users = [];
-                    $.each(publicItem.admins, function(i, data) {
-                        users.push({
-                            userId: data.vk_id,
-                            userName: data.name,
-                            userPhoto: data.ava === 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
-                            userDescription: data.role || '&nbsp;'
-                        });
-                    });
-                    clearList.push({
-                        intId: publicItem.id,
-                        publicId: publicItem.vk_id,
-                        publicImg: publicItem.ava,
-                        publicName: publicItem.name,
-                        publicFollowers: publicItem.quantity,
-                        publicGrowthNum: publicItem.diff_abs,
-                        publicGrowthPer: publicItem.diff_rel,
-                        publicIsActive: !!publicItem.active,
-                        publicInSearch: !!publicItem.in_search,
-                        publicVisitors: publicItem.visitors,
-                        publicAudience: publicItem.viewers,
-                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
-                        users: users
-                    });
-                });
-            }
+        if (dirtyData.hasMore) {
+            $('#load-more-table').show();
         } else {
-            /*
-             id - id
-             name - name
-             ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
-             auth_likes_eff: 0 - Авторское/спарсенное: лайки
-             auth_posts: 0 - авторских постов
-             auth_reposts_eff: 0 - Авторское/спарсенное: репосты
-             avg_vie_grouth: null - средний суточный прирост просмотров
-             avg_vis_grouth: null - средний суточный прирост уников
-             overall_posts: 68 - общее количество постов за период
-             posts_days_rel: 0 - в среднем постов за сутки
-             sb_posts_count: 56 - постов из источников
-             sb_posts_rate: 0 - средний рейтинг постов из источников
-             views: null - просмотры
-             visitors: null - посетители
-             */
-            if ($.isArray(dirtyData.list)) {
-                $.each(dirtyData.list, function(i, publicItem) {
-                    clearList.push({
-                        publicId: publicItem.id,
-                        publicImg: publicItem.ava,
-                        publicName: publicItem.name,
-                        publicPosts: publicItem.overall_posts,
-                        publicViews: publicItem.views,
-                        publicVisitors: publicItem.visitors,
-                        publicPostsPerDay: publicItem.posts_days_rel,
-                        publicSbPosts: publicItem.sb_posts_count,
-                        publicSbLikes: publicItem.sb_posts_rate,
-                        publicAuthorsPosts: publicItem.auth_posts,
-                        publicAuthorsLikes: publicItem.auth_likes_eff,
-                        publicAuthorsReposts: publicItem.auth_reposts_eff,
-                        publicGrowthViews: publicItem.avg_vie_grouth,
-                        publicGrowthVisitors: intval(publicItem.abs_vis_grow),
-                        publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
-                    });
+            $('#load-more-table').hide();
+        }
+
+        if ($.isArray(dirtyData.list)) {
+            $.each(dirtyData.list, function(i, publicItem) {
+                clearList.push({
+                    intId: publicItem.id,
+                    publicId: publicItem.vk_id,
+                    publicImg: publicItem.ava,
+                    publicName: publicItem.name,
+                    publicFollowers: publicItem.quantity,
+                    publicGrowthNum: publicItem.diff_abs,
+                    publicGrowthPer: publicItem.diff_rel,
+                    publicIsActive: !!publicItem.active,
+                    publicInSearch: !!publicItem.in_search,
+                    publicVisitors: publicItem.visitors,
+                    publicAudience: publicItem.viewers,
+                    cpp: publicItem.cpp,
+                    lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                    users: []
                 });
-            }
+            });
         }
 
         var data = {
             clearList: clearList,
-            clearPeriod: clearPeriod,
-            clearListType: clearListType
+            clearPeriod: [dirtyData.min_max.min, dirtyData.min_max.max],
+            clearListType: 0
         };
 
         return data;
@@ -810,6 +758,7 @@ var Table = (function() {
                         }
                     }
                     $el.removeClass('loading');
+                    initUserPublics();
                 }
         );
     }
@@ -842,6 +791,7 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    initUserPublics();
                 }
         );
     }
@@ -866,18 +816,11 @@ var Table = (function() {
                     currentListType = listType;
                     currentSearch = text;
                     dataTable = data;
-                    if (!listType) {
-                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    } else {
-                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    }
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                     if ($.isFunction(callback))
                         callback(data);
+                    
+                    initUserPublics();
                 }
         );
     }
@@ -897,19 +840,21 @@ var Table = (function() {
         };
 
         Events.fire('load_table', params,
-                function(data, maxPeriod, listType) {
-                    pagesLoaded = 1;
-                    currentListType = listType;
-                    currentPeriod = period;
-                    dataTable = data;
-                    if (!listType) {
-                        $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    } else {
-                        $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    }
-                    if ($.isFunction(callback))
-                        callback(data);
+            function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
+                currentListType = listType;
+                currentPeriod = period;
+                dataTable = data;
+                if (!listType) {
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                } else {
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
                 }
+                if ($.isFunction(callback))
+                    callback(data);
+                
+                initUserPublics();
+            }
         );
     }
     function setAudience(audience, callback) {
@@ -942,6 +887,8 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    
+                    initUserPublics();
                 }
         );
     }
@@ -973,6 +920,8 @@ var Table = (function() {
                     }
                     if ($.isFunction(callback))
                         callback(data);
+                    
+                    initUserPublics();
                 }
         );
     }
@@ -996,8 +945,6 @@ var Table = (function() {
             slug: slug
         };
 
-        getTable(params, loadTableCallback);
-
         function getTable(params, callback) {
             if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
                 var data = prepareServerData(entriesPrecache);
@@ -1008,6 +955,8 @@ var Table = (function() {
                 Events.fire('load_table', params, callback);
             }
         }
+
+        getTable(params, loadTableCallback);
 
         function loadTableCallback(data, maxPeriod, listType) {
             pagesLoaded = 1;
@@ -1036,9 +985,85 @@ var Table = (function() {
             Filter.setSliderMin(maxPeriod[0]);
             Filter.setSliderMax(maxPeriod[1]);
             Def.fireSuccess();
+            initUserPublics();
         }
 
         return Def;
+    }
+
+    /**
+     * Переназначает сама себя
+     * @lazy
+     */
+    var initUserPublicsEvents = function () {
+        $container.delegate('.cpp-value.editable', 'click', function () {
+            var $container = $(this);
+            $container.removeClass('editable');
+            $container.data('htmlBefore', $container.html());
+            $container.html('<span class="edit-wrap"><input class="input" type="text" />&nbsp;руб</span>');
+            $container.find('.input').bind('blur',
+                function () {
+                    cancelEditor($(this).closest('.cpp-value'));
+                }).val($container.data('cpp')).focus();
+        })
+        .delegate('.cpp-value .input', 'keyup', function (e) {
+            var $input = $(this);
+            $input.removeClass('invalid');
+            if (e.keyCode === KEY.ENTER) {
+                var $container = $input.closest('.cpp-value');
+                saveEditor($container.closest('.public').find('.public-info').data('id'), $input.val()).success(function(result) {
+                    if (result) {
+                        if (result.success) {
+                            if (result.cpp) {
+                                $container.text(result.cpp + ' руб');
+                            } else {
+                                $container.html('<span class="unspec">Не указано</span>');
+                            }
+                            $container.data('cpp', result.cpp);
+                            $container.addClass('editable');
+                        } else if (result.validation) {
+                            $input.addClass('invalid');
+                        }
+                    }
+                });
+            } else if (e.keyCode === KEY.ESC) {
+                cancelEditor($(this).closest('.cpp-value'));
+            }
+        });
+
+        function saveEditor(id, rawVal) {
+            var Def = new Deferred();
+            var val = $.trim(rawVal);
+            if (val) {
+                Events.fire('set_cpp', id, val, function (result) {
+                    Def.fireSuccess(result);
+                });
+            } else {
+                Def.fireSuccess(false);
+            }
+            return Def;
+        }
+
+        function cancelEditor($container) {
+            $container.html($container.data('htmlBefore'));
+            $container.addClass('editable');
+        }
+
+        initUserPublicsEvents = function() {};
+    }
+
+    /**
+     * @private
+     */
+    function initUserPublics() {
+        if (currentListId === 'my') {
+            $container.find('.cpp-value')
+                        .addClass('editable')
+                    .find('.unspec')
+                        .html('Не указано');
+
+            initUserPublicsEvents();
+        }
     }
 
     function _initEvents() {
@@ -1086,14 +1111,7 @@ var Table = (function() {
             inSearch: '.in-search',
             visitors: '.visitors',
             views: '.views',
-            posts: '.posts',
-            postsPerDay: '.posts-per-day',
-            authorsPosts: '.authors-posts',
-            authorsLikes: '.authors-likes',
-            authorsReposts: '.authors-reposts',
-            sbPosts: '.sb-posts',
-            sbLikes: '.sb-likes',
-            growthVisitors: '.growth-visitors'
+            cpp: '.cpp'
         };
 
         $.each(sortFields, function(sortFieldKey, sortFieldSelector) {
@@ -1130,7 +1148,7 @@ var Table = (function() {
         })();
 
         (function() {
-            var b = $("#load-more-table");
+            var b = $('#load-more-table');
             var w = $(window);
 
             b.click(function() {

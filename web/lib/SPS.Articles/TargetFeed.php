@@ -60,5 +60,8 @@
         /** @var TargetFeedPublisher[] */
         public $publishers;
 
+        //** $var int */
+        public $subscribers;
+
     }
 ?>

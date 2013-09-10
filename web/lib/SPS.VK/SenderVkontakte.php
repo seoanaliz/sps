@@ -188,6 +188,7 @@
 //            preg_replace( '/^@/', '^ @', $text );
             if ( $text && $text[0] == '@')
                 $text = ' ' . $text;
+            $text = preg_replace('/\[([^|]+)(\|)([^|]+)]/', '@$1($3)', $text);
             return $text;
         }
 
@@ -295,7 +296,7 @@
                 );
                 $res = VkHelper::api_request( 'wall.delete', $params );
 
-                $check = ParserVkontakte::get_posts_by_vk_id( $full_post_id );
+                $check = VkHelper::api_request( 'wall.getById', array( 'posts' => $full_post_id ));
                 if( empty( $check ))
                     return true;
                 throw new Exception('Failed on deleting ' . $post_id . ', ' . $res );

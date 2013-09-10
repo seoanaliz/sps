@@ -111,9 +111,7 @@ class PublicsGrowFixer
             $offset += 1000;
         }
         $count = $this->get_users_count( $public_id );
-        echo '<br>';
-        print_r( array( $count, $quantity ));
-        echo '<br>';
+
 
         return ( abs( $count - $quantity ) < 100 );
     }

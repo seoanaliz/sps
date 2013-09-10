@@ -78,5 +78,20 @@
             
             return $result;
         }
+
+        /**
+         * Validate Object
+         *
+         * @param Author $object
+         * @return array
+         */
+        protected function validate( $object ) {
+            $errors = parent::$factory->Validate( $object );
+            if ( $object->isBot && $object->postFromBot ) {
+                $errors['fields']['isBot']['onlyOne'] = 'onlyOne';
+                $errors['fields']['postFromBot']['onlyOne'] = 'onlyOne';
+            }
+            return $errors;
+        }
     }
 ?>

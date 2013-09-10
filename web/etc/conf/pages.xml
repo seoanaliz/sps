@@ -156,6 +156,9 @@
                 <page uri="controls://setPostPrice/">
                     <actions>SPS.Stat.setPostPrice</actions>
                 </page>
+                <page uri="controls://add-public-to-stat/">
+                    <actions>SPS.Stat.addPublicToStat</actions>
+                </page>
                 <page uri="controls://setGroup/">
                     <actions>SPS.Stat.setGroup</actions>
                 </page>
@@ -170,6 +173,9 @@
                 </page>
                 <page uri="controls://getEntries/">
                     <actions>SPS.Stat.getEntries</actions>
+                </page>
+                <page uri="controls://setCpp/">
+                    <actions>SPS.Stat.setCpp</actions>
                 </page>
                 <page uri="controls://implPublic/">
                     <actions>SPS.Stat.implEntryToGroup</actions>
@@ -231,70 +237,6 @@
                 <page uri="controls://approveNewUser/">
                     <actions>SPS.Stat.approveNewUser</actions>
                 </page>
-            </pageGroup>
-
-            <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
-                <page uri="controls://getDialogsList/">
-                    <actions>SPS.Stat.getDialogsList</actions>
-                </page>
-                <page uri="controls://addTemplate/">
-                    <actions>SPS.Stat.addTemplate</actions>
-                </page>
-                <page uri="controls://findTemplate/">
-                    <actions>SPS.Stat.findTemplate</actions>
-                </page>
-                <page uri="controls://deleteTemplate/">
-                    <actions>SPS.Stat.deleteTemplate</actions>
-                </page>
-                <page uri="controls://getTemplates/">
-                    <actions>SPS.Stat.getTemplates</actions>
-                </page>
-                <page uri="controls://getDialog/">
-                    <actions>SPS.Stat.getDialog</actions>
-                </page>
-                <page uri="controls://toggleReadRead/">
-                    <actions>SPS.Stat.toggleReadRead</actions>
-                </page>
-                <page uri="controls://addDialog/">
-                    <actions>SPS.Stat.addDialog</actions>
-                </page>
-                <page uri="controls://messages.send/">
-                    <actions>SPS.Stat.writeMes</actions>
-                </page>
-                <page uri="controls://markMes/">
-                    <actions>SPS.Stat.markMes</actions>
-                </page>
-                <page uri="controls://getOnline/">
-                    <actions>SPS.Stat.getOnline</actions>
-                </page>
-                <page uri="controls://setStatus/">
-                    <actions>SPS.Stat.setStatus</actions>
-                </page>
-                <page uri="controls://implEntryToGroup/">
-                    <actions>SPS.Stat.implEntryToGroup</actions>
-                </page>
-                <page uri="controls://exlEntryFromGroup/">
-                    <actions>SPS.Stat.exEntryFromGroup</actions>
-                </page>
-                <page uri="controls://saveAt/">
-                    <actions>SPS.Stat.saveAt</actions>
-                </page>
-                <page uri="controls://watchDog/">
-                    <actions>SPS.Stat.watchDog</actions>
-                </page>
-                <page uri="controls://getGroupDialogs/">
-                    <actions>SPS.Stat.getGroupDialogs</actions>
-                </page>
-                <page uri="controls://searchDialog/">
-                    <actions>SPS.Stat.searchDialog</actions>
-                </page>
-                <page uri="controls://getFriends/">
-                    <actions>SPS.Stat.getFriends</actions>
-                </page>
-                <page uri="controls://manageFriend/">
-                    <actions>SPS.Stat.manageFriend</actions>
-                </page>
-
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

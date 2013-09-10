@@ -20,8 +20,8 @@
         /** StatAuthority instance mapping  */
         public static $mapping = array (
             'class'       => 'StatAuthority'
-            , 'table'     => 'stat_users_authorities'
-            , 'view'      => 'getStat_users_authorities'
+            , 'table'     => 'stat_ranks'
+            , 'view'      => 'get_stat_ranks'
             , 'flags'     => array( 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array()
             , 'fields'    => array(

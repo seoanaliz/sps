@@ -36,7 +36,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @param $targetFeedId
      * @return bool
      */
-    protected function moreThenAuthor($targetFeedId){
+    public function moreThenAuthor($targetFeedId){
         if ($targetFeedId == null) return false;
         $role = $this->getRoleForTargetFeed($targetFeedId);
         if (!is_null($role)) {

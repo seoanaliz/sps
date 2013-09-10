@@ -443,6 +443,22 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
+    /**
+     * Переназначает сама себя
+     * @lazy
+     */
+    requestArticles: function () {
+        var t = this;
+        var Def = new Deferred();
+
+        Def.fireSuccess(sourceArticlesPrecache);
+        delete sourceArticlesPrecache;
+
+        t.requestArticles = $.proxy(Control.fire, Control);
+        
+        return Def;
+    },
+
     loadArticles: function(clean) {
         var t = this;
 
@@ -536,7 +552,7 @@ var LeftPanelWidget = Event.extend({
             requestData.articlesOnly = 1;
         }
 
-        Control.fire('get_articles', requestData).always(function() {
+        t.requestArticles('get_articles', requestData).always(function() {
             if (clean) {
                 t.$wall.empty();
             }

@@ -236,26 +236,30 @@ class AddArticleToQueueControl extends BaseControl
     protected function createArticle( $postVkId, $targetFeed ) {
         $result = false;
         $fullPostId = '-' . $targetFeed->externalId . '_' . $postVkId;
-        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed->targetFeedId);
-        if( !$token) {
-            $token = AccessTokenUtility::getTokenForTargetFeed( $targetFeed->targetFeedId );
-        }
-
-        try {
-            $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
-        } catch ( Exception $e) {
+        $token = AccessTokenFactory::Get( array( 'vkId' => AuthVkontakte::IsAuth()));
+        if( empty( $token ))
             return $result;
+        $token = current( $token)->accessToken;
+        for( $i = 0; $i < 3; $i++ ) {
+            try {
+                $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
+                break;
+            } catch ( Exception $e) {
+                sleep(0.4);
+                if( $i == 2)
+                    return $result;
+            }
         }
         if( !empty( $posts)) {
             $article = ParserVkontakte::get_article_from_post(
-                current($posts),
+                $posts[0],
                 $targetFeed->targetFeedId
             );
             $article->isSuggested = true;
         }
 
         if( !empty($article) && ArticleFactory::Add($article, array( BaseFactory::WithReturningKeys => true ))) {
-            $articleRecord = ParserVkontakte::get_articleRecord_from_post( current($posts));
+            $articleRecord = ParserVkontakte::get_articleRecord_from_post( $posts[0]);
             $articleRecord->articleId = $article->articleId;
             if ( ArticleRecordFactory::Add( $articleRecord, array( BaseFactory::WithReturningKeys => true ))) {
                 return array(

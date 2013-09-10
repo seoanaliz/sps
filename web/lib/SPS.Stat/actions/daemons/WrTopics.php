@@ -135,9 +135,6 @@ class WrTopics extends wrapper
             }
         }
 
-//        if( $quantity < StatPublics::STAT_QUANTITY_LIMIT )
-//            $show_in_main = false;
-
         if ( !$only_quantity ) {
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
                 SET

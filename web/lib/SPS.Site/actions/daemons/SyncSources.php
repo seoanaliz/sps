@@ -31,7 +31,7 @@
 
             foreach ($sources as $source) {
                 //пропускаем специальные источники
-                if (SourceFeedUtility::IsTopFeed($source) || $source->externalId == '-') {
+                if (SourceFeedUtility::IsTopFeed($source) || $source->externalId == '-' || !is_numeric( $source->externalId )) {
                     continue;
                 }
 
@@ -83,6 +83,7 @@
                     $posts = !empty($posts) ? $posts : array();
 
                     $this->saveFeedPosts($source, $posts);
+                   
                 }
             }
         }

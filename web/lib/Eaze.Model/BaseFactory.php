@@ -415,6 +415,14 @@
             if ( !isset( $resultSearch[BaseFactoryPrepare::Page] ) ) {
                 $resultSearch[BaseFactoryPrepare::Page] = 0;
             }
+
+            if (isset($searchArray['limit'])) {
+                $resultSearch['limit'] = $searchArray['limit'];
+            }
+            if (isset($searchArray['offset'])) {
+                $resultSearch['offset'] = $searchArray['offset'];
+            }
+
             return $resultSearch;
         }
 
@@ -877,10 +885,13 @@
             } else {
                 $expires = empty( $mapping["cache"] ) ? self::$DefaultCacheTime : $mapping["cache"];
             }
-            
-            self::ProcessSearchParameters( $searchArray, $mapping, $options, $cmd );
 
-            if ( self::CanPages( $mapping ) ) {
+            self::ProcessSearchParameters( $searchArray, $mapping, $options, $cmd );
+            
+            if (isset($searchArray['limit'])) {
+                $cmd->SetInteger( "@limit", $searchArray['limit'] );
+                $cmd->SetInteger( "@offset", isset($searchArray['offset']) ? $searchArray['offset'] : '0' );
+            } else if ( self::CanPages( $mapping ) ) {
                 $cmd->SetInteger( "@pageOffset", $searchArray[BaseFactoryPrepare::Page] * $searchArray[BaseFactoryPrepare::PageSize] );
                 $cmd->SetInteger( "@pageSize",   $searchArray[BaseFactoryPrepare::PageSize] );
             }
@@ -919,8 +930,6 @@
                 }
             }
 
-
-//            echo $cmd->GetQuery(), '<br>';
             $ds        = $cmd->Execute();
             $structure = self::GetObjectTree( $ds->Columns );
             $result    = array();

@@ -79,5 +79,11 @@ class VkPublic {
 
     /** @var bool */
     public $inLists;
+
+    /** @var int */
+    public $cpp;
+
+    /** @var string */
+    public $cppChange;
 }
 ?>
