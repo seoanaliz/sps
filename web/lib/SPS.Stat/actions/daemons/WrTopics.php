@@ -13,49 +13,9 @@ class WrTopics extends wrapper
     private $ids;
     private $conn;
 
-    public static $toface_beauty = array(
-        25678227,
-        38000449,
-        35807278,
-        38000423,
-        38000513,
-        38000540,
-        42351996,
-        41946825,
-        42352011,
-        42352024,
-        42494921,
-        42352077,
-        42352062,
-        42494824,
-        42494714,
-        41946847,
-        42495064,
-        42352154,
-        42352138,
-        42494794,
-        41946872,
-        42495143,
-        42495239,
-        42494936,
-        41946945,
-        42495024,
-        41946887,
-        41946921,
-        42495048,
-        42494987,
-        41946866,
-        42494848,
-        42352086,
-        42352120,
-        42494766,
-        49903343
-    );
-
     public function Execute2()
     {
         $this->conn = ConnectionFactory::Get( 'tst' );
-
 
         set_time_limit(14000);
         if (! $this->check_time()) {
@@ -95,18 +55,18 @@ class WrTopics extends wrapper
         $sql = "select vk_id
                 FROM " . TABLE_STAT_PUBLICS . "
                 WHERE quantity > @limit
+                AND updated_at < now() - interval '23 hour'
                 ORDER BY vk_id";
+
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@limit',  $limit );
+
         $ds = $cmd->Execute();
         $res = array();
         while ( $ds->Next() ) {
             $res[] = $ds->getInteger( 'vk_id' );
         }
-
-
-        $this->ids =  array_merge( $res, self::$toface_beauty );
-        return $res;
+        $this->ids = $res;
 
     }
 
@@ -124,14 +84,14 @@ class WrTopics extends wrapper
     }
 
     //обновление данных по каждому паблику(текущее количество, разница со вчерашним днем)
-    public function set_public_grow( $publ_id, $quantity, $name, $ava, $is_closed, $only_quantity = null )
+    public function set_public_grow( $publ_id, $quantity, $name, $ava, $is_closed, $is_page, $only_quantity = null )
     {
 
-        $show_in_main = false;
-        $diff_abs = null;
+        $show_in_main   = false;
+        $diff_abs       = null;
         $diff_abs_week  = null;
         $diff_abs_month = null;
-        $diff_rel = null;
+        $diff_rel       = null;
         $diff_rel_week  = null;
         $diff_rel_month = null;
 
@@ -175,8 +135,8 @@ class WrTopics extends wrapper
             }
         }
 
-        if( $quantity < StatPublics::STAT_QUANTITY_LIMIT )
-            $show_in_main = false;
+//        if( $quantity < StatPublics::STAT_QUANTITY_LIMIT )
+//            $show_in_main = false;
 
         if ( !$only_quantity ) {
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
@@ -191,14 +151,18 @@ class WrTopics extends wrapper
                     sh_in_main      =   @sh_in_main,
                     name            =   @name,
                     closed          =   @closed,
-                    ava             =   @ava
+                    ava             =   @ava,
+                    updated_at      =   now(),
+                    active          =   true,
+                    is_page         =   @is_page
                  WHERE
                     vk_id = @publ_id;
                 ';
         }  else {
             $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
                 SET
-                    quantity = @new_quantity
+                    quantity = @new_quantity,
+                    updated_at      =   now()
                 WHERE
                     vk_id = @publ_id;
                 ';
@@ -217,6 +181,7 @@ class WrTopics extends wrapper
         $cmd->SetString( '@ava',               $ava );
         $cmd->SetString( '@name',              $name );
         $cmd->SetBoolean('@closed',            $is_closed);
+        $cmd->SetBoolean('@is_page',            $is_page);
         $cmd->Execute();
 
     }
@@ -305,9 +270,10 @@ class WrTopics extends wrapper
         $sql = 'SELECT id FROM '
             . TABLE_STAT_PUBLICS_POINTS . '
            WHERE time > now() - interval \'2 day\'
-           AND   ( quantity is null or quantity < 1)
+           AND   ( quantity is null or quantity = 0 )
            AND   id > 0';
         $cmd = new SqlCommand( $sql, $this->conn );
+        echo $cmd->GetQuery();
         $ds = $cmd->Execute();
         $res = array();
         while( $ds->Next() ) {
@@ -491,6 +457,7 @@ class WrTopics extends wrapper
         set_time_limit(14000);
         if ( !$this->check_time()) {
             $ids = $this->getFaultedPublics();
+
             if ( empty( $ids )) {
                 die('Не сейчас');
             } else {
@@ -500,10 +467,12 @@ class WrTopics extends wrapper
             die();
         }
 
-        $this->get_id_arr( StatPublics::STAT_QUANTITY_LIMIT );
+        $start = microtime(1);
+        $this->get_id_arr( 1000000 );
         $this->createPoints();
         $this->updateCommonInfo();
         $this->update_visitors();
+        echo '<br>' . round( microtime(1) - $start);
     }
 
     public function createPoints() {
@@ -513,7 +482,8 @@ class WrTopics extends wrapper
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetString ( '@time',      $date );
         $ds = $cmd->Execute();
-        if ( $ds->GetSize() == count($this->ids)) {
+        if ( $ds->GetSize() == count($this->ids) ) {
+            print_r( count( $this->ids ));
             echo 'fuck';
             die();
             return;
@@ -555,6 +525,7 @@ class WrTopics extends wrapper
             $publicIds = $this->ids;
         }
         $publcIdsChunks = array_chunk( $publicIds, 200 );
+        $start = microtime(1);
         foreach ( $publcIdsChunks as $chunk ) {
             $idsRow = implode(',', $chunk);
             $params = array(
@@ -568,23 +539,33 @@ class WrTopics extends wrapper
                 print_r( $ex );
                 continue;
             }
+
             $res = ArrayHelper::Collapse( $res, 'gid', $convertToArray = false );
-            ConnectionFactory::BeginTransaction('tst');
+
             foreach( $chunk as $publicId ) {
                 if ( isset( $res[$publicId] )) {
-                    $this->updatePoint($publicId, $res[$publicId]->members_count,0,0,0,0 );
+                    if ( isset($res[$publicId]->deactivated ) ) {
+                        $public = new VkPublic();
+                        $public->active = false;
+                        $public->updated_at = DateTimeWrapper::Now();
+                        VkPublicFactory::UpdateByMask( $public, array( 'active,updated_at' ), array( 'vk_id' => $publicId ));
+                      echo 'vk.com/club' . $publicId . ' take ban<br>';
+                        continue;
+                    }
+                    $this->updatePoint( $publicId, $res[$publicId]->members_count, 0, 0, 0, 0 );
 
                     $this->set_public_grow(
                         $publicId,
-                        $res[$publicId]->members_count,
+                        isset( $res[$publicId]->members_count ) ? $res[$publicId]->members_count : 0,
                         $res[$publicId]->name,
                         $res[$publicId]->photo,
-                        isset( $res[$publicId]->is_closed ) ? $res[$publicId]->is_closed : 0
+                        isset( $res[$publicId]->is_closed ) ? $res[$publicId]->is_closed : 0,
+                        $res[$publicId]->type == 'page'
                     );
                 }
+
             }
 
-            ConnectionFactory::CommitTransaction( $commit = true, 'tst');
         }
     }
 
