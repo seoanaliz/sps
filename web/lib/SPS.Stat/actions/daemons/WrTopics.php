@@ -86,7 +86,6 @@ class WrTopics extends wrapper
     //обновление данных по каждому паблику(текущее количество, разница со вчерашним днем)
     public function set_public_grow( $publ_id, $quantity, $name, $ava, $is_closed, $is_page, $only_quantity = null )
     {
-
         $show_in_main   = false;
         $diff_abs       = null;
         $diff_abs_week  = null;
@@ -95,7 +94,7 @@ class WrTopics extends wrapper
         $diff_rel_week  = null;
         $diff_rel_month = null;
 
-        if ( $quantity > 1000 && !$only_quantity ) {
+        if ( $quantity > StatPublics::STAT_QUANTITY_LIMIT && !$only_quantity ) {
             $show_in_main = true;
             $sql = 'SELECT quantity, (now()::date -  time) as interv FROM ' . TABLE_STAT_PUBLICS_POINTS .
                   ' WHERE
@@ -128,12 +127,12 @@ class WrTopics extends wrapper
             }
 
             if ( isset ( $quan_arr[2] ) && $quan_arr[2] ) {
-                $diff_rel = $quan_arr[2] ? round( ( $quantity / $quan_arr[2] - 1) * 100, 2 ) : 0;
+                $diff_rel = $quan_arr[2] ? round(( $quantity / $quan_arr[2] - 1) * 100, 2 ) : 0;
                 $diff_abs = $quantity - $quan_arr[2];
-            } else {
-                $show_in_main = false;
+                $show_in_main = true;
             }
         }
+
 
         if ( !$only_quantity ) {
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
@@ -267,7 +266,7 @@ class WrTopics extends wrapper
         $sql = 'SELECT id FROM '
             . TABLE_STAT_PUBLICS_POINTS . '
            WHERE time > now() - interval \'2 day\'
-           AND   ( quantity is null or quantity = 0 )
+           AND   quantity = 0
            AND   id > 0';
         $cmd = new SqlCommand( $sql, $this->conn );
         echo $cmd->GetQuery();
@@ -465,7 +464,7 @@ class WrTopics extends wrapper
         }
 
         $start = microtime(1);
-        $this->get_id_arr( 1000000 );
+        $this->get_id_arr( StatPublics::STAT_QUANTITY_LIMIT );
         $this->createPoints();
         $this->updateCommonInfo();
         $this->update_visitors();
@@ -545,10 +544,15 @@ class WrTopics extends wrapper
                         $public = new VkPublic();
                         $public->active = false;
                         $public->updated_at = DateTimeWrapper::Now();
-                        VkPublicFactory::UpdateByMask( $public, array( 'active,updated_at' ), array( 'vk_id' => $publicId ));
-                      echo 'vk.com/club' . $publicId . ' take ban<br>';
+                        VkPublicFactory::UpdateByMask( $public, array( 'active', 'updated_at' ), array( 'vk_id' => $publicId ));
+                        echo 'vk.com/club' . $publicId . ' take ban<br>';
+                        $this->updatePoint( $publicId, null, 0, 0, 0, 0 );
                         continue;
                     }
+                    if( !isset( $res[$publicId]->members_count)) {
+                        continue;
+                    }
+
                     $this->updatePoint( $publicId, $res[$publicId]->members_count, 0, 0, 0, 0 );
 
                     $this->set_public_grow(
@@ -560,9 +564,7 @@ class WrTopics extends wrapper
                         $res[$publicId]->type == 'page'
                     );
                 }
-
             }
-
         }
     }
 
