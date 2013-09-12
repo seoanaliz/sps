@@ -23,7 +23,6 @@
             ,33704958
             ,38000521
             ,1792796
-            ,27421965
             ,34010064
             ,25749497
             ,35807078
@@ -81,12 +80,9 @@
         public static function get_our_publics_list( $selector = 0 )
         {
             $publics = TargetFeedFactory::Get(array('isOur' => true ));
-
             $res = array();
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
-                    continue;
-                if(!isset($public->params['isOur']) || $public->params['isOur'] =='off')
                     continue;
 
                 // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
@@ -628,23 +624,40 @@
             return $res;
         }
 
-        public static function get_public_walls_mk2( $walls_array, $app = '' )
+        public static function  get_public_walls_mk2( $walls_array, $app = '', $postponed = false )
         {
             $walls = array();
             $walls_array = array_unique( $walls_array );
             $sliced_walls_array = array_chunk( $walls_array, 25 );
+            $filter = '';
+            $access_token = false;
+
+            if ( $postponed ) {
+                $filter = ',"filter":"postponed"';
+                $access_tokens = AccessTokenFactory::Get(array('vkId' => '187850505', 'version'=> AuthVkontakte::$Version));
+                if ( !empty($access_tokens )) {
+                    $access_token  = current( $access_tokens )->accessToken;
+                } else {
+                    return array();
+                }
+                $app = false;
+            }
             foreach( $sliced_walls_array as $chunk ) {
                 $code = '';
                 $return = "return{";
                 $i = 0;
                 foreach( $chunk as $public ) {
                     $id = trim( $public );
-                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 6 });';
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 6' . $filter . ' });';
                     $return .=  "\"id$id\":id$id,";
                     $i++;
                 }
                 $code .= trim( $return, ',' ) . "};";
-                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
+                $params = array( 'code' => $code );
+                if ( $access_token ) {
+                    $params['access_token'] = $access_token;
+                }
+                $res   = VkHelper::api_request( 'execute', $params, 0, $app );
                 if( isset( $res->error ))
                     continue;
                 foreach( $res as $id => $content ) {
