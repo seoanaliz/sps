@@ -53,6 +53,7 @@
 */5     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/inst-postchecker/ > /dev/null
 *       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/inst-wallchecker/ > /dev/null
 
+*/5     *       *       *       *       /home/sps/www/clean_tmp.sh > /dev/null
 
 #*/20     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-suggests/ > /dev/null
 

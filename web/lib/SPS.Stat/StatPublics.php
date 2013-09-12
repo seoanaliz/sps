@@ -84,7 +84,6 @@
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
-
                 // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
                 if(( $selector == 1 && in_array( $public->externalId, self::$topface_beauty)) ||
                     ($selector == 2 && !in_array( $public->externalId, self::$topface_beauty)))
