@@ -310,7 +310,7 @@
                 'photo_sizes'   =>  1
             );
             $result = VkHelper::api_request( 'photos.getById', $params );
-
+            sleep(0.4);
 
             foreach( $result as $photo ) {
                 $tmp_url_list = ArrayHelper::Collapse( $photo->sizes, 'type', false );
