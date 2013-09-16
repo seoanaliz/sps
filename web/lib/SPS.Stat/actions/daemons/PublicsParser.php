@@ -32,16 +32,18 @@ class PublicsParser
             if( !$res)
                 continue;
             $new_entries = array();
+            $update_entries = 0;
             foreach( $res as $public ) {
                 sleep( self::PAUSE );
-                if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
+                if( !isset( $public->type) || !isset( $public->members_count ) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
-                if( $public->name == 'DELETED' && $this->current_public > 61000000 && $public->members_count == 0) {
+                if( $public->name == 'DELETED' && $this->current_public > 63000000 && $public->members_count == 0) {
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
+                $check = VkPublicFactory::GetOne( array( 'vk_id' => $public->gid ));
 
-                if ( $public->members_count > self::LIMIT && !VkPublicFactory::Get( array( 'vk_id' => $public->gid ))) {
+                if ( $public->members_count > self::LIMIT && !$check )  {
                     $entry = new VkPublic();
                     $entry->vk_id = $public->gid;
                     $entry->ava   = $public->photo;
@@ -52,13 +54,17 @@ class PublicsParser
                     $entry->is_page    =  $public->type == 'page' ? true : false;
                     $entry->sh_in_main =  true;
                     $new_entries[] = $entry;
+                } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {
+                    $check->quantity = $public->members_count;
+                    VkPublicFactory::Update($check);
+                    $update_entries++;
                 }
             }
             if( $new_entries ) {
                 VkPublicFactory::AddRange( $new_entries );
             }
-            echo 'добавил: ', count($new_entries),'<br>', round(microtime(1) - $ms, 2),'<br>';
-
+            echo 'добавил: ', count($new_entries),'<br>', round(microtime(1) - $ms, 2),' обновил ' . $update_entries . '<br>';
+            $update_entries = 0;
             $this->current_public += $take_counter;
             $this->set_state($this->current_public);
             $this->set_tries(0);
