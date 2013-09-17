@@ -361,6 +361,8 @@ var QueueWidget = Event.extend({
                 time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0'),
                 qid = $post.find('.post').data('queue-id');
 
+            time = parseInt(time.replace(':', ''), 10) > 2359 ? '23:59': time;
+
             $input.blur().hide().val(time);
 
             if (time) {
