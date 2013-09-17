@@ -343,6 +343,33 @@ var QueueWidget = Event.extend({
             $input.focus().select();
         });
 
+        /**
+         * Поле ввода времени блокировки
+         */
+        $queue.delegate('.time-of-locked-edit', 'blur keydown', function (e) {
+            var $input = $(this);
+
+            if (~['keydown', 'focusout'].indexOf(e.type)
+                && (!e.originalEvent || e.keyCode !== KEY.ENTER)) {
+                return;
+            }
+
+            var $post = $input.closest('.slot'),
+                $page = $post.closest('.queue-page'),
+                gridLineId = $post.data('grid-id'),
+                gridLineItemId = $post.data('grid-item-id'),
+                time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0'),
+                qid = $post.find('.post').data('queue-id');
+
+            $input.blur().hide().val(time);
+
+            if (time) {
+                Events.fire('rightcolumn_locked_time_edit', gridLineId, gridLineItemId, time, qid, function() {
+                    t.updateSinglePage($page);
+                });
+            }
+        });
+
         $queue.delegate('.repeater', 'click', function () {
             var $slot = $(this).closest('.slot');
 
