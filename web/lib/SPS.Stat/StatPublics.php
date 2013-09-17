@@ -8,13 +8,10 @@
 
         const time_shift = 0;
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
-
+        const STAT_QUANTITY_LIMIT = 30000;
         const WARNING_DATA_NOT_ACCURATE = 1;
         const WARNING_DATA_FROM_YESTERDAY = 2;
         const WARNING_DATA_ACCURATE = 3;
-
-        const STAT_QUANTITY_LIMIT    = 30000;
-
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
              26776509
@@ -511,7 +508,6 @@
 
         public static function get_views_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-
             $params = array(
                 'gid'           =>  $public_id,
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
@@ -519,14 +515,18 @@
             );
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
-            if ( !empty ( $res->error))
-                return false;
             $connect = ConnectionFactory::Get( 'tst' );
+            if ( !empty ( $res->error)) {
+                StatPublics::save_view_visitor( $public_id, null, null, null, date( 'Y-m-d', $time_from ), $connect );
+                return false;
+            }
+
             foreach( $res as $day ) {
                 $subs = isset($day->reach_subscribers) ? $day->reach_subscribers : 0;
                 StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $subs, $day->day, $connect );
             }
             sleep(0.3);
+            return true;
         }
 
         public static function get_average_rate( $sb_id, $time_from, $time_to ) {
@@ -562,39 +562,16 @@
 
         public static function save_view_visitor( $public_id, $views, $visitors, $reach, $date, $connect )
         {
-            $sql = 'select * from
-                stat_publics_50k_points
-            WHERE
-                id=@public_id
-                AND time=@date';
-            $cmd = new SqlCommand( $sql, $connect );
-            $cmd->SetInteger( '@public_id', $public_id );
-            $cmd->SetString ( '@date',      $date );
-            $ds = $cmd->Execute();
+            $sql = 'UPDATE
+                    stat_publics_50k_points
+                SET
+                    visitors=@visitors,
+                    views   =@views,
+                    reach   =@reach
+                WHERE
+                    id=@public_id
+                    AND time=@date';
 
-            if ( $ds->GetSize()) {
-                $sql = 'UPDATE
-                        stat_publics_50k_points
-                    SET
-                        visitors=@visitors,
-                        views   =@views,
-                        reach   =@reach
-                    WHERE
-                        id=@public_id
-                        AND time=@date';
-            } else {
-                $sql = 'INSERT INTO
-                        stat_publics_50k_points
-                    VALUES(
-                           @public_id,
-                           @date,
-                           0,
-                           @visitors,
-                           @views,
-                           @reach
-                    )';
-
-            }
             $cmd = new SqlCommand( $sql, $connect );
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->SetInteger( '@visitors',  $visitors );

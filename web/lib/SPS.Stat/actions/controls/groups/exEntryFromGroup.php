@@ -15,6 +15,7 @@
          */
 
         public function Execute() {
+            new stat_tables();
             $user_id   = AuthVkontakte::IsAuth();
             $group_id  = Request::getInteger ( 'groupId' );
             $entry_id  = Request::getInteger ( 'publId'  );
