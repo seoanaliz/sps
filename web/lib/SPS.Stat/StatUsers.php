@@ -9,12 +9,13 @@ class StatUsers
      * trustworthy users
      */
     public static $editors_black_list = array(
-        670456,
+         670456,
         191774732,
         106175502,
         196506553,
         176239625,
-        13049517
+        13049517,
+        181981756
     );
 
     const EDITOR_ROLE = 2;
