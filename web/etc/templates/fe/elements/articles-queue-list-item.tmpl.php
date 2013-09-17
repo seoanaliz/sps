@@ -100,6 +100,7 @@
             </div>
         </div>
         <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
+            <div class="locked-trigger"></div>
             <div class="edit-trigger"></div>
             <div class="delete"></div>
         <? } ?>

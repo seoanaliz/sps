@@ -424,7 +424,7 @@ i {font-style: italic;}
     }
 }
 
-.delete, .edit-trigger {
+.delete, .edit-trigger, .locked-trigger {
     position: absolute;
     top: 10px;
     cursor: pointer;
@@ -446,6 +446,13 @@ i {font-style: italic;}
 .edit-trigger {
     right: 30px;
     background-image: url('../../images/common/edit.png');
+}
+
+.locked-trigger {
+    right: 50px;
+    background-image: url('../../images/common/locked.png');
+    background-size: 18px 18px;
+    background-repeat: no-repeat
 }
 
 .controls {
@@ -570,6 +577,7 @@ i {font-style: italic;}
                 &:hover {
                     opacity: 1;
                 }
+
             }
             
             input.hasDatepick {
@@ -666,7 +674,7 @@ i {font-style: italic;}
             }
 
             &:hover {
-                .delete, .edit-trigger {
+                .delete, .edit-trigger, .locked-trigger {
                     opacity: 0.5;
                 }
             }
