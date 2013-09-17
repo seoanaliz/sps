@@ -82,8 +82,8 @@
         'js://fe/main.js',
     );
 
-    CssHelper::Init( true );
-    JsHelper::Init( true );
+    CssHelper::Init( false );
+    JsHelper::Init( false );
 
     CssHelper::PushGroups( $cssFiles );
     if( !empty( $cssFilesAdds ) ) {
