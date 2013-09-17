@@ -591,7 +591,8 @@ i {
   opacity: 0.5;
 }
 .right-panel .items .slot .time-of-remove {
-  padding-left: 4px;
+  padding-left: 2px;
+  padding-right: 2px;
 }
 .right-panel .items .slot input.hasDatepick {
   width: 15px;
