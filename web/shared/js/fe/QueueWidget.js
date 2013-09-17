@@ -318,6 +318,31 @@ var QueueWidget = Event.extend({
             }
         });
 
+        /**
+         * Клик по замку. для установки времени блокировки
+         * создаем инпут для ввода
+         *
+         * //великая копипаста
+         */
+        $queue.delegate('.locked-trigger', 'click', function (e) {
+            var $time = $(this);
+            var $post = $time.closest('.slot-header');
+            var $input = $time.data('time-of-locked-edit');
+
+            if (!$input) {
+                $input = $('<input />')
+                    .attr('type', 'text')
+                    .attr('class', 'time-of-locked-edit')
+                    .width($time.width() + 2)
+                    .mask('29:59')
+                    .appendTo($post);
+                $time.data('time-of-locked-edit', $input);
+            } else {
+                $input.show();
+            }
+            $input.focus().select();
+        });
+
         $queue.delegate('.repeater', 'click', function () {
             var $slot = $(this).closest('.slot');
 
