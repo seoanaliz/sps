@@ -47,7 +47,7 @@
             <div class="slot-header">
                 <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                 <span class="repeater"></span>
-                <span class="time-of-removal"></span>
+                <span class="time-of-removal <?= $deleteAt ? 'visible': '' ?>"></span>
                 <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
                 {increal:tmpl://fe/elements/articles-queue-item-header.tmpl.php}
             </div>

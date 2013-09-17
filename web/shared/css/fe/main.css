@@ -586,6 +586,12 @@ i {
 .right-panel .items .slot .time-of-removal:hover {
   opacity: 1;
 }
+.right-panel .items .slot .time-of-removal.visible {
+  opacity: 0.5;
+}
+.right-panel .items .slot .time-of-remove {
+  padding-left: 4px;
+}
 .right-panel .items .slot input.hasDatepick {
   width: 15px;
   height: 10px;
@@ -627,7 +633,8 @@ i {
   top: 0;
   left: 60px;
   height: 12px;
-  min-width: 30px;
+  min-width: 32px;
+  padding-left: 12px;
 }
 .right-panel .items .slot.new {
   min-height: 0;
