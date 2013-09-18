@@ -91,13 +91,13 @@ class CheckWalls
         //добавляем стены пабликов для отслеживания внешних ссылок
         $ids_array = array_merge( $ids_array, $this->monitoring_array, $our_publics_ids);
         $ids_array = array_unique( $ids_array );
-
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $this->monitoring_array as $public_id ) {
             $post = $walls[ $public_id ][1];
             $this->save_post( $public_id, $post->id, $post->text );
         }
 
+        $walls_postponed = StatPublics::get_public_walls_mk2( $our_publics_ids, $app = '', $getPostponed = true);
         //сохраняем активность наших пабликов
         foreach( $our_publics_ids as  $public_id ) {
             if ( !isset( $walls[ $public_id ][1] ))
@@ -107,6 +107,7 @@ class CheckWalls
 
             //заносим отсутствующие в sb посты в sb
             $this->add_posts_to_sb_queue( $walls[$public_id], $our_publics[$public_id]['sb_id'] );
+            $this->add_posts_to_sb_queue( $walls_postponed[$public_id], $our_publics[$public_id]['sb_id'] );
         }
 
         //перебор мониторов, поиск постов на соответств. стенах
@@ -447,7 +448,7 @@ class CheckWalls
         $result = array();
         //выбираем внешние id отправленных чз sb(или уже спаренных) постов
         $sql = <<<sql
-            SELECT "externalId"
+            SELECT "externalId", "startDate"
             FROM   "articleQueues"
             WHERE
                    "sentAt" IS NOT NULL
@@ -458,7 +459,7 @@ sql;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $ds = $cmd->Execute();
         while( $ds->Next()) {
-            $result[$ds->GetValue('externalId')] = 1;
+            $result[$ds->GetValue('externalId')] = $ds->GetDateTime('startDate');
         }
 
         $this->existing_external_ids = $result;
@@ -470,30 +471,48 @@ sql;
 //        $likes_array  = array();
         $look_from_time = new DateTimeWrapper( date('r', time() - 600 ));
         $look_to_time   = new DateTimeWrapper( date('r', time() - 60 ));
+
         try {
             $converted_posts = ParserVkontakte::post_conv( $posts );
+
         } catch (Exception $e) {
             return false;
         }
+        $now = DateTimeWrapper::Now();
         foreach( $converted_posts as $post ) {
             $postDate = new DateTimeWrapper( date('r', $post['time'] ));
             //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
-            $check_date_condition = $check_time &&  ( $postDate >= $look_from_time ) && ( $postDate <= $look_to_time );
+            $check_date_condition = $check_time &&  ( $postDate >= $look_from_time );
             //отсеиваем неподходящие по времени или уже содержащиеся в базе
-            if ( !$check_date_condition  || isset( $this->existing_external_ids[$post['id']] )) {
-//                $likes_array[ $post['id']] = array('likes' => $post['likes_tr'], 'retweet' => $post['retweet']);
+            if ( !$check_date_condition )
+                continue;
+            //если пост не зареган в sb
+            if ( !isset( $this->existing_external_ids[$post['id']])) {
+                //вносим его туда (ниже)
+            //если пост есть, и дата его отправления меньше текущей, или время старта поста совпадает со временем старта
+            // элемента очереди - пропускаем пост
+            } elseif ( $this->existing_external_ids[$post['id']] < $now ||
+                $postDate == $this->existing_external_ids[$post['id']]  ) {
+                continue;
+            // обновляем элемент очереди
+            } else  {
+                $articleQueue = new ArticleQueue();
+                $articleQueue->startDate = $postDate;
+                $endFate =  new DateTimeWrapper( date('r', $post['time'] ));
+                $articleQueue->endDate   = $endFate->modify('+10 minutes');
+                $this->make_grids( $targeetFeedId, $postDate );
+                ArticleQueueFactory::UpdateByMask($articleQueue, array('startDate', 'endDate'), array('externalId' => $post['id']));
                 continue;
             }
             $articleRecord = ParserVkontakte::get_articleRecord_from_post( $post );
-
             $conn = ConnectionFactory::Get();
             $conn->begin();
+
             $articleQueue = ParserVkontakte::get_articleQueue_from_article( $post, $postDate, $targeetFeedId );
             ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true) );
             $articleRecord->articleQueueId = $articleQueue->articleQueueId;
             $this->make_grids( $targeetFeedId, $postDate );
             $result = ArticleRecordFactory::Add( $articleRecord );
-
             if(  $result && $articleRecord->articleQueueId ) {
                 $conn->commit();
             } else {

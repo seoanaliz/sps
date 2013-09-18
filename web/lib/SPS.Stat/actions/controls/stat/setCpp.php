@@ -23,6 +23,8 @@ class setCpp {
                     if( $targetFeed ) {
                         $accessUtility = new TargetFeedAccessUtility($userVkId);
                         if ($accessUtility->moreThenAuthor( $targetFeed->targetFeedId)) {
+                            if ( $cpp === 0 ) 
+					            $cpp = null;
                             $vkPublic = new VkPublic();
                             $vkPublic->cpp = $cpp;
                             $time = time();
@@ -34,7 +36,7 @@ class setCpp {
                             );
                             if ($updateResult) {
                                 $result['success'] = true;
-                                $result['cpp'] = $vkPublic->cpp;
+                                $result['cpp'] = (int) $vkPublic->cpp;
                             }
                         }
                     }

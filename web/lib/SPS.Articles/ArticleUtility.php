@@ -172,5 +172,15 @@
         }
 
 
+        public static function isInProtectedInterval( $targetFeedId, $newPostTimestamp ) {
+            $newPostTime = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $search = array(
+                'startDateFrom' =>  $newPostTime,
+                'protectToLe'   =>  $newPostTime,
+                'targetFeedId'  =>  $targetFeedId,
+            );
+
+            return (bool)ArticleQueueFactory::Count( $search);
+        }
     }
 ?>
