@@ -235,14 +235,19 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_locked_time_edit: function rightcolumn_locked_time_edit(gridLineId, gridLineItemId, time, gid, callback) {
-        //TODO написать запрос когда будет готово апи
-        console.warn('TODO ajax call');
-
-        //Эмулируем асинхронную работу, удалить это когда добавим ajax
-        setTimeout(function () {
-            callback(true);
-        }, 100);
+    rightcolumn_locked_time_edit: function rightcolumn_locked_time_edit(qid, time, callback) {
+        $.ajax({
+            url: controlsRoot + 'protect-post/',
+            type: 'GET',
+            dataType : "json",
+            data: {
+                queueId: qid,
+                time: time
+            },
+            success: function(data) {
+                callback(data);
+            }
+        });
     },
     rightcolumn_post_edit: function(text, photos, link, dataQueueId, callback){
         var $sourceFeedIds = Elements.leftdd();

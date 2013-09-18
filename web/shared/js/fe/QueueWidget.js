@@ -366,7 +366,7 @@ var QueueWidget = Event.extend({
             $input.blur().hide().val(time);
 
             if (time) {
-                Events.fire('rightcolumn_locked_time_edit', gridLineId, gridLineItemId, time, qid, function() {
+                Events.fire('rightcolumn_locked_time_edit', qid, time, function() {
                     t.updateSinglePage($page);
                 });
             }
