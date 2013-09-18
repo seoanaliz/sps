@@ -133,6 +133,9 @@
             <action name="PostDeletePlanControl">
                 <path>controls/PostDeletePlanControl</path>
             </action>
+            <action name="PostSetProtectedControl">
+                <path>controls/PostSetProtectedControl</path>
+            </action>
             <action name="GetArticlesQueueTimelineControl">
                 <path>controls/GetArticlesQueueTimelineControl</path>
             </action>
