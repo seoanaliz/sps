@@ -17,6 +17,7 @@
         <div class="slot-header">
             <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
             <span class="repeater"></span>
+            <div class="delete"></div>
         </div>
         <div class="editing-post">
             <div class="textarea-wrap">
@@ -50,6 +51,10 @@
                 <span class="time-of-removal"></span>
                 <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
                 {increal:tmpl://fe/elements/articles-queue-item-header.tmpl.php}
+                <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
+                    <div class="edit-trigger"></div>
+                    <div class="delete"></div>
+                <? } ?>
             </div>
         <? } ?>
         <div class="post movable
@@ -99,9 +104,5 @@
                 <? } ?>
             </div>
         </div>
-        <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
-            <div class="edit-trigger"></div>
-            <div class="delete"></div>
-        <? } ?>
     <? } ?>
 </div>
