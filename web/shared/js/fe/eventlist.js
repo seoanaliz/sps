@@ -235,6 +235,20 @@ var Eventlist = {
             }
         });
     },
+    rightcolumn_locked_time_edit: function rightcolumn_locked_time_edit(qid, time, callback) {
+        $.ajax({
+            url: controlsRoot + 'protect-post/',
+            type: 'GET',
+            dataType : "json",
+            data: {
+                queueId: qid,
+                time: time
+            },
+            success: function(data) {
+                callback(data);
+            }
+        });
+    },
     rightcolumn_post_edit: function(text, photos, link, dataQueueId, callback){
         var $sourceFeedIds = Elements.leftdd();
         var $sourceFeedId;

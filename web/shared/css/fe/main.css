@@ -83,7 +83,7 @@ i {
   width: 10px;
   height: 10px;
   margin: 0;
-  background: #fff url(../../images/fe/controls.png) no-repeat -44px -2px;
+  background: #ffffff url(../../images/fe/controls.png) no-repeat -44px -2px;
   text-indent: -9999px;
 }
 .qq-uploader .qq-upload-drop-area {
@@ -95,9 +95,9 @@ i {
   font-size: 24px;
   min-height: 1em;
   line-height: 1em;
-  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 .qq-uploader .qq-upload-button {
   float: right;
@@ -138,9 +138,9 @@ i {
 .calendar.active,
 .drop-down.active {
   border-color: #97A4C4;
-  -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.08);
-  -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.08);
-  box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.08);
+  -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+  -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
 }
 .calendar:hover,
 .drop-down:hover {
@@ -343,7 +343,6 @@ i {
 .images-ready {
   width: 510px;
   height: 310px;
-  overflow: hidden;
   margin-top: 10px;
   overflow: hidden;
 }
@@ -432,9 +431,10 @@ i {
   background-position: -56px 0;
 }
 .delete,
-.edit-trigger {
+.edit-trigger,
+.locked-trigger {
   position: absolute;
-  top: 10px;
+  top: -2px;
   cursor: pointer;
   background: center no-repeat;
   width: 20px;
@@ -447,7 +447,8 @@ i {
   z-index: 1;
 }
 .delete:hover,
-.edit-trigger:hover {
+.edit-trigger:hover,
+.locked-trigger:hover {
   opacity: 1 !important;
 }
 .delete {
@@ -457,6 +458,13 @@ i {
 .edit-trigger {
   right: 30px;
   background-image: url('../../images/common/edit.png');
+}
+.locked-trigger {
+  right: 50px;
+  background-image: url('../../images/common/locked.png');
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .controls {
   display: inline-block;
@@ -516,9 +524,9 @@ i {
   z-index: 2;
   top: 131px;
   position: fixed;
-  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-  box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 .right-panel .items .queue-page .empty-queue {
   color: #999;
@@ -579,6 +587,13 @@ i {
 .right-panel .items .slot .time-of-removal:hover {
   opacity: 1;
 }
+.right-panel .items .slot .time-of-removal.visible {
+  opacity: 0.5;
+}
+.right-panel .items .slot .time-of-remove {
+  padding-left: 2px;
+  padding-right: 2px;
+}
 .right-panel .items .slot input.hasDatepick {
   width: 15px;
   height: 10px;
@@ -620,7 +635,20 @@ i {
   top: 0;
   left: 60px;
   height: 12px;
-  min-width: 30px;
+  min-width: 32px;
+  padding-left: 12px;
+}
+.right-panel .items .slot .time-of-locked-edit {
+  font: inherit;
+  color: inherit;
+  border: 1px solid transparent;
+  padding: 2px;
+  background: #fff;
+  position: absolute;
+  left: 236px;
+  height: 12px;
+  min-width: 32px;
+  padding-left: 12px;
 }
 .right-panel .items .slot.new {
   min-height: 0;
@@ -630,17 +658,17 @@ i {
 .right-panel .items .slot.ui-state-active {
   background: #edf4f8;
   border: none;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #dddddd;
 }
 .right-panel .items .slot.ui-state-hover {
   background: #e9eff2;
-  -webkit-box-shadow: inset 0 2px 4px -2px rgba(0,0,0,0.15);
-  -moz-box-shadow: inset 0 2px 4px -2px rgba(0,0,0,0.15);
-  box-shadow: inset 0 2px 4px -2px rgba(0,0,0,0.15);
+  -webkit-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
 }
 .right-panel .items .slot.new .time-of-removal,
-.right-panel .items .slot.new .datepicker,
 .right-panel .items .slot:hover .time-of-removal,
+.right-panel .items .slot.new .datepicker,
 .right-panel .items .slot:hover .datepicker {
   opacity: 0.5;
 }
@@ -658,7 +686,8 @@ i {
   display: block;
 }
 .right-panel .items .slot:hover .delete,
-.right-panel .items .slot:hover .edit-trigger {
+.right-panel .items .slot:hover .edit-trigger,
+.right-panel .items .slot:hover .locked-trigger {
   opacity: 0.5;
 }
 .right-panel .items .slot.repeat .repeater {
@@ -771,9 +800,9 @@ i {
 }
 .right-panel .link-info-content .link-img {
   height: 45px;
-  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
-  -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset;
+  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;
+  -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;
 }
 .right-panel .link-info-content .link-description-content {
   margin-top: 0;
@@ -793,9 +822,9 @@ i {
   background-color: #eee;
   cursor: pointer;
   left: -10px;
-  -webkit-box-shadow: inset -2px 0 1px rgba(0,0,0,0.1);
-  -moz-box-shadow: inset -2px 0 1px rgba(0,0,0,0.1);
-  box-shadow: inset -2px 0 1px rgba(0,0,0,0.1);
+  -webkit-box-shadow: inset -2px 0 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset -2px 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: inset -2px 0 1px rgba(0, 0, 0, 0.1);
   -webkit-border-radius: 3px 0 0 3px;
   -moz-border-radius: 3px 0 0 3px;
   border-radius: 3px 0 0 3px;
@@ -831,9 +860,9 @@ i {
 .right-panel.expanded {
   margin-left: 385px;
   width: 600px;
-  -webkit-box-shadow: 0 0 30px 5px rgba(0,0,0,0.1);
-  -moz-box-shadow: 0 0 30px 5px rgba(0,0,0,0.1);
-  box-shadow: 0 0 30px 5px rgba(0,0,0,0.1);
+  -webkit-box-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.1);
 }
 .right-panel.expanded .queue-page .queue-title {
   width: 572px;
@@ -852,12 +881,12 @@ i {
   height: 6px;
 }
 .right-panel *::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
 .right-panel *:hover::-webkit-scrollbar-thumb,
 .right-panel *:focus::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 .right-panel *::-webkit-resizer,
 .right-panel *::-webkit-scrollbar-corner,
@@ -956,6 +985,7 @@ i {
   height: 100%;
   opacity: 0.5;
 }
+/* Fixes issue here http://code.google.com/p/jcrop/issues/detail?id=1 */
 .jcrop-holder {
   text-align: left;
 }
@@ -963,7 +993,7 @@ i {
 .jcrop-hline {
   font-size: 0px;
   position: absolute;
-  background: white url('../../images/fe/jcrop.gif') top left repeat;
+  background: #ffffff url('../../images/fe/jcrop.gif') top left repeat;
 }
 .jcrop-vline {
   height: 100%;
@@ -1070,9 +1100,9 @@ i {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
-  -webkit-box-shadow: 0px 20px 60px rgba(0,0,0,0.3);
-  -moz-box-shadow: 0px 20px 60px rgba(0,0,0,0.3);
-  box-shadow: 0px 20px 60px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.3);
 }
 .dragged.moving img {
   opacity: 0.1;
@@ -1095,9 +1125,9 @@ i {
   min-width: 300px;
   min-height: 300px;
   margin-left: -150px;
-  -webkit-box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  -moz-box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 .popup-image-edit .close {
   position: absolute;
@@ -1164,9 +1194,9 @@ i {
   cursor: move;
 }
 .show-all-postponed {
-  background: #EDF1F5;
+  background: #edf1f5;
   text-align: center;
-  color: #99ADC2;
+  color: #99adc2;
   padding: 8px;
   cursor: pointer;
   margin: 10px;
@@ -1179,8 +1209,8 @@ i {
   user-select: none;
 }
 .show-all-postponed:hover {
-  background: #E1E7ED;
-  color: #5E82A8;
+  background: #e1e7ed;
+  color: #5e82a8;
 }
 .newpost {
   position: relative;
@@ -1299,9 +1329,9 @@ i {
   padding: 10px;
   padding-left: 50px;
   line-height: 160%;
-  -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
-  -moz-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
-  box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
+  -webkit-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
 }
 .post .userpic {
   top: 10px;
@@ -1373,60 +1403,60 @@ i {
   cursor: text;
   opacity: 1;
 }
-.post>.comments {
+.post > .comments {
   margin-top: 10px;
 }
-.post>.comments>.list>.show-more {
+.post > .comments > .list > .show-more {
   text-align: center;
   padding: 7px 0;
   cursor: pointer;
   color: #6A7989;
-  background-color: #E1E7ED;
+  background-color: #e1e7ed;
 }
-.post>.comments>.list>.show-more.hide {
+.post > .comments > .list > .show-more.hide {
   background-color: transparent;
 }
-.post>.comments>.list>.show-more.hide:hover {
-  background-color: #E1E7ED;
+.post > .comments > .list > .show-more.hide:hover {
+  background-color: #e1e7ed;
 }
-.post>.comments>.list>.show-more.load {
+.post > .comments > .list > .show-more.load {
   background-image: url('../../images/common/upload.gif');
   background-position: center;
   background-repeat: no-repeat;
 }
-.post>.comments>.list>.comment {
+.post > .comments > .list > .comment {
   position: relative;
   border-top: 1px solid #DEE5EB;
   padding: 10px 0;
 }
-.post>.comments>.list>.comment>.photo {
+.post > .comments > .list > .comment > .photo {
   position: absolute;
   overflow: hidden;
   left: 0;
   width: 32px;
   height: 32px;
 }
-.post>.comments>.list>.comment>.photo img {
+.post > .comments > .list > .comment > .photo img {
   max-width: 100%;
 }
-.post>.comments>.list>.comment>.content {
+.post > .comments > .list > .comment > .content {
   margin-left: 42px;
 }
-.post>.comments>.list>.comment>.content>.title .mark-editor {
+.post > .comments > .list > .comment > .content > .title .mark-editor {
   color: #999;
   font-size: 0.9em;
 }
-.post>.comments>.list>.comment>.content>.text {
+.post > .comments > .list > .comment > .content > .text {
   margin: .2em 0;
 }
-.post>.comments>.list>.comment>.content>.date {
+.post > .comments > .list > .comment > .content > .date {
   color: #999;
   font-size: .9em;
 }
-.post>.comments>.list>.comment:hover>.delete {
+.post > .comments > .list > .comment:hover > .delete {
   opacity: 0.5;
 }
-.post>.comments>.list>.comment>.delete {
+.post > .comments > .list > .comment > .delete {
   position: absolute;
   right: 0;
   width: 20px;
@@ -1434,60 +1464,60 @@ i {
   background: url('../../images/common/delete.png') center no-repeat;
   cursor: pointer;
   opacity: 0;
-  -webkit-transition: .2s opacity;
-  -moz-transition: .2s opacity;
-  -o-transition: .2s opacity;
-  transition: .2s opacity;
+  -webkit-transition: 0.2s opacity;
+  -moz-transition: 0.2s opacity;
+  -o-transition: 0.2s opacity;
+  transition: 0.2s opacity;
 }
-.post>.comments>.list>.comment>.delete:hover {
+.post > .comments > .list > .comment > .delete:hover {
   opacity: 1;
 }
-.post>.comments>.new-comment {
+.post > .comments > .new-comment {
   padding: 6px;
   background-color: #f1f1f1;
   position: relative;
 }
-.post>.comments>.new-comment>.photo,
-.post>.comments>.new-comment>.actions {
+.post > .comments > .new-comment > .photo,
+.post > .comments > .new-comment > .actions {
   display: none;
 }
-.post>.comments>.new-comment>.textarea-wrap textarea {
+.post > .comments > .new-comment > .textarea-wrap textarea {
   height: 17px;
 }
-.post>.comments>.new-comment.open {
+.post > .comments > .new-comment.open {
   margin-left: -6px;
 }
-.post>.comments>.new-comment.open>.photo,
-.post>.comments>.new-comment.open>.actions {
+.post > .comments > .new-comment.open > .photo,
+.post > .comments > .new-comment.open > .actions {
   display: block;
 }
-.post>.comments>.new-comment.open>.photo {
+.post > .comments > .new-comment.open > .photo {
   position: absolute;
   width: 32px;
   height: 32px;
 }
-.post>.comments>.new-comment.open>.photo img {
+.post > .comments > .new-comment.open > .photo img {
   max-width: 100%;
 }
-.post>.comments>.new-comment.open>.actions {
+.post > .comments > .new-comment.open > .actions {
   margin-top: 6px;
   margin-left: 38px;
 }
-.post>.comments>.new-comment.open>.actions>.text {
+.post > .comments > .new-comment.open > .actions > .text {
   color: gray;
   margin-left: 5px;
 }
-.post>.comments>.new-comment.open>.textarea-wrap {
+.post > .comments > .new-comment.open > .textarea-wrap {
   margin-left: 38px;
 }
-.post>.comments>.new-comment.open>.textarea-wrap textarea {
+.post > .comments > .new-comment.open > .textarea-wrap textarea {
   height: 20px;
 }
-.post>.moderation>.actions {
+.post > .moderation > .actions {
   padding: 7px;
   background-color: #f1f1f1;
 }
-.post>.moderation>.actions .button + .button {
+.post > .moderation > .actions .button + .button {
   margin-left: 7px;
 }
 .post:hover {
@@ -1501,9 +1531,9 @@ i {
 }
 .post.moving {
   opacity: 0.6;
-  -webkit-box-shadow: 0 0 8px rgba(0,0,0,0.2) inset;
-  -moz-box-shadow: 0 0 8px rgba(0,0,0,0.2) inset;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2) inset;
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) inset;
+  -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) inset;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) inset;
 }
 .post.removed {
   background-color: #d8e1e4;
@@ -1552,9 +1582,9 @@ i {
   border-radius: 3px;
   width: 60px;
   height: 60px;
-  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.4);
-  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.4);
-  box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 .attachments .attachment.photo .delete-attachment {
   margin: 0;
@@ -1563,7 +1593,7 @@ i {
   right: 0;
   width: 10px;
   height: 10px;
-  background: #fff url(../../images/fe/controls.png) no-repeat -44px -2px;
+  background: #ffffff url(../../images/fe/controls.png) no-repeat -44px -2px;
   border: 3px solid #fff;
   cursor: pointer;
   -webkit-border-radius: 2px;
@@ -1581,7 +1611,7 @@ i {
   right: 0;
   width: 10px;
   height: 10px;
-  background: #000 url(../../images/fe/controls.png) no-repeat -44px -2px;
+  background: #000000 url(../../images/fe/controls.png) no-repeat -44px -2px;
   border: 3px solid #000;
   cursor: pointer;
   text-indent: -9999px;
@@ -1598,21 +1628,21 @@ i {
 body.editor-mode .authors-list {
   display: block;
 }
-body.editor-mode .left-panel > .block>* {
+body.editor-mode .left-panel > .block > * {
   display: none !important;
 }
-body.editor-mode .left-panel > .block>.header {
+body.editor-mode .left-panel > .block > .header {
   display: block !important;
-  border-bottom: 1px solid #DAE1E8;
+  border-bottom: 1px solid #dae1e8;
 }
-body.editor-mode .left-panel > .block>.header>* {
+body.editor-mode .left-panel > .block > .header > * {
   display: none !important;
 }
-body.editor-mode .left-panel > .block>.header .type-selector {
+body.editor-mode .left-panel > .block > .header .type-selector {
   display: block !important;
   margin: 0;
 }
-body.editor-mode .left-panel > .block>.wall {
+body.editor-mode .left-panel > .block > .wall {
   display: block !important;
 }
 .authors-tabs {
@@ -1620,7 +1650,7 @@ body.editor-mode .left-panel > .block>.wall {
 }
 .authors-list {
   display: none;
-  background-color: #F7F7F7;
+  background-color: #f7f7f7;
   padding: 10px;
   -webkit-border-radius: 0 0 2px 2px;
   -moz-border-radius: 0 0 2px 2px;
@@ -1641,29 +1671,29 @@ body.editor-mode .left-panel > .block>.wall {
   width: 100%;
   padding: 4px;
 }
-.authors-list>.list .author+.author {
+.authors-list > .list .author + .author {
   margin-top: 5px;
 }
-.authors-list>.list .author {
+.authors-list > .list .author {
   background-color: #fff;
-  border: 1px solid #C4CDE0;
+  border: 1px solid #c4cde0;
   padding: 5px;
   min-height: 30px;
   position: relative;
   line-height: normal;
 }
-.authors-list>.list .author .photo {
+.authors-list > .list .author .photo {
   position: absolute;
   width: 30px;
   height: 30px;
 }
-.authors-list>.list .author .photo img {
+.authors-list > .list .author .photo img {
   max-width: 100%;
 }
-.authors-list>.list .author .info {
+.authors-list > .list .author .info {
   margin-left: 40px;
 }
-.authors-list>.list .author .info .description {
+.authors-list > .list .author .info .description {
   color: #999;
   display: inline-block;
   padding: 2px 4px;
@@ -1673,25 +1703,25 @@ body.editor-mode .left-panel > .block>.wall {
   max-width: 200px;
   overflow: hidden;
 }
-.authors-list>.list .author .info .description>* {
+.authors-list > .list .author .info .description > * {
   margin: 0;
   padding: 0;
 }
-.authors-list>.list .author .info .description> br {
+.authors-list > .list .author .info .description > br {
   display: none;
 }
-.authors-list>.list .author .info .description:hover {
-  background-color: #E1E7ED;
+.authors-list > .list .author .info .description:hover {
+  background-color: #e1e7ed;
 }
-.authors-list>.list .author .info .description[contenteditable] {
+.authors-list > .list .author .info .description[contenteditable] {
   color: #000;
   background-color: #fff;
-  outline: 1px solid #C4CDE0;
+  outline: 1px solid #c4cde0;
 }
-.authors-list>.list .author:hover .action {
+.authors-list > .list .author:hover .action {
   opacity: 0.5;
 }
-.authors-list>.list .author .action {
+.authors-list > .list .author .action {
   position: absolute;
   top: 50%;
   width: 20px;
@@ -1704,24 +1734,24 @@ body.editor-mode .left-panel > .block>.wall {
   -o-transition: 0.2s opacity;
   transition: 0.2s opacity;
 }
-.authors-list>.list .author .action:hover {
+.authors-list > .list .author .action:hover {
   opacity: 1;
 }
-.authors-list>.list .author .delete {
+.authors-list > .list .author .delete {
   right: 10px;
   background: url('../../images/common/delete.png') center no-repeat;
 }
-.authors-list>.list .author .add-to-list {
+.authors-list > .list .author .add-to-list {
   right: 35px;
   background: url('../../images/common/add.png') center no-repeat;
 }
-.authors-list>.list .author .add-to-list.active {
-  background: url('../../images/common/add-white.png') center no-repeat #587DA1;
+.authors-list > .list .author .add-to-list.active {
+  background: url('../../images/common/add-white.png') center no-repeat #587da1;
   opacity: 1;
 }
 .ui-dropdown-add-to-list {
   margin-right: 2px;
-  border-color: #587DA1 !important;
+  border-color: #587da1 !important;
 }
 #slider-cont {
   width: 300px;
