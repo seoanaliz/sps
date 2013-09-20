@@ -158,12 +158,12 @@
                     , 'searchType' => SEARCHTYPE_LE
                 )
                 , 'protectToGE' => array(
-                    'name'         => 'startDate'
+                    'name'         => 'protectTo'
                     , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_GE
                 )
                 , 'protectToLE' => array(
-                    'name'         => 'startDate'
+                    'name'         => 'protectTo'
                     , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_LE
                 )

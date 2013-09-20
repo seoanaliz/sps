@@ -171,16 +171,27 @@
             return false;
         }
 
-
         public static function isInProtectedInterval( $targetFeedId, $newPostTimestamp ) {
             $newPostTime = new DateTimeWrapper(date('r', $newPostTimestamp));
             $search = array(
                 'startDateFrom' =>  $newPostTime,
-                'protectToLe'   =>  $newPostTime,
+                'protectToGE'   =>  $newPostTime,
                 'targetFeedId'  =>  $targetFeedId,
             );
 
             return (bool)ArticleQueueFactory::Count( $search);
+        }
+
+        //ставит статус элементам очереди
+        public static function setAQStatus( $dateFrom, $dateTo, $statusId, $targetFeedId ) {
+            $search = array(
+                'startDateFrom' =>  $dateFrom->modify('+1 minute'),
+                'startDateTo'   =>  $dateTo,
+                'targetFeedId'  =>  $targetFeedId,
+            );
+            $faq = new ArticleQueue();
+            $faq->statusId = $statusId;
+            return ArticleQueueFactory::UpdateByMask($faq, array('statusId'), $search );
         }
     }
 ?>
