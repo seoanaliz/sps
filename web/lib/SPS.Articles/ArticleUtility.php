@@ -37,9 +37,19 @@
             self::BuildDates($object, $timestamp);
             $newDate = new DateTimeWrapper($object->startDate->DefaultFormat());
 
+            if ($object->protectTo ) {
+                ArticleUtility::setAQStatus($object->startDate, $object->protectTo, StatusUtility::Enabled, $object->targetFeedId );
+            }
+
             $object->isDeleted = false;
-            $object->deleteAt = null;
-            ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate', 'isDeleted', 'deleteAt'), array('articleQueueId' => $queueId, 'statusId' => 1));
+            $object->deleteAt  = null;
+            $object->protectTo = null;
+
+            ArticleQueueFactory::UpdateByMask(
+                $object,
+                array('startDate', 'endDate', 'isDeleted', 'deleteAt', 'protectTo'),
+                array('articleQueueId' => $queueId, 'statusId' => 1)
+            );
 
             $targetFeed = TargetFeedFactory::GetById($object->targetFeedId);
 
