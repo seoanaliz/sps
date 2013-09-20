@@ -556,7 +556,7 @@ i {
   left: 7px;
   z-index: 1;
   margin: 0;
-  width: 349px;
+  width: 100%;
 }
 .right-panel .items .slot .repeater {
   display: inline-block;
@@ -655,10 +655,9 @@ i {
   padding: 2px;
   background: #fff;
   position: absolute;
-  left: 236px;
+  right: 66px;
   height: 12px;
   min-width: 32px;
-  padding-left: 12px;
 }
 .right-panel .items .slot.new {
   min-height: 0;
