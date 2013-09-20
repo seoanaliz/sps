@@ -197,6 +197,7 @@
 
         //ставит статус элементам очереди
         public static function setAQStatus( $dateFrom, $dateTo, $statusId, $targetFeedId ) {
+            $dateFrom = new  DateTimeWrapper( $dateFrom->format('r') );
             $search = array(
                 'startDateFrom' =>  $dateFrom->modify('+90 seconds'),
                 'startDateTo'   =>  $dateTo,
