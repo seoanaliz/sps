@@ -181,13 +181,16 @@
             return false;
         }
 
-        public static function isInProtectedInterval( $targetFeedId, $newPostTimestamp ) {
+        public static function isInProtectedInterval( $targetFeedId, $newPostTimestamp, $queueId = false ) {
             $newPostTime = new DateTimeWrapper(date('r', $newPostTimestamp));
             $search = array(
-                'startDateFrom' =>  $newPostTime,
+                'startDateTo'   =>  $newPostTime,
                 'protectToGE'   =>  $newPostTime,
                 'targetFeedId'  =>  $targetFeedId,
             );
+            if ( $queueId ) {
+                $search['articleQueueIdNE'] = $queueId;
+            }
 
             return (bool)ArticleQueueFactory::Count( $search);
         }
@@ -195,7 +198,7 @@
         //ставит статус элементам очереди
         public static function setAQStatus( $dateFrom, $dateTo, $statusId, $targetFeedId ) {
             $search = array(
-                'startDateFrom' =>  $dateFrom->modify('+1 minute'),
+                'startDateFrom' =>  $dateFrom->modify('+90 seconds'),
                 'startDateTo'   =>  $dateTo,
                 'targetFeedId'  =>  $targetFeedId,
             );
