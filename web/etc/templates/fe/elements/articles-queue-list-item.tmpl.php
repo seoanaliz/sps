@@ -17,6 +17,7 @@
         <div class="slot-header">
             <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
             <span class="repeater"></span>
+            <div class="delete"></div>
         </div>
         <div class="editing-post">
             <div class="textarea-wrap">
@@ -56,6 +57,7 @@
                     <span class="locked-trigger <?= $protectTo ? 'visible': '' ?>"></span>
                     <span class="edit-trigger"></span>
                     <span class="delete"></span>
+
                 <? } ?>
             </div>
         <? } ?>
