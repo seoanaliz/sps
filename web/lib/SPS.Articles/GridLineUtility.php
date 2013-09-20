@@ -78,5 +78,27 @@ sql;
 
             return $result;
         }
+
+        //обновляем итемы старой линии после удаляемой ячейки, привязываем их к новой линии
+        /**
+         * @param $fromDate
+         * @param int|int[] $oldGridLineId
+         * @param $newGridLineId  int
+         */
+        public static function RebindGridLineItems( $fromDate, $oldGridLineId, $newGridLineId ) {
+            if (!is_array($oldGridLineId)) {
+                $oldGridLineId = array( $oldGridLineId );
+            }
+            $item = new GridLineItem();
+            $item->gridLineId = $newGridLineId;
+            GridLineItemFactory::UpdateByMask(
+                $item,
+                array('gridLineId'),
+                array(
+                    '_gridLineId' => $oldGridLineId,
+                    'dateGE'      => $fromDate,
+                )
+            );
+        }
     }
 ?>
