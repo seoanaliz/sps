@@ -424,7 +424,7 @@ i {font-style: italic;}
     }
 }
 
-.delete, .edit-trigger {
+.delete, .edit-trigger, .locked-trigger {
     position: absolute;
     top: 0px;
     cursor: pointer;
@@ -446,6 +446,14 @@ i {font-style: italic;}
 .edit-trigger {
     right: 30px;
     background-image: url('../../images/common/edit.png');
+}
+
+.locked-trigger {
+    right: 50px;
+    background-image: url('../../images/common/locked.png');
+    background-size: 18px 18px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .controls {
@@ -570,6 +578,16 @@ i {font-style: italic;}
                 &:hover {
                     opacity: 1;
                 }
+
+                &.visible {
+                    opacity: 0.5;
+                }
+
+            }
+
+            .time-of-remove {
+                padding-left: 2px;
+                padding-right: 2px;
             }
             
             input.hasDatepick {
@@ -617,7 +635,21 @@ i {font-style: italic;}
                 top: 0;
                 left: 60px;
                 height: 12px;
-                min-width: 30px;
+                min-width: 32px;
+                padding-left: 12px;
+            }
+
+            .time-of-locked-edit {
+                font: inherit;
+                color: inherit;
+                border: 1px solid transparent;
+                padding: 2px;
+                background: #fff;
+                position: absolute;
+                left: 236px;
+                height: 12px;
+                min-width: 32px;
+                padding-left: 12px;
             }
 
             &.new {
@@ -666,7 +698,7 @@ i {font-style: italic;}
             }
 
             &:hover {
-                .delete, .edit-trigger {
+                .delete, .edit-trigger, .locked-trigger {
                     opacity: 0.5;
                 }
             }

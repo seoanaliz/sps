@@ -448,7 +448,7 @@ class CheckWalls
         $result = array();
         //выбираем внешние id отправленных чз sb(или уже спаренных) постов
         $sql = <<<sql
-            SELECT "externalId"
+            SELECT "externalId", "startDate"
             FROM   "articleQueues"
             WHERE
                    "sentAt" IS NOT NULL
@@ -459,7 +459,7 @@ sql;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $ds = $cmd->Execute();
         while( $ds->Next()) {
-            $result[$ds->GetValue('externalId')] = 1;
+            $result[$ds->GetValue('externalId')] = $ds->GetDateTime('startDate');
         }
 
         $this->existing_external_ids = $result;
@@ -478,18 +478,36 @@ sql;
         } catch (Exception $e) {
             return false;
         }
+        $now = DateTimeWrapper::Now();
         foreach( $converted_posts as $post ) {
             $postDate = new DateTimeWrapper( date('r', $post['time'] ));
             //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
             $check_date_condition = $check_time &&  ( $postDate >= $look_from_time );
             //отсеиваем неподходящие по времени или уже содержащиеся в базе
-            if ( !$check_date_condition  || isset( $this->existing_external_ids[$post['id']] )) {
-//                $likes_array[ $post['id']] = array('likes' => $post['likes_tr'], 'retweet' => $post['retweet']);
+            if ( !$check_date_condition )
+                continue;
+            //если пост не зареган в sb
+            if ( !isset( $this->existing_external_ids[$post['id']])) {
+                //вносим его туда (ниже)
+            //если пост есть, и дата его отправления меньше текущей, или время старта поста совпадает со временем старта
+            // элемента очереди - пропускаем пост
+            } elseif ( $this->existing_external_ids[$post['id']] < $now ||
+                $postDate == $this->existing_external_ids[$post['id']]  ) {
+                continue;
+            // обновляем элемент очереди
+            } else  {
+                $articleQueue = new ArticleQueue();
+                $articleQueue->startDate = $postDate;
+                $endFate =  new DateTimeWrapper( date('r', $post['time'] ));
+                $articleQueue->endDate   = $endFate->modify('+10 minutes');
+                $this->make_grids( $targeetFeedId, $postDate );
+                ArticleQueueFactory::UpdateByMask($articleQueue, array('startDate', 'endDate'), array('externalId' => $post['id']));
                 continue;
             }
             $articleRecord = ParserVkontakte::get_articleRecord_from_post( $post );
             $conn = ConnectionFactory::Get();
             $conn->begin();
+
             $articleQueue = ParserVkontakte::get_articleQueue_from_article( $post, $postDate, $targeetFeedId );
             ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true) );
             $articleRecord->articleQueueId = $articleQueue->articleQueueId;

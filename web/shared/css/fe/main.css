@@ -431,7 +431,8 @@ i {
   background-position: -56px 0;
 }
 .delete,
-.edit-trigger {
+.edit-trigger,
+.locked-trigger {
   position: absolute;
   top: 0px;
   cursor: pointer;
@@ -446,7 +447,8 @@ i {
   z-index: 1;
 }
 .delete:hover,
-.edit-trigger:hover {
+.edit-trigger:hover,
+.locked-trigger:hover {
   opacity: 1 !important;
 }
 .delete {
@@ -456,6 +458,13 @@ i {
 .edit-trigger {
   right: 30px;
   background-image: url('../../images/common/edit.png');
+}
+.locked-trigger {
+  right: 50px;
+  background-image: url('../../images/common/locked.png');
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .controls {
   display: inline-block;
@@ -578,6 +587,13 @@ i {
 .right-panel .items .slot .time-of-removal:hover {
   opacity: 1;
 }
+.right-panel .items .slot .time-of-removal.visible {
+  opacity: 0.5;
+}
+.right-panel .items .slot .time-of-remove {
+  padding-left: 2px;
+  padding-right: 2px;
+}
 .right-panel .items .slot input.hasDatepick {
   width: 15px;
   height: 10px;
@@ -619,7 +635,20 @@ i {
   top: 0;
   left: 60px;
   height: 12px;
-  min-width: 30px;
+  min-width: 32px;
+  padding-left: 12px;
+}
+.right-panel .items .slot .time-of-locked-edit {
+  font: inherit;
+  color: inherit;
+  border: 1px solid transparent;
+  padding: 2px;
+  background: #fff;
+  position: absolute;
+  left: 236px;
+  height: 12px;
+  min-width: 32px;
+  padding-left: 12px;
 }
 .right-panel .items .slot.new {
   min-height: 0;
@@ -657,7 +686,8 @@ i {
   display: block;
 }
 .right-panel .items .slot:hover .delete,
-.right-panel .items .slot:hover .edit-trigger {
+.right-panel .items .slot:hover .edit-trigger,
+.right-panel .items .slot:hover .locked-trigger {
   opacity: 0.5;
 }
 .right-panel .items .slot.repeat .repeater {

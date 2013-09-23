@@ -63,7 +63,23 @@
                     , 'foreignKey'  => 'TargetFeed'
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                'startDateGE' => array(
+                    'name'         =>  'startDate'
+                    ,'type'        =>  TYPE_DATETIME
+                    ,'searchType'  =>  SEARCHTYPE_GE
+                )
+                ,'startDateL' => array(
+                    'name'         =>  'startDate'
+                    ,'type'        =>  TYPE_DATETIME
+                    ,'searchType'  =>  SEARCHTYPE_L
+                )
+                ,'_gridLineId' => array(
+                      'name'        => 'gridLineId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'searchType'  => SEARCHTYPE_ARRAY
+                )
+            )
         );
         
         /** @return array */

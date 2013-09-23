@@ -70,6 +70,9 @@
                 <page uri="controls://article-queue-toggle-repeat/">
                     <actions>SPS.Site.ArticleQueueToggleRepeat</actions>
                 </page>
+                <page uri="controls://delete-cell/">
+                    <actions>SPS.Site.DeleteGridItemControl</actions>
+                </page>
                 <page uri="controls://article-queue-item-save/">
                     <actions>SPS.Site.SaveQueueItemControl</actions>
                 </page>
@@ -142,6 +145,9 @@
             <pageGroup name = "parseUrl">
                 <page uri="controls://parse-url/">
                     <actions>SPS.Site.ParseUrlControl</actions>
+                </page>
+                <page uri="controls://protect-post/">
+                    <actions>SPS.Site.PostSetProtectedControl</actions>
                 </page>
             </pageGroup>
 
