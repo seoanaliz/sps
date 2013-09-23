@@ -548,7 +548,7 @@ var QueueWidget = Event.extend({
         var imageUploader = $slot.data('imageUploader');
         var photos = imageUploader && imageUploader.getPhotos();
 
-        if (text || photos) {
+        if (text || photos && photos.length) {
             $slot.addClass('locked');
             app.savePost({
                 text: text,
