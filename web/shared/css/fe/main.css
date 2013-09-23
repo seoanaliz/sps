@@ -434,7 +434,7 @@ i {
 .edit-trigger,
 .locked-trigger {
   position: absolute;
-  top: -2px;
+  top: 8px;
   cursor: pointer;
   background: center no-repeat;
   width: 20px;
@@ -699,6 +699,11 @@ i {
 .right-panel .items .slot:hover .edit-trigger,
 .right-panel .items .slot:hover .locked-trigger {
   opacity: 0.5;
+}
+.right-panel .items .slot .delete,
+.right-panel .items .slot .edit-trigger,
+.right-panel .items .slot .locked-trigger {
+  top: -1px;
 }
 .right-panel .items .slot.repeat .repeater {
   opacity: 1;
