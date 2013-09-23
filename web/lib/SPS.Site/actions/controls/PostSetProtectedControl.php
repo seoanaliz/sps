@@ -61,7 +61,7 @@ class PostSetProtectedControl extends BaseControl {
             ArticleQueueFactory::UpdateByMask($articleQueue, array('protectTo'), array('articleQueueId' => $articleQueueId));
 
             //ставим всем остальным записям в этом периоде статус "неотправлена"
-            $this->setAQStatus($articleQueue->startDate, $protectTo, StatusUtility::Finished, $articleQueue->targetFeedId );
+            ArticleUtility::setAQStatus($articleQueue->startDate, $protectTo, StatusUtility::Finished, $articleQueue->targetFeedId );
 
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId);
             $this->clearVkPostponed(
@@ -176,7 +176,7 @@ class PostSetProtectedControl extends BaseControl {
     public function removeProtection( $articleQueue ) {
         if ( !$articleQueue->protectTo ) return true;
 
-        $res = $this->setAQStatus($articleQueue->startDate, $articleQueue->protectTo, StatusUtility::Enabled, $articleQueue->targetFeedId );
+        $res = ArticleUtility::setAQStatus($articleQueue->startDate, $articleQueue->protectTo, StatusUtility::Enabled, $articleQueue->targetFeedId );
         if ( $res ) {
             $articleQueue->protectTo = null;
             $res = ArticleQueueFactory::UpdateByMask($articleQueue, array('protectTo'), array('articleQueueId' => $articleQueue->articleQueueId));
@@ -184,15 +184,6 @@ class PostSetProtectedControl extends BaseControl {
         return $res;
     }
 
-    public function setAQStatus( $dateFrom, $dateTo, $statusId, $targetFeedId ) {
-        $search = array(
-            'startDateFrom' =>  $dateFrom->modify('+1 minute'),
-            'startDateTo'   =>  $dateTo,
-            'targetFeedId'  =>  $targetFeedId,
-        );
-        $faq = new ArticleQueue();
-        $faq->statusId = $statusId;
-        return ArticleQueueFactory::UpdateByMask($faq, array('statusId'), $search );
-    }
+
 }
 ?>
