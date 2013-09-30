@@ -11,7 +11,7 @@
          * Entry Point
          */
         public function Execute() {
-            $gridLineId     =   Request::getInteger('gridLineId');
+            $gridLineId     =   Request::getInteger('gridId');
             $timestamp      =   Request::getString('timestamp');
             $targetFeedId   =   Request::getString('targetFeedId');
             $result = array(
