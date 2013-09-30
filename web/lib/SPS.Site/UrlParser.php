@@ -15,14 +15,14 @@
 
             $result = array();
             $html = self::GetUrlContent($url);
-            $html = mb_check_encoding($html, 'UTF-8') ? $html : utf8_encode($html);
+           
             if (empty($html)) {
                 return $result;
             }
 
             $urlData = parse_url($url);
-            if( $urlData['host'] == 'vk.com' || $urlData['host'] == 'vkontakte.ru') {
-                return $result;
+            if( !($urlData['host'] == 'vk.com' || $urlData['host'] == 'vkontakte.ru')) {
+                 $html = mb_check_encoding($html, 'UTF-8') ? $html : utf8_encode($html);
             }
             $baseUrl = $urlData['scheme'] . '://' . $urlData['host'];
             $document = phpQuery::newDocument($html);
