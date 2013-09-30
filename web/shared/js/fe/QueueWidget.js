@@ -158,6 +158,21 @@ var QueueWidget = Event.extend({
         Events.fire('delete-cell', gridId, timestamp, function (isOk, data) {
             if (!isOk) {
                 popupError(data && data.message || 'Unknown error');
+            } else {
+                var $queuePage = $slot.parent('.queue-page'),
+                    slotCount = $queuePage.children('.slot').length;
+
+                $slot.children().remove();
+
+                if (slotCount > 1) {
+                    $slot.animate({ minHeight: 0 }, 200, function () {
+                        $slot.remove();
+                    });
+                } else {
+                    $slot.remove();
+                    $queuePage.append(EMPTY_QUE);
+                }
+
             }
         });
     },
