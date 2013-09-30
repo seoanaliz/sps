@@ -355,9 +355,10 @@ var QueueWidget = Event.extend({
                 $input = $('<input />')
                     .attr('type', 'text')
                     .attr('class', 'time-of-locked-edit')
-                    .width($time.width() + 2)
+                    .width($time.width())
                     .mask('29:59')
                     .appendTo($post);
+
                 $time.data('time-of-locked-edit', $input);
             } else {
                 $input.show();
@@ -371,8 +372,11 @@ var QueueWidget = Event.extend({
         $queue.delegate('.time-of-locked-edit', 'blur keydown', function (e) {
             var $input = $(this);
 
-            if (~['keydown', 'focusout'].indexOf(e.type)
-                && (!e.originalEvent || e.keyCode !== KEY.ENTER)) {
+            if (e.type === 'keydown' && e.keyCode != KEY.ENTER) {
+                return;
+            }
+
+            if (e.type === 'focusout' && !e.originalEvent) {
                 return;
             }
 

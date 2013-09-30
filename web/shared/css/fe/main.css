@@ -451,6 +451,11 @@ i {
 .locked-trigger:hover {
   opacity: 1 !important;
 }
+.delete.visible,
+.edit-trigger.visible,
+.locked-trigger.visible {
+  opacity: 0.5;
+}
 .delete {
   right: 10px;
   background-image: url('../../images/common/delete.png');
@@ -551,7 +556,7 @@ i {
   left: 7px;
   z-index: 1;
   margin: 0;
-  width: 349px;
+  width: 100%;
 }
 .right-panel .items .slot .repeater {
   display: inline-block;
@@ -593,6 +598,11 @@ i {
 .right-panel .items .slot .time-of-remove {
   padding-left: 2px;
   padding-right: 2px;
+}
+.right-panel .items .slot .time-of-lock {
+  position: absolute;
+  right: 72px;
+  top: 2px;
 }
 .right-panel .items .slot input.hasDatepick {
   width: 15px;
@@ -645,10 +655,10 @@ i {
   padding: 2px;
   background: #fff;
   position: absolute;
-  left: 236px;
+  top: 0;
+  right: 66px;
   height: 12px;
   min-width: 32px;
-  padding-left: 12px;
 }
 .right-panel .items .slot.new {
   min-height: 0;
