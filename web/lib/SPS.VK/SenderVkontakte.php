@@ -151,7 +151,7 @@
 
             $params = array(
                 'object'    =>  'wall' . $this->repost_post,
-                'message'   =>  '',
+                'message'   =>  $this->post_text,
                 'gid'       =>  $this->vk_group_id,
                 'access_token' => $this->vk_access_token
             );
