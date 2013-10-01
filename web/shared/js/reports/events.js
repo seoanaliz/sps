@@ -45,6 +45,12 @@ Control = $.extend(Control, {
                 name: 'groupName'
             }
         },
+        delete_group: {
+            name: 'deleteGroup',
+            params: {
+                groupId: 'groupId'
+            }
+        },
         add_report: {
             name: 'addReport',
             params: {

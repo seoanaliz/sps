@@ -169,3 +169,6 @@ html {
 #load-more-table {
   display: block;
 }
+#main .delete {
+    right: 1px;
+}

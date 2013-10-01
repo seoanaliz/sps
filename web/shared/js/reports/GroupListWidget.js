@@ -7,7 +7,8 @@ GroupListWidget = Widget.extend({
     _modelClass: GroupListModel,
     _events: {
         'click: .item': 'clickItem',
-        'keydown: input': 'keydownInput'
+        'keydown: input': 'keydownInput',
+        'click: .delete' : 'deleteGroup'
     },
 
     _groupId: null,
@@ -75,6 +76,21 @@ GroupListWidget = Widget.extend({
         } else {
             $input.show();
             $input.focus();
+        }
+    },
+
+    deleteGroup: function(e) {
+
+        var t = this;
+        var $target = $(e.target);
+        var $item   = $target.closest('.item');
+        var groupId = $item.data('id');
+        if (groupId) {
+            Control.fire('delete_group', {
+                groupId: groupId
+            }, function() {
+                t.run();
+            });
         }
     },
 
