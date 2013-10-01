@@ -10,7 +10,7 @@ class PublicsParser
 {
 
     const LIMIT = 30000;
-    const REQUESTS_PER_LAUNCH = 70;
+    const REQUESTS_PER_LAUNCH = 120;
     const PUBLICS_PER_REQUEST  = 500;
     const PAUSE = 0.4;
     private $current_public;
@@ -35,9 +35,13 @@ class PublicsParser
             $update_entries = 0;
             foreach( $res as $public ) {
                 sleep( self::PAUSE );
-                if( !isset( $public->type) || !isset( $public->members_count ) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
+                if ( !isset( $public->type) || !isset( $public->members_count ) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
-                if( $public->name == 'DELETED' && $this->current_public > 63000000 && $public->members_count == 0) {
+
+                if ( $this->current_public > 69000000 ) {
+                    $this->set_state();
+                }
+                if ( $public->name == 'DELETED' && $public->members_count == 0) {
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
