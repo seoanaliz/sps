@@ -36,8 +36,10 @@
             }
 
             // проверим доступ
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-            if ( !$SourceAccessUtility->hasAccessToSourceFeed($feedId) ) {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
+            if ( !$TargetFeedAccessUtility->canCreatePlanDeletePost($feedId) ) {
+                echo $feedId . '<br>';
                 return; // ------------------------- RETURN
             }
 
