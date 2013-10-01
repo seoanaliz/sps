@@ -53,9 +53,11 @@ class PublicsParser
                     $entry->short_name =  $public->screen_name;
                     $entry->is_page    =  $public->type == 'page' ? true : false;
                     $entry->sh_in_main =  true;
+                    $entry->active     =  true;
                     $new_entries[] = $entry;
                 } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {
                     $check->quantity = $public->members_count;
+                    $check->active   =  true;
                     VkPublicFactory::Update($check);
                     $update_entries++;
                 }
