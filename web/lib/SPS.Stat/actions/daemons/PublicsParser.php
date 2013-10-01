@@ -21,6 +21,10 @@ class PublicsParser
         echo 'Начинаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
+            if ( $this->current_public > 69000000 ) {
+                $this->set_state();
+                die();
+            }
             $ms = microtime(1);
             $take_counter = rand( 450, self::PUBLICS_PER_REQUEST);
             $params = array(
@@ -38,13 +42,8 @@ class PublicsParser
                 if ( !isset( $public->type) || !isset( $public->members_count ) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
 
-                if ( $this->current_public > 69000000 ) {
-                    $this->set_state();
-                }
-                if ( $public->name == 'DELETED' && $public->members_count == 0) {
-                    $this->set_state( 0, $this->current_public );
-                    die();
-                }
+
+
                 $check = VkPublicFactory::GetOne( array( 'vk_id' => $public->gid ));
 
                 if ( $public->members_count > self::LIMIT && !$check )  {
