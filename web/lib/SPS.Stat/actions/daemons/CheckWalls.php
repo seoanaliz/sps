@@ -481,8 +481,8 @@ sql;
         $now = DateTimeWrapper::Now();
         foreach( $converted_posts as $post ) {
             $postDate = new DateTimeWrapper( date('r', $post['time'] ));
-            //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
-            $check_date_condition = $check_time &&  ( $postDate >= $look_from_time );
+            //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад, или отложенные)
+            $check_date_condition = $check_time &&  ( $postDate >= $look_from_time && $postDate <=  $look_to_time || $postDate >  $now );
             //отсеиваем неподходящие по времени или уже содержащиеся в базе
             if ( !$check_date_condition )
                 continue;
