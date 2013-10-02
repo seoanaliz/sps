@@ -412,9 +412,9 @@
             $articleQueue->externalLikes = (int)$post['likes_tr'];
             $articleQueue->externalRetweets = (int)$post['retweet'];
             $articleQueue->startDate    = new DateTimeWrapper($sent_at->Default24hFormat());
-            $articleQueue->startDate->modify( '-5 minutes');
+            $articleQueue->startDate;
             $articleQueue->endDate      = new DateTimeWrapper($sent_at->Default24hFormat());
-            $articleQueue->endDate->modify( '+5 minutes');
+            $articleQueue->endDate->modify( '+10 minutes');
             $articleQueue->targetFeedId = $target_feed_id;
             $articleQueue->statusId     = StatusUtility::Finished;
             $articleQueue->createdAt    = new DateTimeWrapper(self::false_created_time);
