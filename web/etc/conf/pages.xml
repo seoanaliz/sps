@@ -143,6 +143,9 @@
                 <page uri="controls://parse-url/">
                     <actions>SPS.Site.ParseUrlControl</actions>
                 </page>
+                <page uri="controls://protect-post/">
+                    <actions>SPS.Site.PostSetProtectedControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">

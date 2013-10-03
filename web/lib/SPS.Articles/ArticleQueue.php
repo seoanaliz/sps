@@ -74,5 +74,8 @@ class ArticleQueue {
 
     /** @var boolean */
     public $collectLikes;
+
+    /** @var DateTimeWrapper */
+    public $protectTo;
 }
 ?>

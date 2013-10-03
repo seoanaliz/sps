@@ -44,10 +44,16 @@ class AddArticleToQueueControl extends BaseControl
         }
 
         //ограничение по интервалу между постами
-
         $limits_check = ArticleUtility::checkLimitsForFeed( $targetFeedId, $timestamp, $queueId );
         if( $limits_check ) {
             $result['message'] = $limits_check;
+            echo ObjectHelper::ToJSON( $result );
+            return false;
+        }
+
+        //проверка на защищенность интервала
+        if ( ArticleUtility::isInProtectedInterval($targetFeedId, $timestamp )) {
+            $result['message'] = 'This time interval protected';
             echo ObjectHelper::ToJSON( $result );
             return false;
         }

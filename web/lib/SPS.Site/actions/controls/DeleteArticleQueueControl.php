@@ -32,13 +32,19 @@
             if (is_null($role)){
                 return;
             }
+
+            //возвращаем в строй бывшие в защитном интервале посты
             $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
+            if ($object->protectTo ) {
+                ArticleUtility::setAQStatus($object->startDate, $object->protectTo, StatusUtility::Enabled, $object->targetFeedId );
+            }
 
             $o = new ArticleQueue();
             $o->statusId = 3;
             $o->deleteAt = null;
             $o->isDeleted = false;
-            ArticleQueueFactory::UpdateByMask($o, array('statusId', 'deleteAt', 'isDeleted'), array('articleQueueId' => $id));
+            $o->protectTo = null;
+            ArticleQueueFactory::UpdateByMask($o, array('statusId', 'deleteAt', 'isDeleted', 'protectTo'), array('articleQueueId' => $id));
 
             //пытаемся восстановить статью, которую заблокировали
             if (!empty($object)) {

@@ -101,6 +101,10 @@
                 ,'collectLikes' => array(
                     'name'          => 'collectLikes'
                 , 'type'        => TYPE_BOOLEAN
+                )
+                ,'protectTo'    => array(
+                      'name'        => 'protectTo'
+                    , 'type'        => TYPE_DATETIME
                 ))
             , 'lists'     => array()
             , 'search'    => array(
@@ -150,6 +154,16 @@
                 )
                 , 'startDateTo' => array(
                     'name'         => 'startDate'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_LE
+                )
+                , 'protectToGE' => array(
+                    'name'         => 'protectTo'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_GE
+                )
+                , 'protectToLE' => array(
+                    'name'         => 'protectTo'
                     , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_LE
                 )
