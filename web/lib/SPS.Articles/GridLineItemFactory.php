@@ -42,7 +42,18 @@
                     , 'foreignKey'  => 'GridLine'
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                'dateGE' => array(
+                    'name'         =>  'date'
+                    ,'type'        =>  TYPE_DATETIME
+                    ,'searchType'  =>  SEARCHTYPE_GE
+                )
+                ,'_gridLineId' => array(
+                      'name'       => 'gridLineId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'searchType'  => SEARCHTYPE_ARRAY
+                )
+            )
         );
         
         /** @return array */

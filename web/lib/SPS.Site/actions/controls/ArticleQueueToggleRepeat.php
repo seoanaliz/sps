@@ -43,60 +43,72 @@
                 return false;
             }
 
+            //проверим, есть ли в будущем посты на это время. есть - мимо
+            $dayPressed = date('Y-m-d', $timestamp); // возьмём только дату (отбросим время)
+            $dt = new DateTimeWrapper($dayPressed);
+            $dt->modify('+1 day');
+            $dt->modify('-30 seconds');
+            $queuedArticles = $this->checkForExistingQueues($targetFeedId, $dt, $GridLine->time );
+            if ($queuedArticles) {
+                $message = 'В этой ячейке в будущем есть запланированные посты: ' . join(', ', $queuedArticles) . '.';
+                $result = array(
+                    'success' => false,
+                    'message' => $message,
+                );
+                echo ObjectHelper::ToJSON($result);
+                return false; // -------------- RETURN
+            }
+
             if ($GridLine->repeat) {
                 // ограничим repeat датой нажатой ячейки
-                $dayPressed = date('Y-m-d', $timestamp); // возьмём только дату (отбросим время)
-                $dt = new DateTimeWrapper($dayPressed);
-                $dt->modify('+1 day');
-                $dt->modify('-30 seconds');
+
                 $yearToQueue = $dt->format('Y');
                 if ($yearToQueue > 3000) { // не больше 3000-го года
                     echo ObjectHelper::ToJSON($result);
                     return false;
                 }
 
-                $articlesQueue = ArticleQueueFactory::Get(
-                    array(
-                        'targetFeedId' => $targetFeedId,
-                        'startDateFrom' => $dt,
-                        'type' => ($type == GridLineUtility::TYPE_ALL) ? null : $type,
-                    )
-                    , array(
-                        BaseFactory::WithoutPages => true,
-                        BaseFactory::OrderBy => ' "startDate" ASC ',
-                    )
-                );
-                $queuedArticles = array();
-                $i = 0;
-                $wasBreak = false;
-                foreach ($articlesQueue as $articlesQueueItem) {
-                    $time = new DateTimeWrapper($GridLine->time->format('H:i:s'));
-                    if ($time >= new DateTimeWrapper($articlesQueueItem->startDate->format('H:i:s')) &&
-                        $time <= new DateTimeWrapper($articlesQueueItem->endDate->format('H:i:s'))
-                    ) {
-                        $queuedArticles []= $articlesQueueItem->startDate->format('j M');
-                        $i++;
-                        if ($i > 4) {
-                            $wasBreak = true;
-                            break;
-                        }
-                    }
-                }
-
-                if ($queuedArticles) {
-                    $message = 'В этой ячейке в будущем есть запланированные посты: ' . join(', ', $queuedArticles) . ($wasBreak ? ' и т.д.' : '.');
-                    $result = array(
-                        'success' => false,
-                        'message' => $message,
-                    );
-                    echo ObjectHelper::ToJSON($result);
-                    return false; // -------------- RETURN
-                }
-
                 $GridLine->repeat = false;
                 $GridLine->endDate = new DateTimeWrapper($dayPressed);
                 $result['endDate'] = $GridLine->endDate->format('U');
             } else {
+                //проверим, вдруг цикл на это время уже есть
+                $check = GridLineFactory::Get ( array(
+                    'time'          =>  $GridLine->time,
+                    'type'          =>  $GridLine->type,
+                    'targetFeedId'  =>  $targetFeedId,
+                    'startDateL'    =>  $GridLine->startDate,
+                    'repeat'        =>  true
+                ));
+                if ( !empty( $check )) {
+                    $result['message'] = 'Cycle for this time already exists';
+                    echo ObjectHelper::ToJSON($result);
+                    return false;
+                }
+
+                //склеиваем все циклы в один
+                $killGridLines = GridLineFactory::Get ( array( //выбираем похожие циклы в будущем...
+                    'time'          =>  $GridLine->time,
+                    'type'          =>  $GridLine->type,
+                    'targetFeedId'  =>  $targetFeedId,
+                    'startDateGE'   =>  $GridLine->startDate,
+                ));
+
+                $killGridLineIds = array_keys( $killGridLines );
+                $killGridLineIds = array_diff( $killGridLineIds, array($GridLine->gridLineId));
+
+                if ( !empty( $killGridLineIds )) {
+                    GridLineUtility::RebindGridLineItems(//..переписываем их итемы на новый цикл...
+                        new DateTimeWrapper('01-01-1970'),
+                        $killGridLineIds,
+                        $GridLine->gridLineId
+                    );
+
+                    GridLineFactory::DeleteByMask( array(//.. и удаляем их
+                       '_gridLineId' => $killGridLineIds,
+                    ));
+                }
+
                 $GridLine->repeat = true;
                 $GridLine->endDate = new DateTimeWrapper('3000-01-01');
             }
@@ -108,6 +120,36 @@
             }
 
             echo ObjectHelper::ToJSON($result);
+        }
+
+        public function checkForExistingQueues( $targetFeedId, $dateFrom, $cellTime ) {
+            $articlesQueue = ArticleQueueFactory::Get(
+                array(
+                    'targetFeedId' => $targetFeedId,
+                    'startDateFrom' => $dateFrom
+                )
+                , array(
+                    BaseFactory::WithoutPages => true,
+                    BaseFactory::OrderBy => ' "startDate" ASC ',
+                )
+            );
+            $queuedArticles = array();
+            $i = 0;
+            $wasBreak = false;
+            $time = new DateTimeWrapper($cellTime->format('H:i:s'));
+            foreach ($articlesQueue as $articlesQueueItem) {
+                if ($time >= new DateTimeWrapper($articlesQueueItem->startDate->format('H:i:s')) &&
+                    $time <= new DateTimeWrapper($articlesQueueItem->endDate->format('H:i:s'))
+                ) {
+                    $queuedArticles[]= $articlesQueueItem->startDate->format('j M');
+                    $i++;
+                    if ($i > 4) {
+                        $wasBreak = true;
+                        break;
+                    }
+                }
+            }
+            return $queuedArticles;
         }
     }
 ?>

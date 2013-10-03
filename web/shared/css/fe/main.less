@@ -426,7 +426,7 @@ i {font-style: italic;}
 
 .delete, .edit-trigger, .locked-trigger {
     position: absolute;
-    top: -2px;
+    top: 0px;
     cursor: pointer;
     background: center no-repeat;
     width: 20px;
@@ -437,6 +437,10 @@ i {font-style: italic;}
 
     &:hover {
         opacity: 1 !important;
+    }
+
+    &.visible {
+        opacity: 0.5;
     }
 }
 .delete {
@@ -544,7 +548,7 @@ i {font-style: italic;}
                 left: 7px;
                 z-index: 1;
                 margin: 0;
-                width: 349px;
+                width: 100%;
             }
             
             .repeater {
@@ -588,6 +592,12 @@ i {font-style: italic;}
             .time-of-remove {
                 padding-left: 2px;
                 padding-right: 2px;
+            }
+
+            .time-of-lock {
+                position: absolute;
+                right: 72px;
+                top: 2px;
             }
             
             input.hasDatepick {
@@ -646,10 +656,10 @@ i {font-style: italic;}
                 padding: 2px;
                 background: #fff;
                 position: absolute;
-                left: 236px;
+                top: 0;
+                right: 66px;
                 height: 12px;
                 min-width: 32px;
-                padding-left: 12px;
             }
 
             &.new {
