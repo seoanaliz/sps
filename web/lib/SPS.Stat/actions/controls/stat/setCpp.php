@@ -8,7 +8,7 @@
  */
 class setCpp {
     //на проде - 435
-    private $cheapGroupId = 629;
+    private $cheapGroupId = 435;
 
     public function Execute() {
         $result = array('success' => false);
@@ -52,25 +52,37 @@ class setCpp {
     }
 
     public function checkIfCheap($vkId, $price) {
-        $vkPublic = VkPublicFactory::GetOne(array( 'vkId' => $vkId));
+        $vkPublic = VkPublicFactory::GetOne(array( 'vk_id' => $vkId));
         if ( isset( $vkPublic->viewers_week )) {
-            if ( ($vkPublic->viewers_week <= 10000 && $price <= 50)  ||
-                 ($vkPublic->viewers_week <= 50000 && $price <= 200)  ||
-                 ($vkPublic->viewers_week <= 100000 && $price <= 400)  ||
-                 ($vkPublic->viewers_week <= 200000 && $price <= 800)  ||
-                 ($vkPublic->viewers_week <= 500000 && $price <= 1500)  ||
-                 ($vkPublic->viewers_week <= 1000000 && $price <= 3000)  ||
-                 ($vkPublic->viewers_week <= 1500000 && $price <= 4500)  ||
-                 ($vkPublic->viewers_week <= 2000000 && $price <= 6000)  ||
-                 ($vkPublic->viewers_week <= 3000000 && $price <= 9000) ) {
-                    $ge = new GroupEntry(
-                        $this->cheapGroupId,
-                        $vkId,
-                        Group::STAT_GROUP
-                    );
-                    GroupEntryFactory::Add($ge);
+            if ( $price && (
+                ($vkPublic->viewers_week <= 10000 && $price <= 50)  ||
+                ($vkPublic->viewers_week <= 50000 && $vkPublic->viewers_week > 10000&& $price <= 200)  ||
+                ($vkPublic->viewers_week <= 100000 && $vkPublic->viewers_week > 50000 && $price <= 400)  ||
+                ($vkPublic->viewers_week <= 200000 && $vkPublic->viewers_week > 100000 && $price <= 800)  ||
+                ($vkPublic->viewers_week <= 500000 && $vkPublic->viewers_week > 200000 && $price <= 1500)  ||
+                ($vkPublic->viewers_week <= 1000000 && $vkPublic->viewers_week > 500000 && $price <= 3000)  ||
+                ($vkPublic->viewers_week <= 1500000 && $vkPublic->viewers_week > 1000000 && $price <= 4500)  ||
+                ($vkPublic->viewers_week <= 2000000 && $vkPublic->viewers_week > 1500000 && $price <= 6000)  ||
+                ($vkPublic->viewers_week <= 3000000 && $vkPublic->viewers_week > 2000000 && $price <= 9000) )) {
+
+
+                $ge = new GroupEntry(
+                    $this->cheapGroupId,
+                    $vkPublic->vk_public_id,
+                    Group::STAT_GROUP,
+                    AuthVkontakte::IsAuth()
+                );
+
+                GroupEntryFactory::Add($ge);
+            } else {
+                GroupEntryFactory::DeleteByMask( array(
+                    'groupId'   =>  $this->cheapGroupId,
+                    'entryId'   =>  $vkPublic->vk_public_id,
+                    'sourceType'=>  Group::STAT_GROUP,
+                ));
             }
         }
     }
+
 }
 ?>
