@@ -42,6 +42,8 @@ var REPORTS = {
 
     GROUP_LIST_ITEM:
     '<div data-id="<?=id?>" class="item"><?=name?></div>',
+    GROUP_LIST_ITEM_WITH_DEL:
+    '<div data-id="<?=id?>" class="item"><?=name?><span class="icon delete"></span></div>',
 
     GROUP_LIST:
     '<? if (count(defaultLists) && (!count(userLists) || count(userLists) > 1)) { ?>' +
@@ -51,7 +53,7 @@ var REPORTS = {
     '<? } ?>' +
     '<div class="title">Мои списки</div>' +
     '<div class="list">' +
-        '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
+        '<? each(REPORTS.GROUP_LIST_ITEM_WITH_DEL, userLists); ?>' +
         '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item"><u>Создать список</u></div>' +
     '</div>' +
