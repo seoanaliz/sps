@@ -126,11 +126,8 @@ var QueueWidget = Event.extend({
             isEmpty = false;
         }
         
-        var $post = $slot.find('.post');
-        var pid = $post.data('queue-id');
-
-        //если нет пост ид, то пустой
-        isEmpty = !pid;
+        var $post = $slot.find('.post'),
+            pid = $post.data('queue-id');
 
         var eventName = isEmpty ? 'rightcolumn_render_empty' : 'rightcolumn_deletepost';
         Events.fire(eventName, pid, $slot.data('grid-id'), $slot.data('id'),
@@ -150,14 +147,51 @@ var QueueWidget = Event.extend({
         );
     },
 
+    /**
+     * Удаление пустой ячейки
+     * @param $slot Object JQuery обект слота
+     */
+    deleteCell: function($slot) {
+        var gridId = $slot.data('grid-id'),
+            timestamp = $slot.closest('.queue-page').data('timestamp');
+
+        Events.fire('delete-cell', gridId, timestamp, function (isOk, data) {
+            if (!isOk) {
+                popupError(data && data.message || 'Unknown error');
+            } else {
+                var $queuePage = $slot.parent('.queue-page'),
+                    slotCount = $queuePage.children('.slot').length;
+
+                $slot.children().remove();
+
+                if (slotCount > 1) {
+                    $slot.animate({ minHeight: 0 }, 200, function () {
+                        $slot.remove();
+                    });
+                } else {
+                    $slot.remove();
+                    $queuePage.append(EMPTY_QUE);
+                }
+
+            }
+        });
+    },
+
     initQueue: function() {
         var t = this;
         var $queue = t.$queue;
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
-            var $slot = $(this).closest('.slot');
-            t.deleteArticleInSlot($slot);
+            var $slot = $(this).closest('.slot'),
+                $post = $slot.find('.post');
+
+            if ($post && $post.length) {
+                t.deleteArticleInSlot($slot);
+            } else {
+                //если поста у ячейки нет удаляем ее
+                t.deleteCell($slot);
+            }
         });
 
         // Смена даты

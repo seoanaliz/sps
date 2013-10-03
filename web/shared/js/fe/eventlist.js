@@ -156,6 +156,27 @@ var Eventlist = {
             }
         });
     },
+    //удаляем пустую ячейку
+    'delete-cell': function (gridId, timestamp, callback) {
+        callback = callback || function () {};
+
+        $.ajax({
+            url: controlsRoot + 'delete-cell/',
+            dataType: 'json',
+            data: {
+                gridId: gridId,
+                targetFeedId: Elements.rightdd(),
+                timestamp: timestamp
+            },
+            success: function (data) {
+                if (data.success) {
+                    callback(true, data);
+                } else {
+                    callback(false, data.message);
+                }
+            }
+        });
+    },
     'article-queue-toggle-repeat': function(gridLineId, timestamp, callback){
         $.ajax({
             url: controlsRoot + 'article-queue-toggle-repeat/',

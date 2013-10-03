@@ -57,7 +57,6 @@
                     <span class="locked-trigger <?= $protectTo ? 'visible': '' ?>"></span>
                     <span class="edit-trigger"></span>
                     <span class="delete"></span>
-
                 <? } ?>
             </div>
         <? } ?>
