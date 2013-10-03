@@ -132,13 +132,13 @@
         }
 
         //удаляет группу - точнее, все упоминания группы. она сама меняет статус
-        public static function delete_group( Group $group )
+        public static function delete_group( Group $group, Group $default_group )
         {
             //удаляем эвенты группы
             $object = new BarterEvent();
-            $object->status = 7;
+            $object->groups_ids = array($default_group->group_id, 3);
             $search = array( '_groups_ids' => array( $group->group_id ));
-            BarterEventFactory::UpdateByMask( $object, array( 'status'), $search );
+            BarterEventFactory::UpdateByMask( $object, array( 'groups_ids'), $search );
 
             $group->users_ids   =   array(0);
             $group->status      =   7;

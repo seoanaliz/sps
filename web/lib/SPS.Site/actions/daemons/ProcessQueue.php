@@ -142,6 +142,7 @@ sql;
                 foreach ($articlePhotos as $photoItem) {
                     $remotePath = MediaUtility::GetArticlePhoto($photoItem);
                     $localPath  = Site::GetRealPath('temp://upl_' . md5($remotePath) . '.jpg');
+                    $localPath2 = Site::GetRealPath('temp://upl_' . md5($remotePath . 'DDADade') . '.jpg');
                     try {
                         file_put_contents($localPath, file_get_contents($remotePath));
                     } catch( Exception $Ex ) {
@@ -149,7 +150,22 @@ sql;
                             'failed get photo from vk( ' . $remotePath . '): ' . $Ex->getMessage());
                         throw $Ex;
                     }
-                    $post_data['photo_array'][] = $localPath;
+                    $fs = filesize( $localPath) / 1024 ;
+                    if ( $fs < 3 )  {
+                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                            'damaged photo ' . $remotePath . ' .Its size = ' . $fs . 'kb' );
+                        unlink( $localPath);
+                        try {
+                            file_put_contents($localPath2, file_get_contents($remotePath));
+                        } catch( Exception $Ex ) {
+                            AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                                'failed get photo from vk( ' . $remotePath . '): ' . $Ex->getMessage());
+                            throw $Ex;
+                        }
+                        $post_data['photo_array'][] = $localPath2;
+                    } else {
+                        $post_data['photo_array'][] = $localPath;
+                    }
 
                 }
             }
