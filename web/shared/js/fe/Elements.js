@@ -97,6 +97,8 @@ var Elements = {
                         if ($post.hasClass('relocatable')) { // скроем в "источниках"
                             $post.addClass('hidden_' + data.id).hide();
                         }
+                    } else if (data.message) {
+                        popupError(data.message, { timeout: 1500 });
                     }
                 });
             }
