@@ -909,9 +909,9 @@
             $vkPublic = VkPublicFactory::GetOne(array( 'vk_id' => $vkId));
             //если пересчитываем, внешнеуказанной цены нет
             if ( $price == -1) {
-                $price = $vkPublic->cpp;
+                $price = (int)$vkPublic->cpp;
             }
-            if ( isset( $vkPublic->viewers_week )) {
+            if ( isset( $vkPublic->viewers_week ) && (int)$vkPublic->viewers_week ) {
                 if ( $price && StatPublics::isCheap($vkPublic, $price )) {
                     $ge = new GroupEntry(
                         self::cheapGroupId,
