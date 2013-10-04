@@ -74,7 +74,6 @@ if(!empty($jsFilesAdds)) {
         var rank = <?= ObjectHelper::ToJSON($rank) ?>;
         var vkLoginUrlTpl = <?= ObjectHelper::ToJSON(AuthVkontakte::getVkLoginUrlTpl()) ?>;
     </script>
-    sendLoadStat
     <title><?=$__pageTitle?></title>
     <meta name="keywords" content="{form:$__metaKeywords}" />
     <meta name="description" content="{form:$__metaDescription}" />
