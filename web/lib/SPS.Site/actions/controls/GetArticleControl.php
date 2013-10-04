@@ -36,12 +36,7 @@
             }
 
             // проверим доступ
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
-            if ( !$TargetFeedAccessUtility->canCreatePlanDeletePost($feedId) ) {
-                echo $feedId . '<br>';
-                return; // ------------------------- RETURN
-            }
 
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
             if (empty($articleRecord)) {
