@@ -12,6 +12,9 @@
         const WARNING_DATA_NOT_ACCURATE = 1;
         const WARNING_DATA_FROM_YESTERDAY = 2;
         const WARNING_DATA_ACCURATE = 3;
+        //на проде - 435
+        const cheapGroupId = 435;
+
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
              26776509
@@ -888,6 +891,44 @@
                 return $result[0];
             }
             return false;
+        }
+
+        public static function isCheap( VkPublic $vkPublic, $price ) {
+            return ($vkPublic->viewers_week <= 10000 && $price <= 50)  ||
+                ($vkPublic->viewers_week <= 50000 && $vkPublic->viewers_week > 10000&& $price <= 200)  ||
+                ($vkPublic->viewers_week <= 100000 && $vkPublic->viewers_week > 50000 && $price <= 400)  ||
+                ($vkPublic->viewers_week <= 200000 && $vkPublic->viewers_week > 100000 && $price <= 800)  ||
+                ($vkPublic->viewers_week <= 500000 && $vkPublic->viewers_week > 200000 && $price <= 1500)  ||
+                ($vkPublic->viewers_week <= 1000000 && $vkPublic->viewers_week > 500000 && $price <= 3000)  ||
+                ($vkPublic->viewers_week <= 1500000 && $vkPublic->viewers_week > 1000000 && $price <= 4500)  ||
+                ($vkPublic->viewers_week <= 2000000 && $vkPublic->viewers_week > 1500000 && $price <= 6000)  ||
+                ($vkPublic->viewers_week <= 3000000 && $vkPublic->viewers_week > 2000000 && $price <= 9000);
+        }
+
+        public static function checkIfCheap($vkId, $price = -1) {
+            $vkPublic = VkPublicFactory::GetOne(array( 'vk_id' => $vkId));
+            //если пересчитываем, внешнеуказанной цены нет
+            if ( $price == -1) {
+                $price = (int)$vkPublic->cpp;
+            }
+            if ( isset( $vkPublic->viewers_week ) && (int)$vkPublic->viewers_week ) {
+                if ( $price && StatPublics::isCheap($vkPublic, $price )) {
+                    $ge = new GroupEntry(
+                        self::cheapGroupId,
+                        $vkPublic->vk_public_id,
+                        Group::STAT_GROUP,
+                        AuthVkontakte::IsAuth()
+                    );
+
+                    GroupEntryFactory::Add($ge);
+                } else {
+                    GroupEntryFactory::DeleteByMask( array(
+                        'groupId'   =>  self::cheapGroupId,
+                        'entryId'   =>  $vkPublic->vk_public_id,
+                        'sourceType'=>  Group::STAT_GROUP,
+                    ));
+                }
+            }
         }
     }
 ?>
