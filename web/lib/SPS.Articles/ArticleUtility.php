@@ -8,7 +8,7 @@
     class ArticleUtility {
 
         /** in seconds*/
-        const TimeBeetwenPosts   =  59;
+        const TimeBeetwenPosts   =  299;
 
         const PostsPerDayInFeed  =  150;
 
