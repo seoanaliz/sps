@@ -13,9 +13,9 @@ var Configs = {
 
 var cur = {
     dataUser: {
-        isAuthorized: true || (window.rank > 1),
-        isEditor: true || (window.rank > 2),
-        isAdmin: true || (window.rank > 3)
+        isAuthorized: (window.rank > 1),
+        isEditor: (window.rank > 2),
+        isAdmin: (window.rank > 3)
     }
 };
 
