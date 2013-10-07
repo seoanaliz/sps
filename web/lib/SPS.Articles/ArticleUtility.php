@@ -8,7 +8,8 @@
     class ArticleUtility {
 
         /** in seconds*/
-        const TimeBeetwenPosts   =  299;
+
+        const TimeBeetwenPosts   =  269;
 
         const PostsPerDayInFeed  =  150;
 
@@ -83,12 +84,13 @@
                 'startDateFrom' =>  $from,
                 'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . ' seconds')
             );
-
+            //удаляем из проверки сам пост
             if( $articleQueueId ) {
                 $search['articleQueueIdNE'] = $articleQueueId;
             }
+                print_r($search);
             $check = ArticleQueueFactory::Get( $search );
-            //удаляем из проверки сам пост
+
 
             return !empty( $check );
         }
@@ -202,6 +204,7 @@
                 'startDateFrom' =>  $dateFrom->modify('+90 seconds'),
                 'startDateTo'   =>  $dateTo,
                 'targetFeedId'  =>  $targetFeedId,
+                'statusIdNE'    =>  StatusUtility::Deleted,
             );
             $faq = new ArticleQueue();
             $faq->statusId = $statusId;

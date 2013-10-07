@@ -176,6 +176,11 @@
                       'name'       => 'articleQueueId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_NOT_EQUALS
+                )
+                , 'statusIdNE' => array(
+                      'name'       => 'statusId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_NOT_EQUALS
                 ))
         );
         
