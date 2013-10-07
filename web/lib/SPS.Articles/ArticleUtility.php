@@ -88,7 +88,6 @@
             if( $articleQueueId ) {
                 $search['articleQueueIdNE'] = $articleQueueId;
             }
-                print_r($search);
             $check = ArticleQueueFactory::Get( $search );
 
 
