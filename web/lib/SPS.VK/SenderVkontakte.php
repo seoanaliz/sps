@@ -114,6 +114,7 @@
 //            }
             foreach( $this->post_photo_array as $photo_adr ) {
                 $photo_array[] = $this->load_photo( $photo_adr, $meth );
+                sleep(0.5);
             }
             echo 1;
             $attachments = array_merge( $photo_array, $this->audio_id, $this->video_id );
@@ -150,7 +151,7 @@
 
             $params = array(
                 'object'    =>  'wall' . $this->repost_post,
-                'message'   =>  '',
+                'message'   =>  $this->post_text,
                 'gid'       =>  $this->vk_group_id,
                 'access_token' => $this->vk_access_token
             );
@@ -188,6 +189,7 @@
 //            preg_replace( '/^@/', '^ @', $text );
             if ( $text && $text[0] == '@')
                 $text = ' ' . $text;
+            $text = preg_replace('/\[([^|]+)(\|)([^|]+)]/', '@$1($3)', $text);
             return $text;
         }
 
@@ -295,7 +297,7 @@
                 );
                 $res = VkHelper::api_request( 'wall.delete', $params );
 
-                $check = ParserVkontakte::get_posts_by_vk_id( $full_post_id );
+                $check = VkHelper::api_request( 'wall.getById', array( 'posts' => $full_post_id ));
                 if( empty( $check ))
                     return true;
                 throw new Exception('Failed on deleting ' . $post_id . ', ' . $res );
@@ -399,6 +401,7 @@
                 $params = array_merge($params, $captcha);
             }
             $res = VkHelper::api_request( 'wall.post', $params, false );
+            sleep(0.5);
             if ( isset( $res->post_id ))
                 return $res->post_id;
 
@@ -472,7 +475,7 @@
         {
             if ( !file_exists( $path ))
                 throw new exception( " Can't find file : $path for vk.com/public" . $this->vk_group_id);
-            if ( filesize( $path) / 1024 < 5)
+            if ( filesize( $path) / 1024 < 3)
                 throw new exception( " File damaged : $path for vk.com/public" . $this->vk_group_id);
             $aid = '';
             switch ( $destination ) {
@@ -507,7 +510,7 @@
             $res = VkHelper::api_request( $method_get_server, $params, false );
                 print_r($params);
 
-            sleep( 0.4 );
+            sleep( 0.5 );
             if ( !isset( $res->upload_url )) {
                 if ( isset ( $res->error) && in_array( $res->error->error_code, $this->change_admin_errors )) {
                     throw new ChangeSenderException($res->error->error_msg);

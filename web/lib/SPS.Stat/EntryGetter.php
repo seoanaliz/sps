@@ -43,7 +43,10 @@ class EntryGetter {
         $limit      =   Request::getInteger( 'limit' ) ?: 25;
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
-        $period     =   Request::getInteger( 'period' );
+        $period     =   Request::getInteger( 'period' );//
+        $type       =   Request::getString( 'sourcType' );
+        $is_page    =   !($type == 'group');
+
         $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
         $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
@@ -72,7 +75,7 @@ class EntryGetter {
             ,'limit'        =>  $limit + 1
             ,'offset'       =>  $offset
             ,'sh_in_main'   =>  true
-            ,'is_page'      =>  true
+            ,'is_page'      =>  $is_page
             ,'active'       =>  true
         );
 
@@ -129,10 +132,19 @@ class EntryGetter {
         $result = array();
         foreach ($vkPublics as $vkPublic) {
             $groups_ids = array();
-            $group_entries_by_entry = GroupEntryFactory::Get(array(
-                'entryId'   =>  $vkPublic->vk_public_id,
+
+            $available_groups = GroupUserFactory::Get( array(
+                'vkIdIn'    =>  array( AuthVkontakte::IsAuth(), GroupsUtility::Fake_User_ID_Global ),
                 'sourceType'=>  Group::STAT_GROUP
             ));
+            $available_groups = ArrayHelper::Collapse($available_groups, 'groupId', false);
+            $available_groups = array_keys( $available_groups );
+            $group_entries_by_entry = GroupEntryFactory::Get(array(
+                'entryId'   =>  $vkPublic->vk_public_id,
+                'sourceType'=>  Group::STAT_GROUP,
+                'groupIdIn' =>  $available_groups
+            ));
+
             foreach ($group_entries_by_entry as $grupEntry) {
                 $groups_ids[] = $grupEntry->groupId;
             }

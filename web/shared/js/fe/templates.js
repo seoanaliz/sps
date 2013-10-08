@@ -170,3 +170,6 @@ var ARTICLE_PHOTO =
         '<img src="<?=url?>" alt="" />' +
     '</div>' +
 '</a>';
+
+
+var EMPTY_QUE = '<div class="empty-queue">Пусто</div>';

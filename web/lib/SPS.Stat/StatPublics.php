@@ -8,11 +8,12 @@
 
         const time_shift = 0;
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
-
+        const STAT_QUANTITY_LIMIT = 30000;
         const WARNING_DATA_NOT_ACCURATE = 1;
         const WARNING_DATA_FROM_YESTERDAY = 2;
         const WARNING_DATA_ACCURATE = 3;
-
+        //на проде - 435
+        const cheapGroupId = 435;
 
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
@@ -22,7 +23,6 @@
             ,33704958
             ,38000521
             ,1792796
-            ,27421965
             ,34010064
             ,25749497
             ,35807078
@@ -80,14 +80,10 @@
         public static function get_our_publics_list( $selector = 0 )
         {
             $publics = TargetFeedFactory::Get(array('isOur' => true ));
-
             $res = array();
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
-                if(!isset($public->params['isOur']) || $public->params['isOur'] =='off')
-                    continue;
-
                 // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
                 if(( $selector == 1 && in_array( $public->externalId, self::$topface_beauty)) ||
                     ($selector == 2 && !in_array( $public->externalId, self::$topface_beauty)))
@@ -515,7 +511,6 @@
 
         public static function get_views_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-
             $params = array(
                 'gid'           =>  $public_id,
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
@@ -523,14 +518,18 @@
             );
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
-            if ( !empty ( $res->error))
-                return false;
             $connect = ConnectionFactory::Get( 'tst' );
+            if ( !empty ( $res->error)) {
+                StatPublics::save_view_visitor( $public_id, null, null, null, date( 'Y-m-d', $time_from ), $connect );
+                return false;
+            }
+
             foreach( $res as $day ) {
                 $subs = isset($day->reach_subscribers) ? $day->reach_subscribers : 0;
                 StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $subs, $day->day, $connect );
             }
             sleep(0.3);
+            return true;
         }
 
         public static function get_average_rate( $sb_id, $time_from, $time_to ) {
@@ -566,39 +565,16 @@
 
         public static function save_view_visitor( $public_id, $views, $visitors, $reach, $date, $connect )
         {
-            $sql = 'select * from
-                stat_publics_50k_points
-            WHERE
-                id=@public_id
-                AND time=@date';
-            $cmd = new SqlCommand( $sql, $connect );
-            $cmd->SetInteger( '@public_id', $public_id );
-            $cmd->SetString ( '@date',      $date );
-            $ds = $cmd->Execute();
+            $sql = 'UPDATE
+                    stat_publics_50k_points
+                SET
+                    visitors=@visitors,
+                    views   =@views,
+                    reach   =@reach
+                WHERE
+                    id=@public_id
+                    AND time=@date';
 
-            if ( $ds->GetSize()) {
-                $sql = 'UPDATE
-                        stat_publics_50k_points
-                    SET
-                        visitors=@visitors,
-                        views   =@views,
-                        reach   =@reach
-                    WHERE
-                        id=@public_id
-                        AND time=@date';
-            } else {
-                $sql = 'INSERT INTO
-                        stat_publics_50k_points
-                    VALUES(
-                           @public_id,
-                           @date,
-                           0,
-                           @visitors,
-                           @views,
-                           @reach
-                    )';
-
-            }
             $cmd = new SqlCommand( $sql, $connect );
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->SetInteger( '@visitors',  $visitors );
@@ -627,23 +603,40 @@
             return $res;
         }
 
-        public static function get_public_walls_mk2( $walls_array, $app = '' )
+        public static function  get_public_walls_mk2( $walls_array, $app = '', $postponed = false )
         {
             $walls = array();
             $walls_array = array_unique( $walls_array );
             $sliced_walls_array = array_chunk( $walls_array, 25 );
+            $filter = '';
+            $access_token = false;
+
+            if ( $postponed ) {
+                $filter = ',"filter":"postponed"';
+                $access_tokens = AccessTokenFactory::Get(array('vkId' => '187850505', 'version'=> AuthVkontakte::$Version));
+                if ( !empty($access_tokens )) {
+                    $access_token  = current( $access_tokens )->accessToken;
+                } else {
+                    return array();
+                }
+                $app = false;
+            }
             foreach( $sliced_walls_array as $chunk ) {
                 $code = '';
                 $return = "return{";
                 $i = 0;
                 foreach( $chunk as $public ) {
                     $id = trim( $public );
-                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 6 });';
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 6' . $filter . ' });';
                     $return .=  "\"id$id\":id$id,";
                     $i++;
                 }
                 $code .= trim( $return, ',' ) . "};";
-                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
+                $params = array( 'code' => $code );
+                if ( $access_token ) {
+                    $params['access_token'] = $access_token;
+                }
+                $res   = VkHelper::api_request( 'execute', $params, 0, $app );
                 if( isset( $res->error ))
                     continue;
                 foreach( $res as $id => $content ) {
@@ -875,6 +868,67 @@
             echo $cmd->GetQuery();
             $ds->Next();
             return $ds->Next() ? $ds->GetDateTime( 'max' ) : DateTimeWrapper::Now() ;
+        }
+
+
+        //возвращает информацию о паблике по ссылке, shrotname'у или id
+        public static function getPublicInfo( $piblicId, $user_token )
+        {
+            $search = array( '/(.+club)(\d{1,22})$/', '/(.+public)(\d{1,22})$/', '/(.+)\/([^\/]+)$/' );
+
+            $url = parse_url( $piblicId );
+            $url = ltrim( $url['path'], '/' );
+            $public_id = preg_replace( $search, '$2', $url );
+
+            $params = array(
+                'filter'        =>  'admin,editor',
+                'group_id'      =>  $public_id,
+                'fields'        =>  'members_count,contacts',
+                'access_token'  =>  $user_token
+            );
+            $result = VkHelper::api_request( 'groups.getById', $params );
+            if ( is_array( $result )) {
+                return $result[0];
+            }
+            return false;
+        }
+
+        public static function isCheap( VkPublic $vkPublic, $price ) {
+            return ($vkPublic->viewers_week <= 10000 && $price <= 50)  ||
+                ($vkPublic->viewers_week <= 50000 && $vkPublic->viewers_week > 10000&& $price <= 200)  ||
+                ($vkPublic->viewers_week <= 100000 && $vkPublic->viewers_week > 50000 && $price <= 400)  ||
+                ($vkPublic->viewers_week <= 200000 && $vkPublic->viewers_week > 100000 && $price <= 800)  ||
+                ($vkPublic->viewers_week <= 500000 && $vkPublic->viewers_week > 200000 && $price <= 1500)  ||
+                ($vkPublic->viewers_week <= 1000000 && $vkPublic->viewers_week > 500000 && $price <= 3000)  ||
+                ($vkPublic->viewers_week <= 1500000 && $vkPublic->viewers_week > 1000000 && $price <= 4500)  ||
+                ($vkPublic->viewers_week <= 2000000 && $vkPublic->viewers_week > 1500000 && $price <= 6000)  ||
+                ($vkPublic->viewers_week <= 3000000 && $vkPublic->viewers_week > 2000000 && $price <= 9000);
+        }
+
+        public static function checkIfCheap($vkId, $price = -1) {
+            $vkPublic = VkPublicFactory::GetOne(array( 'vk_id' => $vkId));
+            //если пересчитываем, внешнеуказанной цены нет
+            if ( $price == -1) {
+                $price = (int)$vkPublic->cpp;
+            }
+            if ( isset( $vkPublic->viewers_week ) && (int)$vkPublic->viewers_week ) {
+                if ( $price && StatPublics::isCheap($vkPublic, $price )) {
+                    $ge = new GroupEntry(
+                        self::cheapGroupId,
+                        $vkPublic->vk_public_id,
+                        Group::STAT_GROUP,
+                        AuthVkontakte::IsAuth()
+                    );
+
+                    GroupEntryFactory::Add($ge);
+                } else {
+                    GroupEntryFactory::DeleteByMask( array(
+                        'groupId'   =>  self::cheapGroupId,
+                        'entryId'   =>  $vkPublic->vk_public_id,
+                        'sourceType'=>  Group::STAT_GROUP,
+                    ));
+                }
+            }
         }
     }
 ?>

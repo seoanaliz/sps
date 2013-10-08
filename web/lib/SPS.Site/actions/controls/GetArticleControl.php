@@ -36,10 +36,7 @@
             }
 
             // проверим доступ
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-            if ( !$SourceAccessUtility->hasAccessToSourceFeed($feedId) ) {
-                return; // ------------------------- RETURN
-            }
+
 
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
             if (empty($articleRecord)) {

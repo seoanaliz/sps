@@ -10,7 +10,7 @@ class PublicsParser
 {
 
     const LIMIT = 30000;
-    const REQUESTS_PER_LAUNCH = 70;
+    const REQUESTS_PER_LAUNCH = 120;
     const PUBLICS_PER_REQUEST  = 500;
     const PAUSE = 0.4;
     private $current_public;
@@ -21,6 +21,10 @@ class PublicsParser
         echo 'Начинаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
+            if ( $this->current_public > 69000000 ) {
+                $this->set_state();
+                die();
+            }
             $ms = microtime(1);
             $take_counter = rand( 450, self::PUBLICS_PER_REQUEST);
             $params = array(
@@ -32,16 +36,17 @@ class PublicsParser
             if( !$res)
                 continue;
             $new_entries = array();
+            $update_entries = 0;
             foreach( $res as $public ) {
                 sleep( self::PAUSE );
-                if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
+                if ( !isset( $public->type) || !isset( $public->members_count ) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
-                if( $public->name == 'DELETED' && $this->current_public > 61000000 && $public->members_count == 0) {
-                    $this->set_state( 0, $this->current_public );
-                    die();
-                }
 
-                if ( $public->members_count > self::LIMIT && !VkPublicFactory::Get( array( 'vk_id' => $public->gid ))) {
+
+
+                $check = VkPublicFactory::GetOne( array( 'vk_id' => $public->gid ));
+
+                if ( $public->members_count > self::LIMIT && !$check )  {
                     $entry = new VkPublic();
                     $entry->vk_id = $public->gid;
                     $entry->ava   = $public->photo;
@@ -51,14 +56,21 @@ class PublicsParser
                     $entry->short_name =  $public->screen_name;
                     $entry->is_page    =  $public->type == 'page' ? true : false;
                     $entry->sh_in_main =  true;
+                    $entry->active     =  true;
+                    $entry->updated_at = DateTimeWrapper::Now()->modify('-1 day');
                     $new_entries[] = $entry;
+                } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {
+                    $check->quantity = $public->members_count;
+                    $check->active   =  true;
+                    VkPublicFactory::Update($check);
+                    $update_entries++;
                 }
             }
             if( $new_entries ) {
                 VkPublicFactory::AddRange( $new_entries );
             }
-            echo 'добавил: ', count($new_entries),'<br>', round(microtime(1) - $ms, 2),'<br>';
-
+            echo 'добавил: ', count($new_entries),'<br>', round(microtime(1) - $ms, 2),' обновил ' . $update_entries . '<br>';
+            $update_entries = 0;
             $this->current_public += $take_counter;
             $this->set_state($this->current_public);
             $this->set_tries(0);

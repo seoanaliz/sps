@@ -126,8 +126,8 @@ var QueueWidget = Event.extend({
             isEmpty = false;
         }
         
-        var $post = $slot.find('.post');
-        var pid = $post.data('queue-id');
+        var $post = $slot.find('.post'),
+            pid = $post.data('queue-id');
 
         var eventName = isEmpty ? 'rightcolumn_render_empty' : 'rightcolumn_deletepost';
         Events.fire(eventName, pid, $slot.data('grid-id'), $slot.data('id'),
@@ -147,14 +147,51 @@ var QueueWidget = Event.extend({
         );
     },
 
+    /**
+     * Удаление пустой ячейки
+     * @param $slot Object JQuery обект слота
+     */
+    deleteCell: function($slot) {
+        var gridId = $slot.data('grid-id'),
+            timestamp = $slot.closest('.queue-page').data('timestamp');
+
+        Events.fire('delete-cell', gridId, timestamp, function (isOk, data) {
+            if (!isOk) {
+                popupError(data && data.message || 'Unknown error');
+            } else {
+                var $queuePage = $slot.parent('.queue-page'),
+                    slotCount = $queuePage.children('.slot').length;
+
+                $slot.children().remove();
+
+                if (slotCount > 1) {
+                    $slot.animate({ minHeight: 0 }, 200, function () {
+                        $slot.remove();
+                    });
+                } else {
+                    $slot.remove();
+                    $queuePage.append(EMPTY_QUE);
+                }
+
+            }
+        });
+    },
+
     initQueue: function() {
         var t = this;
         var $queue = t.$queue;
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
-            var $slot = $(this).closest('.slot');
-            t.deleteArticleInSlot($slot);
+            var $slot = $(this).closest('.slot'),
+                $post = $slot.find('.post');
+
+            if ($post && $post.length) {
+                t.deleteArticleInSlot($slot);
+            } else {
+                //если поста у ячейки нет удаляем ее
+                t.deleteCell($slot);
+            }
         });
 
         // Смена даты
@@ -313,6 +350,64 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
+                    t.updateSinglePage($page);
+                });
+            }
+        });
+
+        /**
+         * Клик по замку. для установки времени блокировки
+         * создаем инпут для ввода
+         *
+         * //великая копипаста
+         */
+        $queue.delegate('.locked-trigger', 'click', function (e) {
+            var $time = $(this);
+            var $post = $time.closest('.slot-header');
+            var $input = $time.data('time-of-locked-edit');
+
+            if (!$input) {
+                $input = $('<input />')
+                    .attr('type', 'text')
+                    .attr('class', 'time-of-locked-edit')
+                    .width($time.width())
+                    .mask('29:59')
+                    .appendTo($post);
+
+                $time.data('time-of-locked-edit', $input);
+            } else {
+                $input.show();
+            }
+            $input.focus().select();
+        });
+
+        /**
+         * Поле ввода времени блокировки
+         */
+        $queue.delegate('.time-of-locked-edit', 'blur keydown', function (e) {
+            var $input = $(this);
+
+            if (e.type === 'keydown' && e.keyCode != KEY.ENTER) {
+                return;
+            }
+
+            if (e.type === 'focusout' && !e.originalEvent) {
+                return;
+            }
+
+            var $post = $input.closest('.slot'),
+                $page = $post.closest('.queue-page'),
+                gridLineId = $post.data('grid-id'),
+                gridLineItemId = $post.data('grid-item-id'),
+                time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0'),
+                qid = $post.find('.post').data('queue-id');
+
+            time = parseInt(time.replace(':', ''), 10) > 2359 ? '23:59': time;
+
+            $input.blur().hide().val(time);
+
+            if (time) {
+                Events.fire('rightcolumn_locked_time_edit', qid, time, function() {
                     t.updateSinglePage($page);
                 });
             }
@@ -490,7 +585,7 @@ var QueueWidget = Event.extend({
         var imageUploader = $slot.data('imageUploader');
         var photos = imageUploader && imageUploader.getPhotos();
 
-        if (text || photos) {
+        if (text || photos && photos.length) {
             $slot.addClass('locked');
             app.savePost({
                 text: text,
@@ -501,6 +596,11 @@ var QueueWidget = Event.extend({
                     Events.fire('post_moved', postId, $slot.data('id'), null, null, function(isOk, data) {
                         if (isOk && data && data.html) {
                             t.setSlotArticleHtml($slot, data.html);
+                        } else
+                        //ошибка от базы
+                        if (data.message) {
+                            popupError(data.message);
+                            $slot.removeClass('locked');
                         }
                     });
                 }

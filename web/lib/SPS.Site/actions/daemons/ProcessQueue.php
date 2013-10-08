@@ -83,26 +83,14 @@ sql;
                 }
                 $roles = array();
 
-                //из-за вавилонства с ролями с наших пабликов пока могут посылать только editors
-                if ( !$targetFeed->isOur ) {
-                    $roles = array( UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR);
-                }
-                $tokens = AccessTokenUtility::getAllTokens( $targetFeed->targetFeedId, AuthVkontakte::$Version, $roles );
-                //отправка в ненаши - только с токена запланировавшего пост
-                if ( !$targetFeed->isOur ) {
-                    if( isset($tokens[$articleQueue->author] )) {
-                        $tmp  = $tokens[0];
-                        $tokens[0] = $tokens[$articleQueue->author];
-                        $tokens[] = $tmp;
-                    } else {
-                    }
-                } else {
-                    shuffle( $tokens );
+                $tokens = array();
+                if ( $articleQueue->author ) {
+                  $tokens = AccessTokenUtility::getTokens( $articleQueue->author, $targetFeed);
                 }
 
                 foreach ($tokens as $token) {
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token, $article);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $token->accessToken, $article);
                         return true;
                     } catch (Exception $Ex) {
                         Logger::Warning($Ex->getMessage());
@@ -154,6 +142,7 @@ sql;
                 foreach ($articlePhotos as $photoItem) {
                     $remotePath = MediaUtility::GetArticlePhoto($photoItem);
                     $localPath  = Site::GetRealPath('temp://upl_' . md5($remotePath) . '.jpg');
+                    $localPath2 = Site::GetRealPath('temp://upl_' . md5($remotePath . 'DDADade') . '.jpg');
                     try {
                         file_put_contents($localPath, file_get_contents($remotePath));
                     } catch( Exception $Ex ) {
@@ -161,7 +150,22 @@ sql;
                             'failed get photo from vk( ' . $remotePath . '): ' . $Ex->getMessage());
                         throw $Ex;
                     }
-                    $post_data['photo_array'][] = $localPath;
+                    $fs = filesize( $localPath) / 1024 ;
+                    if ( $fs < 3 )  {
+                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                            'damaged photo ' . $remotePath . ' .Its size = ' . $fs . 'kb' );
+                        unlink( $localPath);
+                        try {
+                            file_put_contents($localPath2, file_get_contents($remotePath));
+                        } catch( Exception $Ex ) {
+                            AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                                'failed get photo from vk( ' . $remotePath . '): ' . $Ex->getMessage());
+                            throw $Ex;
+                        }
+                        $post_data['photo_array'][] = $localPath2;
+                    } else {
+                        $post_data['photo_array'][] = $localPath;
+                    }
 
                 }
             }

@@ -23,6 +23,8 @@ class setCpp {
                     if( $targetFeed ) {
                         $accessUtility = new TargetFeedAccessUtility($userVkId);
                         if ($accessUtility->moreThenAuthor( $targetFeed->targetFeedId)) {
+                            if ( $cpp === 0 ) 
+					            $cpp = null;
                             $vkPublic = new VkPublic();
                             $vkPublic->cpp = $cpp;
                             $time = time();
@@ -35,6 +37,7 @@ class setCpp {
                             if ($updateResult) {
                                 $result['success'] = true;
                                 $result['cpp'] = $vkPublic->cpp;
+                                StatPublics::checkIfCheap($intId, $cppString);
                             }
                         }
                     }
@@ -45,5 +48,6 @@ class setCpp {
         }
         echo ObjectHelper::ToJSON($result);
     }
+
 }
 ?>

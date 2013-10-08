@@ -100,14 +100,14 @@ html {
 #main .left-column > .content #results .item,
 #main .left-column > .content #results .column {
   text-align: center;
-  width: 90px;
+  width: 80px;
 }
 #main .left-column > .content .list-head .item.public,
 #main .left-column > .content .list-head .column.public,
 #main .left-column > .content #results .item.public,
 #main .left-column > .content #results .column.public {
   text-align: left;
-  width: 210px;
+  width: 200px;
 }
 #main .left-column > .content .list-head .item.action,
 #main .left-column > .content .list-head .column.action,
@@ -168,4 +168,7 @@ html {
 }
 #load-more-table {
   display: block;
+}
+#main .delete {
+    right: 1px;
 }

@@ -101,6 +101,10 @@
                 ,'collectLikes' => array(
                     'name'          => 'collectLikes'
                 , 'type'        => TYPE_BOOLEAN
+                )
+                ,'protectTo'    => array(
+                      'name'        => 'protectTo'
+                    , 'type'        => TYPE_DATETIME
                 ))
             , 'lists'     => array()
             , 'search'    => array(
@@ -153,6 +157,16 @@
                     , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_LE
                 )
+                , 'protectToGE' => array(
+                    'name'         => 'protectTo'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_GE
+                )
+                , 'protectToLE' => array(
+                    'name'         => 'protectTo'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_LE
+                )
                 , 'createdAtNE' => array(
                       'name'       => 'createdAt'
                     , 'type'       => TYPE_DATETIME
@@ -160,6 +174,11 @@
                 )
                 , 'articleQueueIdNE' => array(
                       'name'       => 'articleQueueId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_NOT_EQUALS
+                )
+                , 'statusIdNE' => array(
+                      'name'       => 'statusId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_NOT_EQUALS
                 ))

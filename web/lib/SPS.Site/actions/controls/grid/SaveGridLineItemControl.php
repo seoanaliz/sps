@@ -49,6 +49,11 @@
                     echo ObjectHelper::ToJSON($result);
                     return false;
                 }
+                if ( ArticleUtility::isInProtectedInterval($gridLine->targetFeedId,$itemDate->getTimestamp(), $queueId )) {
+                    $result['message'] = 'This time interval protected';
+                    echo ObjectHelper::ToJSON( $result );
+                    return false;
+                }
             }
 
             $object = new GridLineItem();

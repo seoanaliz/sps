@@ -17,6 +17,7 @@
         <div class="slot-header">
             <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
             <span class="repeater"></span>
+            <div class="delete"></div>
         </div>
         <div class="editing-post">
             <div class="textarea-wrap">
@@ -42,14 +43,21 @@
             $repostArticleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
         }
         $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
+        $protectTo = !empty($articleQueue->protectTo) ? $articleQueue->protectTo->modify('+1 minute')->defaultTimeFormat() : null;
         ?>
         <? if ($canEditQueue) { ?>
             <div class="slot-header">
                 <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                 <span class="repeater"></span>
-                <span class="time-of-removal"></span>
+                <span class="time-of-removal <?= $deleteAt ? 'visible': '' ?>"></span>
                 <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
                 {increal:tmpl://fe/elements/articles-queue-item-header.tmpl.php}
+                <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
+                    <span class="time-of-lock"><?= $protectTo ? $protectTo: '' ?></span>
+                    <span class="locked-trigger <?= $protectTo ? 'visible': '' ?>"></span>
+                    <span class="edit-trigger"></span>
+                    <span class="delete"></span>
+                <? } ?>
             </div>
         <? } ?>
         <div class="post movable
@@ -99,9 +107,5 @@
                 <? } ?>
             </div>
         </div>
-        <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
-            <div class="edit-trigger"></div>
-            <div class="delete"></div>
-        <? } ?>
     <? } ?>
 </div>
