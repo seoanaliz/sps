@@ -41,6 +41,31 @@ class GetIndexPage extends BaseControl
             $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds));
         }
 
+        //сортируем по количеству  участников
+        if ( $this->vkId != 1670456 ) {
+            foreach( $targetFeeds as $tf ) {
+                if ( $tf->type != TargetFeedUtility::VK)
+                    continue;
+                $externalIds[] = $tf->externalId;
+            }
+            if (!empty($externalIds)) {
+                $targetFeeds = ArrayHelper::Collapse($targetFeeds, 'externalId', $toArray = false);
+                $vkPublics = VkPublicFactory::Get(
+                    array('_vk_id' => $externalIds ),
+                    array( BaseFactory::WithoutPages => true, BaseFactory::OrderBy => ' "quantity" DESC ', )
+                );
+                $result = array();
+                foreach ($vkPublics as $public ) {
+                    $result[] = $targetFeeds[$public->vk_id];
+                    unset($targetFeeds[$public->vk_id]);
+                }
+                $targetFeeds = array_values($targetFeeds);
+                if (!empty($targetFeeds)) {
+                    $targetFeeds = $result + $targetFeeds;
+                }
+            }
+        }
+
         if (empty($currentTargetFeedId)) {
             //пытаемся получить источники для первого паблика
             if (!empty($targetFeeds)) {
