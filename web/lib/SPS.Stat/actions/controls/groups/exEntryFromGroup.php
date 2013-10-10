@@ -61,6 +61,7 @@
                         $public->inLists = false;
                         VkPublicFactory::UpdateByMask($public, array('inLists'), array('vk_public_id' => $entry_id));
                     }
+                    $this->logg_delete($entry_id, $group_id);
                     $response['success'] = true;
                     die( ObjectHelper::ToJSON(array( 'response' => true )));
                 } else {
@@ -75,5 +76,16 @@
                 die( ObjectHelper::ToJSON(array( 'response' => false )));
             }
         }
+
+        public function logg_delete($entryId, $groupId) {
+            $sql = 'insert into stat_audit("userId","entryId","groupId","act","createdAt") values( @userId,@entryId,@groupId,@act,now())';
+            $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
+            $cmd->SetInt('@userId', AuthVkontakte::IsAuth());
+            $cmd->SetInt('@entryId', $entryId);
+            $cmd->SetInt('@groupId', $groupId);
+            $cmd->SetString('@act', 'delete');
+            $cmd->Execute();
+        }
+
     }
 ?>
