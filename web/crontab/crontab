@@ -31,6 +31,7 @@
 0     3       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-top/ > /dev/null
 
 59     23       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/SyncLikes/ > /dev/null
+59     15       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-userpics/ > /dev/null
 #*/5    *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/SyncLikes/?all > /dev/null
 
 5     4-20   *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/wr-topics/ > /dev/null
