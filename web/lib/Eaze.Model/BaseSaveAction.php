@@ -202,39 +202,41 @@
             $object = self::$factory->GetById( $objectId, $this->search, $this->options );
             $this->originalObject = !empty( $object ) ? clone $object : null;
 
-            $this->beforeAction();
-            $this->setForeignLists();
-            $this->setCurrentTab();
+            //если нужна кнопка "применить фильтр" на форме добавления
+            if ( $this->beforeAction() !== 'skip') {
+                $this->setForeignLists();
+                $this->setCurrentTab();
 
-            /**
-             * set current object if null
-             */
-            if ( $this->currentObject === null ) {
-                if ( is_null( $object ) ) {
-                    $object = $this->getFromRequest();
-                } elseif ( $this->action == self::UpdateAction ) {
-                    $object = $this->getFromRequest( $object );
+                /**
+                 * set current object if null
+                 */
+                if ( $this->currentObject === null ) {
+                    if ( is_null( $object ) ) {
+                        $object = $this->getFromRequest();
+                    } elseif ( $this->action == self::UpdateAction ) {
+                        $object = $this->getFromRequest( $object );
+                    }
+
+                    $this->currentObject = $object;
                 }
 
-                $this->currentObject = $object;
+                $this->beforeSave();
+
+                /**
+                 * set object to response
+                 */
+                Response::setParameter( 'object', $this->currentObject );
+                Response::setInteger( 'objectId', $this->objectId );
+
+                /**
+                 * action filter
+                 */
+                if( !in_array( $this->action, $this->allowedMethods ) ) {
+                    return null;
+                }
+                return $this->save( $this->action );
             }
 
-            $this->beforeSave();
-
-            /**
-             * set object to response
-             */
-            Response::setParameter( 'object', $this->currentObject );
-            Response::setInteger( 'objectId', $this->objectId );
-
-            /**
-             * action filter
-             */
-            if( !in_array( $this->action, $this->allowedMethods ) ) {
-                return null;
-            }
-
-            return $this->save( $this->action );
         }
 
 

@@ -35,7 +35,10 @@
         </div>
         <div data-row="onlyOurs" class="row required">
             <label>{lang:vt.sourceFeed.onlyOurs}</label>
-            <?= FormHelper::FormCheckBox(  'onlyOurs', null, 'onlyOurs', null, $onlyOuers ); ?>
+            <?= FormHelper::FormCheckBox(  'onlyOurs', null, 'onlyOurs', null, $onlyOurs ); ?>
+            <div class="buttons-inner">
+                <?= FormHelper::FormSubmit( 'apply', LocaleLoader::Translate( 'vt.common.applyFilter' ), null, 'refresh' ); ?>
+            </div>
         </div>
         <div data-row="targetFeedIds" class="row">
             <label>{lang:vt.sourceFeed.targetFeedIds}</label>

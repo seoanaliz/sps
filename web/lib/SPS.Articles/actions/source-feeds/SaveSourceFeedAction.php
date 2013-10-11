@@ -18,7 +18,6 @@
                 BaseFactory::WithoutDisabled => false
                 , BaseFactory::WithLists     => true
             );
-
             parent::$factory = new SourceFeedFactory();
             $this->onlyOursTargetFeeds = Request::getString('onlyOurs');
         }
@@ -105,7 +104,7 @@
          */
         protected function add( $object ) {
             $result = parent::$factory->Add( $object );
-            
+
             return $result;
         }
         
@@ -127,20 +126,31 @@
          * Set Foreign Lists
          */
         protected function setForeignLists() {
-            Response::setBoolean( 'onlyOuers', $this->onlyOursTargetFeeds );
+            //по умолчанию показываем только наши ленты отправки
+            Response::setBoolean( 'onlyOurs', Request::getString( 'onlyOurs' ) || !Request::getString( 'refr' ));
             $search = array();
-            if( $this->onlyOursTargetFeeds ) {
+            if ( $this->onlyOursTargetFeeds || !Request::getString( 'refr' )) {
                 $search['isOur'] = true;
             }
 
-            $targetFeeds = TargetFeedFactory::Get( $search, array( BaseFactory::WithoutDisabled => false ) );
+            $targetFeeds = TargetFeedFactory::Get( $search, array( BaseFactory::WithoutDisabled => false ));
             Response::setArray( 'targetFeeds', $targetFeeds );
+
         }
 
         protected function afterAction($result) {
             if ($result && $this->currentObject->type == SourceFeedUtility::Source) {
                 SourceFeedUtility::SaveRemoteImage($this->currentObject->externalId);
             }
+        }
+
+        protected function beforeAction() {
+            //если применяем фильтр - выставляем нужные фиды, и прпускаем все остальные действия контрольки
+            if ( Request::getString( 'refr' )) {
+                $this->setForeignLists();
+                return 'skip';
+            }
+
         }
     }
 ?>

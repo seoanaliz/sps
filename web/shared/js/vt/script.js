@@ -185,6 +185,13 @@ $(document).ready( function () {
         return false;
     });
 
+    //apply filter
+    $('.refresh').click(function() {
+        var input = $("<input />").attr("type", "hidden").attr("name", "refr").val("1");
+        $('form#data-form').append($(input));
+        $('form#data-form').submit();
+    });
+
     //add and update
     $('form#data-form div.buttons div.buttons-inner input').click(function(){
         if( $(this).hasClass('edit-preview') ) {
