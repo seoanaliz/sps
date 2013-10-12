@@ -57,15 +57,17 @@ class GetIndexPage extends BaseControl
 
                 $result = array();
                 foreach ($vkPublics as $public ) {
-                    $result[] = $targetFeeds[$public->vk_id];
+                    if( !isset( $targetFeeds[$public->vk_id]))
+                        continue;
+
+                    $result[$targetFeeds[$public->vk_id]->targetFeedId] = $targetFeeds[$public->vk_id];
                     unset($targetFeeds[$public->vk_id]);
                 }
-
                 $targetFeeds = array_values($targetFeeds);
 
                 if (!empty($targetFeeds)) {
                     foreach($targetFeeds as $ttf) {
-                        $result[] = $ttf;
+                        $result[$ttf->targetFeedId] = $ttf;
                     }
                 }
                 $targetFeeds = $result;
@@ -75,17 +77,17 @@ class GetIndexPage extends BaseControl
         if (empty($currentTargetFeedId)) {
             //пытаемся получить источники для первого паблика
             if (!empty($targetFeeds)) {
-                $currentTargetFeedId = current(array_keys($targetFeeds));
+                $currentTargetFeedId = current($targetFeeds)->targetFeedId;
             } else {
                 $currentTargetFeedId = 0;
             }
         }
 
-        $availableSourceTypes = $gridTypes = array();
-        if ( $currentTargetFeedId && isset( $targetFeeds[$currentTargetFeedId])) {
-            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($targetFeeds[$currentTargetFeedId]);
-            $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
-        }
+//        $availableSourceTypes = $gridTypes = array();
+//        if ( $currentTargetFeedId && isset( $targetFeeds[$currentTargetFeedId])) {
+//            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($targetFeeds[$currentTargetFeedId]);
+//            $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
+//        }
 
         $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
 
@@ -125,7 +127,7 @@ class GetIndexPage extends BaseControl
         Response::setParameter('SourceAccessUtility', $SourceAccessUtility);
         Response::setParameter('sourceTypes', SourceFeedUtility::$Types);
         Response::setParameter('availableSourceTypes', $availableSourceTypes);
-        Response::setParameter('gridTypes', $gridTypes);
+        Response::setParameter('gridTypes', [ 'content' => 'Контент', 'ads' => 'Реклама']);
         Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
         Response::setParameter('articleStatuses', $articleStatuses);
         Response::setParameter('isShowSourceList', $isShowSourceList);
