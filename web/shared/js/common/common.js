@@ -1226,7 +1226,7 @@ var tmpl = (function($) {
             .replace(/[\r\t\n]/g, ' ')
             .split('<?').join('\t')
             .split("'").join("\\'")
-            .replace(/\t=(.*?)\?>/g, "',$1,'")
+            .replace(/\t=(.*?)\?>/g, "',escape($1),'")
             .split('?>').join("p.push('")
             .split('\t').join("');")
             .split('\r').join("\\'") : str;
@@ -1240,6 +1240,8 @@ var tmpl = (function($) {
                 'var p=[],' +
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
+                    'escape=function (val) { if ("string" !== typeof val) return val;' +
+                        'return val.replace(/script/g, "").replace(/\\\"/g, "\\\'")},' +
                     'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
                     'count=function(obj){return (obj instanceof Array) ? obj.length : countObj(obj)};' +
                     'countObj=function(obj){var cnt = 0; for(var i in obj) { if (obj.hasOwnProperty(i)) cnt++; } return cnt};' +
