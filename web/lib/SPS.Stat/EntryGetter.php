@@ -43,7 +43,7 @@ class EntryGetter {
         $limit      =   Request::getInteger( 'limit' ) ?: 25;
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
-        $period     =   Request::getInteger( 'period' );//
+        $period     =   Request::getInteger( 'period' );
         $type       =   Request::getString( 'sourcType' );
         $is_page    =   !($type == 'group');
 
@@ -71,7 +71,7 @@ class EntryGetter {
 
         $search = array(
              '_quantityLE'  =>  $quant_max ? $quant_max : 100000000
-            ,'_quantityGE'  =>  $quant_min ? $quant_min : 20000
+            ,'_quantityGE'  =>  $quant_min ? $quant_min : 30000
             ,'limit'        =>  $limit + 1
             ,'offset'       =>  $offset
             ,'sh_in_main'   =>  true
@@ -138,16 +138,18 @@ class EntryGetter {
                 'sourceType'=>  Group::STAT_GROUP
             ));
             $available_groups = ArrayHelper::Collapse($available_groups, 'groupId', false);
-            $available_groups = array_keys( $available_groups );
-            $group_entries_by_entry = GroupEntryFactory::Get(array(
-                'entryId'   =>  $vkPublic->vk_public_id,
-                'sourceType'=>  Group::STAT_GROUP,
-                'groupIdIn' =>  $available_groups
-            ));
-
-            foreach ($group_entries_by_entry as $grupEntry) {
-                $groups_ids[] = $grupEntry->groupId;
+            if ( !empty($available_groups )) {
+                $available_groups = array_keys( $available_groups );
+                $group_entries_by_entry = GroupEntryFactory::Get(array(
+                    'entryId'   =>  $vkPublic->vk_public_id,
+                    'sourceType'=>  Group::STAT_GROUP,
+                    'groupIdIn' =>  $available_groups
+                ));
+                foreach ($group_entries_by_entry as $grupEntry) {
+                    $groups_ids[] = $grupEntry->groupId;
+                }
             }
+
             $result[] =  array(
                 'id'        =>  $vkPublic->vk_public_id,
                 'vk_id'     =>  $vkPublic->vk_id,
@@ -172,13 +174,13 @@ class EntryGetter {
 
     public function get_min_max()
     {
-        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 100' ;
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity >= 30000' ;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
         $ds = $cmd->Execute();
         $ds->Next();
         return array(
-                        'min'  =>   $ds->getValue('min'),
-                        'max'  =>   $ds->getValue('max')
+            'min'  =>   $ds->getValue('min'),
+            'max'  =>   $ds->getValue('max')
         );
     }
 
