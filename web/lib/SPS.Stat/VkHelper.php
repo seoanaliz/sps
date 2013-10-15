@@ -43,6 +43,7 @@
             const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
             const FALSE_COUNTER = 3;
             const TESTING = true;
+            const MEM_TOKENS_KEY = 'serv_access_tokens';
 
             /**
              *id аппа обмена
@@ -152,7 +153,7 @@
 
             public static function get_vk_time( $access_token = '' )
             {
-                return self::api_request( 'getServerTime', array( 'access_token' =>  $access_token ), 0 );
+                return self::api_request( 'getServerTime', array( 'access_token' =>  $access_token ), $throwException = 0 );
             }
 
             public static function multiget( $urls, &$result )
@@ -218,28 +219,57 @@
 
             public static function get_service_access_token( $app_id = self::APP_ID_STATISTICS )
             {
-                $connect =  ConnectionFactory::Get( 'tst' );
-                $count = 0;
-                while( 1 ) {
-                    if( $count++ > 1000 )
-                        throw new Exception ('закончились сервисные токены!');
-                    $sql = 'SELECT access_token
+                $at = json_decode(MemcacheHelper::Get( self::MEM_TOKENS_KEY), $toArray = true );
+                if ( empty( $at )) {
+                    $connect = ConnectionFactory::Get( 'tst' );
+                    $sql = 'SELECT *
                             FROM serv_access_tokens
-                            WHERE active IS TRUE
-                            AND app_id = @app_id
-                            ORDER BY random()
-                            LIMIT 1';
+                            WHERE active IS TRUE';
                     $cmd = new SqlCommand( $sql, $connect );
                     $cmd->SetInt( '@app_id', $app_id );
                     $ds  = $cmd->Execute();
-                    $ds->Next();
-                    $at  = $ds->GetString( 'access_token' );
-                    if ( !$at ) {
-                        throw new Exception ('закончились сервисные токены!');
+                    $at = [];
+                    while( $ds->Next()) {
+                        $at[] = [
+                            'token'         =>  $ds->GetString( 'access_token' ),
+                            'updated_at'    =>  microtime(true),
+                            'app_id'        =>  $ds->GetInteger('app_id'),
+                            'vkId'          =>  $ds->GetInteger('user_id'),
+                        ];
                     }
-                    if ( self::check_at( $at ))
-                        return $at;
+                    MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
+                    sleep(0.2);
+
                 }
+                $tryes = 0;
+                $result_token = null;
+                if ( empty( $at )) {
+                    AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов!');
+                    return false;
+                }
+                while( $tryes < 100 ) {
+                    $now = microtime(true);
+                    foreach( $at as $index => $token ) {
+                        if ( $token['app_id'] == $app_id && ( $now - $token['updated_at'] > 0.3 )) {
+                            $result_token = $token;
+                            break(2);
+                        }
+                    }
+                    sleep(0.03);
+                    $at = json_decode(MemcacheHelper::Get( self::MEM_TOKENS_KEY), $toArray = true);
+                    $tryes ++;
+                }
+
+                if ( $result_token ) {
+                    $at[$index]['updated_at'] = $now;
+                    MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
+                    return $result_token['token'];
+                }
+                Logger::Warning('нету токенов!');
+                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов!');
+
+                return false;
+
             }
 
             public static function get_all_service_tokens()
