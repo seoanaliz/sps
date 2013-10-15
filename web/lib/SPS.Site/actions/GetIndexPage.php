@@ -83,11 +83,11 @@ class GetIndexPage extends BaseControl
             }
         }
 
-//        $availableSourceTypes = $gridTypes = array();
-//        if ( $currentTargetFeedId && isset( $targetFeeds[$currentTargetFeedId])) {
-//            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($targetFeeds[$currentTargetFeedId]);
-//            $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
-//        }
+        $availableSourceTypes = $gridTypes = array();
+        if ( $currentTargetFeedId && isset( $targetFeeds[$currentTargetFeedId])) {
+            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($targetFeeds[$currentTargetFeedId]);
+            $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
+        }
 
         $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
 
