@@ -73,6 +73,7 @@
                 'groups.getById'    => true,
                 'wall.getById'      => true,
                 'photos.getAlbums'  => true,
+                'groups.getMembers' => true
             );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
@@ -235,6 +236,7 @@
                             'updated_at'    =>  microtime(true),
                             'app_id'        =>  $ds->GetInteger('app_id'),
                             'vkId'          =>  $ds->GetInteger('user_id'),
+                            'errors'        =>  0
                         ];
                     }
                     MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
@@ -244,29 +246,40 @@
                 $tryes = 0;
                 $result_token = null;
                 if ( empty( $at )) {
-                    AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов!');
+                    AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов1!');
                     return false;
                 }
                 while( $tryes < 100 ) {
+                    $index_res = null;
                     $now = microtime(true);
-                    foreach( $at as $index => $token ) {
-                        if ( $token['app_id'] == $app_id && ( $now - $token['updated_at'] > 0.3 )) {
+                    foreach( $at as $index => &$token ) {
+                        if ( $token['app_id'] == $app_id && ( $now - $token['updated_at'] > 0.7 ) ) {
                             $result_token = $token;
+                            sleep(0.3);
+                            if ( !self::check_at( $token['token'])) {
+                                sleep(0.3);
+                                $token['updated_at'] = $now;
+                                $token['errors'] ++;
+                                continue;
+                            }
                             break(2);
                         }
                     }
-                    sleep(0.03);
-                    $at = json_decode(MemcacheHelper::Get( self::MEM_TOKENS_KEY), $toArray = true);
+
+                    sleep(0.1);
+                    MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
+                    $at = json_decode( MemcacheHelper::Get( self::MEM_TOKENS_KEY), $toArray = true);
                     $tryes ++;
                 }
 
                 if ( $result_token ) {
                     $at[$index]['updated_at'] = $now;
                     MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
+                    sleep(0.8);
                     return $result_token['token'];
                 }
-                Logger::Warning('нету токенов!');
-                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов!');
+//                Logger::Warning('нету токенов!');
+//                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов2!');
 
                 return false;
 
