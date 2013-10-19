@@ -57,6 +57,7 @@ class PublicsParser
                     $entry->is_page    =  $public->type == 'page' ? true : false;
                     $entry->sh_in_main =  true;
                     $entry->active     =  true;
+                    $entry->inLists = false;
                     $entry->updated_at = DateTimeWrapper::Now()->modify('-1 day');
                     $new_entries[] = $entry;
                 } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {

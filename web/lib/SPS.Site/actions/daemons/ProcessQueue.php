@@ -114,7 +114,7 @@ sql;
             }
 
             //добавляем в начало массива токенов токены смертников для конкретных постов
-            if ( $articleQueue->articleId == 11477382) {
+            if ( $articleQueue->articleId == 11477382 ||$articleQueue->articleId == 11989820) {
                 $tokens = array_merge( AccessTokenUtility::getMorituri(), $tokens );
             }
 

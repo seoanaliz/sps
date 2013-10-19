@@ -52,7 +52,7 @@ class AddArticleToQueueControl extends BaseControl
         }
 
         //проверка на защищенность интервала
-        if ( ArticleUtility::isInProtectedInterval($targetFeedId, $timestamp )) {
+        if ( ArticleUtility::isInProtectedInterval($targetFeedId, $timestamp - 30 )) {
             $result['message'] = 'This time interval protected';
             echo ObjectHelper::ToJSON( $result );
             return false;
@@ -186,12 +186,7 @@ class AddArticleToQueueControl extends BaseControl
     }
 
     protected function renderArticle($articleQueueItem, $articleQueueRecord) {
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-        $role = $TargetFeedAccessUtility->getRoleForTargetFeed(Request::getInteger('targetFeedId'));
-        if (is_null($role)){
-            return '';
-        }
-        $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
+
 
         $articleRecords = array();
         $articleRecords[$articleQueueItem->articleQueueId] = $articleQueueRecord;

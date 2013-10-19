@@ -39,9 +39,7 @@ class setGroup {
             $group_source = Group::STAT_GROUP;
         }
 
-        if ( !GroupsUtility::check_name( $user_id, $group_source, $groupName ))
-            die( ObjectHelper::ToJSON(array('success' => false, 'err_mess' =>  'already exist')));
-
+       
         //если не задан id - создаем группу, задан - обновляем
 
         if ( !$groupId ) {
