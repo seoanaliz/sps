@@ -224,6 +224,7 @@ class AddArticleToQueueControl extends BaseControl
             $now = DateTimeWrapper::Now();
             $grid[$place]['queue'] = $articleQueueItem;
             $grid[$place]['blocked'] = ($articleQueueItem->statusId != 1 || $articleQueueItem->endDate <= $now);
+            $author = $this->getAuthor();
             $grid[$place]['failed'] = ($articleQueueItem->statusId != StatusUtility::Finished && $articleQueueItem->endDate <= $now);
             $gridItem = $grid[$place];
         } else {
