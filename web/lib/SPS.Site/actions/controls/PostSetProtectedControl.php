@@ -39,11 +39,12 @@ class PostSetProtectedControl extends BaseControl {
             if (!$result['success'])
                 $result['message'] = 'Database error';
         } else {
-
             list($hour, $minutes) = explode(':', $time);
             $ts = $articleQueue->startDate->getTimestamp();
             $protectTo = new DateTimeWrapper(null);
-            $protectTo->setTimestamp($ts)->modify('+' . $hour . ' hours')->modify('+' . $minutes . ' minutes');
+            $protectTo->setTimestamp($ts)->modify('+' . $hour . ' hours')
+                ->modify('+' . $minutes . ' minutes')
+                ->modify('-30 seconds');
             if ( $hour > 5 || $protectTo <= $articleQueue->startDate ) {
                 $result['message'] = 'Wrong protect time';
                 die(ObjectHelper::ToJSON($result));

@@ -373,22 +373,33 @@
                             <template>tmpl://vt/navigations/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
-                    <pageGroup name="stat">
-                        <page uri="vt://stat-groups/">
-                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Stat.GetGroupList</actions>
-                            <template>tmpl://vt/stat-groups/index.tmpl.php</template>
-                        </page>
-                        <page uri="vt://stat-groups/add">
-                            <actions>SPS.Stat.SaveGroup</actions>
-                            <template>tmpl://vt/stat-groups/add.tmpl.php</template>
-                        </page>
-                        <page uri="vt://stat-groups/delete/([0-9]+)">
-                            <actions>SPS.Stat.SaveGroup</actions>
-                        </page>
-                        <page uri="vt://stat-groups/edit/([0-9]+)">
-                            <actions>SPS.Stat.SaveGroup</actions>
-                            <template>tmpl://vt/stat-groups/edit.tmpl.php</template>
-                        </page>
+                    <pageGroup name="publics">
+                        <pageGroup name="stat">
+                            <page uri="vt://stat-groups/">
+                                <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Stat.GetGroupList</actions>
+                                <template>tmpl://vt/stat-groups/index.tmpl.php</template>
+                            </page>
+                            <page uri="vt://stat-groups/add">
+                                <actions>SPS.Stat.SaveGroup</actions>
+                                <template>tmpl://vt/stat-groups/add.tmpl.php</template>
+                            </page>
+                            <page uri="vt://stat-groups/delete/([0-9]+)">
+                                <actions>SPS.Stat.SaveGroup</actions>
+                            </page>
+                            <page uri="vt://stat-groups/edit/([0-9]+)">
+                                <actions>SPS.Stat.SaveGroup</actions>
+                                <template>tmpl://vt/stat-groups/edit.tmpl.php</template>
+                            </page>
+                        </pageGroup>
+                        <pageGroup name = "publics-stat">
+                            <page uri="vt://publics-stat/">
+                                <actions>SPS.Stat.GetPublicsStat</actions>
+                                <template>tmpl://vt/publics-stat/index.tmpl.php</template>
+                            </page>
+                            <page uri="controls://get-publics-stat/">
+                                <actions>SPS.Stat.GetPublicsStat</actions>
+                            </page>
+                        </pageGroup>
                     </pageGroup>
                 </pageGroup>
 
@@ -584,7 +595,6 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-
 
                 <pageGroup name="SPS.App">
                     <pageGroup name="author">
