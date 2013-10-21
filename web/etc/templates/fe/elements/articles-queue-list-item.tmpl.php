@@ -74,7 +74,8 @@
         </div>
 
         <?
-        if (!empty($articleQueue->articleAuthor)) {
+        if(isset($author)) {
+        } elseif (!empty($articleQueue->articleAuthor)) {
             $author = $articleQueue->articleAuthor;
         } elseif (!empty($articleQueue->articleQueueCreator)) {
             $author = $articleQueue->articleQueueCreator;
