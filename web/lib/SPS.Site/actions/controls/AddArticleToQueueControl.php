@@ -235,7 +235,7 @@ class AddArticleToQueueControl extends BaseControl
         } else {
             return ''; // ---------------- RETURN
         }
-
+        $articleQueueItem->articleAuthor = $this->getAuthor();
         ob_start();
         include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
         $html = ob_get_clean();

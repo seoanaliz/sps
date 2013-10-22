@@ -74,6 +74,7 @@ class setPostPrice {
 
             die();
 
+            $this->changeArticleForArticleQueue(12072289, 12072322);
 
             die();
             if( MemcacheHelper::Flush()) {
@@ -433,7 +434,7 @@ class setPostPrice {
 
     //оно работает!
     public function changeArticleForArticleQueue( $oldArticleId, $newArticleId) {
-        $sql = 'select * from "articleQueues" where "articleId" = ' . $oldArticleId . ' and "startDate" > now();';
+        $sql = ' select * from "articleQueues" where  "articleId" = 12072289 and extract(dow from "startDate")::int in (4) and "statusId" = 1';
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $ds = $cmd->execute();
 //            $aq->articleId = 11989820;
