@@ -80,8 +80,7 @@
         </div>
 
         <?
-        if(isset($author)) {
-        } elseif (!empty($articleQueue->articleAuthor)) {
+        if (!empty($articleQueue->articleAuthor)) {
             $author = $articleQueue->articleAuthor;
         } elseif (!empty($articleQueue->articleQueueCreator)) {
             $author = $articleQueue->articleQueueCreator;
