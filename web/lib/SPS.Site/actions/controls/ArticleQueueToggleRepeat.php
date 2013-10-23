@@ -138,7 +138,9 @@
             $wasBreak = false;
             $time = new DateTimeWrapper($cellTime->format('H:i:s'));
             foreach ($articlesQueue as $articlesQueueItem) {
-                if ($time == new DateTimeWrapper($articlesQueueItem->startDate->format('H:i:s'))) {
+                if ($time <= (new DateTimeWrapper($articlesQueueItem->startDate->format('H:i:s')))->modify('+3 minute') &&
+                    $time >= new DateTimeWrapper($articlesQueueItem->startDate->format('H:i:s')) 
+		        ){
                     $queuedArticles[]= $articlesQueueItem->startDate->format('j M');
                     $i++;
                     if ($i > 4) {
