@@ -251,7 +251,7 @@ var LeftPanelWidget = Event.extend({
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + postId;
                     var $deleteMessage = $('#' + deleteMessageId);
-                    var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
+                    var isShowIgnoreAllBtn = /^(source)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
                         $deleteMessage.show();
