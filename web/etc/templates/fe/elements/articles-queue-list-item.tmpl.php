@@ -71,12 +71,12 @@
                 <? if ($isRepost) { ?>
                     {increal:tmpl://fe/elements/articles-queue-item-content-repost.tmpl.php}
                 <? } ?>
-                <span class="original">
+            </div>
+               <span class="original" id="to_post" >
                     <? if ($originalId) { ?>
-                            <a href="http://vk.com/wall{$originalId}" target="_blank">Оригинал</a>
+                        <a href="http://vk.com/wall{$originalId}" target="_blank">Оригинал</a>
                     <? } ?>
                 </span>
-            </div>
         </div>
 
         <?

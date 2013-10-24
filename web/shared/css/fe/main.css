@@ -1573,6 +1573,13 @@ i {
 .post.author .name:hover {
   text-decoration: underline;
 }
+
+#to_post{
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+}
+
 .autohide-enabled .post * {
   visibility: hidden;
   opacity: 0;
