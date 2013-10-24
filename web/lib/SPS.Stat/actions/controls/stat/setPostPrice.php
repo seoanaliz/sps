@@ -18,6 +18,65 @@ class setPostPrice {
             header('Content-Type: text/html; charset=utf-8');
             set_time_limit(1000);
 
+            $search = array(
+                 '_quantityLE'  =>  100000000
+                ,'_quantityGE'  =>  30000
+                ,'sh_in_main'   =>  true
+                ,'is_page'      =>  true
+                ,'active'       =>  true
+            );
+            $publics = VkPublicFactory::Get($search,[BaseFactory::WithoutPages=>true, BaseFactory::WithColumns => 'vk_id']);
+            $publics = ArrayHelper::Collapse($publics, 'vk_id', false);
+            $publicsIds = array_keys($publics);
+
+            $sliced_walls_array = array_chunk( $publicsIds, 25 );
+            $filter = '';
+            $access_token = false;
+            $global_res = [];
+            foreach( $sliced_walls_array as $chunk ) {
+                $code = '';
+                $return = "return{";
+                $i = 0;
+                foreach( $chunk as $public ) {
+                    $id = trim( $public );
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 1' . $filter . ' });';
+                    $return .=  "\"id$id\":id$id,";
+                    $i++;
+                }
+                $code .= trim( $return, ',' ) . "};";
+                $params = array( 'code' => $code );
+                if ( $access_token ) {
+                    $params['access_token'] = $access_token;
+                }
+                $res   = VkHelper::api_request( 'execute', $params, 0 );
+                if( isset( $res->error ))
+                    continue;
+                foreach( $res as $id => $content ) {
+                    $global_res[$id] = $content[0];
+                }
+
+            }
+
+            arsort($a);
+            $i = 0;
+            $res = [];
+            foreach($a as $k => $v) {
+                $i++;
+                $id = ltrim( $k, 'id');
+                $resss[$id] = $v;
+                if($i > 8) break;
+            }
+            $res  = VkHelper::api_request('groups.getById', ['group_ids' => array_keys($resss)]);
+            foreach( $res as $public)
+                $public->postsq = $resss[$public->gid];
+            foreach($res as $ddfd)
+                echo $ddfd->name,' http://vk.com/club', $ddfd->gid, ' постов:',$ddfd->postsq,'<br>';
+
+            die();
+
+            $this->changeArticleForArticleQueue(12072289, 12072322);
+
+            die();
             if( MemcacheHelper::Flush()) {
                 print_r( MemcacheHelper::Get('accessToken') );
                 echo 1;
@@ -375,7 +434,7 @@ class setPostPrice {
 
     //оно работает!
     public function changeArticleForArticleQueue( $oldArticleId, $newArticleId) {
-        $sql = 'select * from "articleQueues" where "articleId" = ' . $oldArticleId . ' and "startDate" > now();';
+        $sql = ' select * from "articleQueues" where  "articleId" = 12072289 and extract(dow from "startDate")::int in (4) and "statusId" = 1';
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $ds = $cmd->execute();
 //            $aq->articleId = 11989820;

@@ -10,8 +10,8 @@ Package::Load( 'SPS.VK' );
 class GetPublicsStatControl {
 
     //чайников
-    const   USER_LOGIN          = 'akalie@list.ru';#"79502274097";
-    const   USER_PASS           = 'weH@veReturn';#"hghgY&76&F#$";
+    const   USER_LOGIN          = "79523825768";
+    const   USER_PASS           = "gprsforyou";
     const   StatPage            = "http://vk.com/stats?gid=";
     const   StatReachPage       = "http://vk.com/stats?act=reach&gid=";
     const   StatActivityPage    = "http://vk.com/stats?act=activity&gid=";
@@ -23,7 +23,7 @@ class GetPublicsStatControl {
     private $to;
     private $today;
 
-    #стата - список пабликов
+    //стата - список пабликов
     private $samorost_publics_array = array(
          36959676
         ,35806721
@@ -79,6 +79,7 @@ class GetPublicsStatControl {
     );
 
     private $publics_for_barter = array(
+
           36959676
         , 43503725
         , 35806721
@@ -131,15 +132,15 @@ class GetPublicsStatControl {
         , 43503298
         , 43503235
     );
-    #стата - пердполагаемый саморост пабликов
+    //стата - пердполагаемый саморост пабликов
     private $samorost = array(
     );
 
-    #массив регулярок для парса страниц
+    //массив регулярок для парса страниц
     private $preg_array = array(
         'members_lost'      =>  '/"Members lost",(.*?\:\[\[.*?]])/',
         'members_growth'    =>  '/f":1,"name":"New members".*?("d"\:\[\[.*?]])/',
-        'vidget_members'    =>  '/{"name":"New members","l".*?,("d".*?]])/',
+        #'vidget_members'    =>  '/{"name":"New members","l".*?,("d".*?]])/', // не во всех пабликах есть, нафиг его
         'unique_visitors'   =>  '/unique visitors.*?,("d".*?]])/',
         'views'             =>  '/Pageviews.*?,("d".*?]])/',
         'full_coverage'     =>  '/Full coverage.*?,("d".*?]])/',
@@ -152,6 +153,7 @@ class GetPublicsStatControl {
         'reposts'           =>  '/{"name":"Share".*?,("d".*?]])/',
     );
 
+    //массив возможных выборок статы
     private $meth_array = array(
         'barter'            =>  array( 'members_growth' ),
         'reach'             =>  array( 'full_coverage', 'followers_coverage', 'unique_visitors' ),
@@ -170,8 +172,9 @@ class GetPublicsStatControl {
         $methods_num = array_keys($this->meth_array);
         Response::setArray('methods', $methods_num);
 
-        if ( Request::getString('action') != 'updateStata') {
-
+        if ( Request::getString('action') == 'updateStata') {
+            $this->get_cookies();
+            $this->get_all_pages();
             die();
         }
         if ( Request::getString('action') != 'add') {
@@ -191,7 +194,7 @@ class GetPublicsStatControl {
             return;
         }
 
-        $this->get_cookies();
+
         $method     = $methods_num[$method];
         $this->to   = $to->format('U');
         $this->from = $from->format('U');
@@ -207,13 +210,9 @@ class GetPublicsStatControl {
             $page = '';
             $page = $this->get_page($public_id);
             foreach( $this->meth_array[$method] as $field ) {
-                $values = array();
-                preg_match( $this->preg_array[$field], $page, $values );
-                $values = json_decode( '{' . $values[1] . '}' )->d;
+                $values = $page[$field];
                 $result[$public_id][$field] = $this->key_maker_mk2( $values, $sub );
             }
-;
-            sleep( self::PAUSE );
         }
 
         $public_count = count( $this->samorost_publics_array );
@@ -253,8 +252,7 @@ class GetPublicsStatControl {
     public  function form_excel_file($method, $from, $to, $data)
     {
         $to = $to->sub( new DateInterval('P1D'));
-
-        include_once 'C:/work/classes/PHPExcel.php';
+//        include_once('C:\work\sps\sps\web\lib\SPS.Stat\PHPExcel.php');
         $pExcel = new PHPExcel();
         $pExcel->setActiveSheetIndex(0);
         $aSheet = $pExcel->getActiveSheet();
@@ -375,13 +373,39 @@ class GetPublicsStatControl {
             unlink($yFilename);
 
         if ( file_exists( $filename ) || filesize($filename) > 100 ) {
-            return file_get_contents($filename);
+            return json_decode( file_get_contents($filename), $assoc = true);
         } else {
-            $page  = VkHelper::connect( self::StatPage . $publicId, $this->cookies );
-            $page .= VkHelper::connect( self::StatReachPage . $publicId, $this->cookies );
-            $page .= VkHelper::connect( self::StatActivityPage . $publicId, $this->cookies );
-            file_put_contents($filename, $page);
-            return $page;
+            if ( !$this->cookies ) {
+                $this->cookies = $this->get_cookies();
+            }
+            $tryes = 0;
+            $result = [];
+            while( $tryes < 4) {
+                $tryes ++;
+                try {
+                    $page  = VkHelper::connect( self::StatPage . $publicId, $this->cookies );
+                    $page .= VkHelper::connect( self::StatReachPage . $publicId, $this->cookies );
+                    $page .= VkHelper::connect( self::StatActivityPage . $publicId, $this->cookies );
+                    #file_put_contents( $filename.'2131', $page);
+                    foreach( $this->preg_array as $name => $pattern ) {
+                        $values = [];
+                        if ( !preg_match( $pattern, $page, $values ))
+                            throw new Exception('cant find pattern! ' . $pattern . '<br>' . 'in ' . $publicId);
+                        $values = json_decode( '{' . $values[1] . '}' )->d;
+                        $result[$name] = $values;
+                    }
+                    #file_put_contents( $filename.'21312', $result);
+                    unset($name);
+                    unset($pattern);
+                    file_put_contents( $filename, json_encode($result));
+                    return $result;
+                } catch (Exception $e ) {
+                    print_r($e->getMessage());
+                    $page = '';
+                    sleep(0.4);
+                    die();
+                }
+            }
         }
     }
 
