@@ -34,7 +34,7 @@ html {
 }
 #main .left-column > .content .list-head .item .filter {
   padding: 5px;
-  width: 200px;
+  width: 190px;
   margin-left: 10px;
 }
 #main .left-column > .content .list-head .item .filter.loading {
@@ -107,7 +107,7 @@ html {
 #main .left-column > .content #results .item.public,
 #main .left-column > .content #results .column.public {
   text-align: left;
-  width: 200px;
+  width: 190px;
 }
 #main .left-column > .content .list-head .item.action,
 #main .left-column > .content .list-head .column.action,
