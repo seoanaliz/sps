@@ -59,10 +59,12 @@ class PublicsParser
                     $entry->inLists = false;
                     $entry->updated_at = DateTimeWrapper::Now()->modify('-1 day');
                     $new_entries[] = $entry;
+                    echo 'add http://vk.com/club' . $public->gid . '<br>';
                 } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {
-                    $check->quantity = $public->members_count;
-                    $check->active   =  true;
-                    VkPublicFactory::Update($check);
+                    $pub = VkPublicFactory::Get(['vk_id' => $public->gid]);
+                    $pub->quantity = $public->members_count;
+                    $pub->active   =  true;
+                    VkPublicFactory::Update($pub);
                     $update_entries++;
                 }
             }
