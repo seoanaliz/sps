@@ -61,7 +61,7 @@ class PublicsParser
                     $new_entries[] = $entry;
                     echo 'add http://vk.com/club' . $public->gid . '<br>';
                 } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {
-                    $pub = VkPublicFactory::Get(['vk_id' => $public->gid]);
+                    $pub = VkPublicFactory::GetOne(['vk_id' => $public->gid]);
                     $pub->quantity = $public->members_count;
                     $pub->active   =  true;
                     VkPublicFactory::Update($pub);
