@@ -194,6 +194,10 @@ class GetPublicsStatControl {
             return;
         }
 
+        if ( $to < $from ) {
+            echo('wrong time');
+            return;
+        }
 
         $method     = $methods_num[$method];
         $this->to   = $to->format('U');
@@ -256,22 +260,24 @@ class GetPublicsStatControl {
         $pExcel = new PHPExcel();
         $pExcel->setActiveSheetIndex(0);
         $aSheet = $pExcel->getActiveSheet();
-        $aSheet->setTitle('Первый лист');
+        $aSheet->setTitle($method);
 
-        $cell = $aSheet->getCellByColumnAndRow( 0, 1);
+        $cell = $aSheet->getCellByColumnAndRow( 0, 1 );
         $cell->setValue( 'паблик' );
-        $cell = $aSheet->getCellByColumnAndRow( 1, 1);
+        $cell = $aSheet->getCellByColumnAndRow( 1, 1 );
         $second_colum  = $method == 'barter' ? '' : 'раздел';
         if ($second_colum) {
             $cell->setValue( $second_colum );
         }
         $filename = $method . ' ' . $from->format('d-m-Y') . ' to ' . $to->format('d-m-Y') . '.xls';
-        $i = $from->format('d');
 
+        $date = new DateTimeWrapper($from->format('d-m-Y'));
+        //проставляем даты
         $column = 2;
         foreach( $this->grid as $element ) {
             $cell = $aSheet->getCellByColumnAndRow( $column++, 1);
-            $cell->setValue( $i++ );
+            $cell->setValue( $date->format('d'));
+            $date->modify('+1 day');
         }
         $row_number = 2;
 
