@@ -60,7 +60,7 @@ class PublicsParser
                     $entry->updated_at = DateTimeWrapper::Now()->modify('-1 day');
                     $new_entries[] = $entry;
                     echo 'add http://vk.com/club' . $public->gid . '<br>';
-                } elseif ( $check && $check->quantity < self::LIMIT && $public->members_count > self::LIMIT) {
+                } elseif ( $check && $this->base_publics[$public->gid] < self::LIMIT && $public->members_count > self::LIMIT) {
                     $pub = VkPublicFactory::GetOne(['vk_id' => $public->gid]);
                     $pub->quantity = $public->members_count;
                     $pub->active   =  true;
@@ -117,11 +117,11 @@ class PublicsParser
     public function set_base_publics( ) {
         if ( empty($this->base_publics)) {
             $result = [];
-            $sql = 'select vk_id from stat_publics_50k';
+            $sql = 'select vk_id, quantity from stat_publics_50k';
             $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
             $ds = $cmd->Execute();
             while( $ds->Next()) {
-                $result[$ds->GetInteger('vk_id')] = true;
+                $result[$ds->GetInteger('vk_id')] = $ds->GetInteger('quantity');
             }
             $this->base_publics = $result;
         }
