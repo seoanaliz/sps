@@ -39,7 +39,6 @@ class PostSetProtectedControl extends BaseControl {
             if (!$result['success'])
                 $result['message'] = 'Database error';
         } else {
-
             list($hour, $minutes) = explode(':', $time);
             $ts = $articleQueue->startDate->getTimestamp();
             $protectTo = new DateTimeWrapper(null);

@@ -205,6 +205,9 @@
         <addTitle><![CDATA[Добавление ленты отправки]]></addTitle>
         <editTitle><![CDATA[Редактирование ленты отправки]]></editTitle>
       </targetFeed>
+      <publics-stat>
+        <main><![CDATA[Получение статы]]></main>
+      </publics-stat>
       <article>
         <list><![CDATA[Список статей]]></list>
         <addTitle><![CDATA[Добавление статьи]]></addTitle>
@@ -313,6 +316,7 @@
       <editors><![CDATA[Админы]]></editors>
       <stat><![CDATA[Stat]]></stat>
       <statGroups><![CDATA[Слаги]]></statGroups>
+      <publics-stat><![CDATA[Статистика по пабликам]]></publics-stat>
     </menu>
     <metaDetail>
       <deleteString><![CDATA[Вы действительно хотите удалить параметр ссылки?]]></deleteString>
@@ -404,6 +408,12 @@
       <type><![CDATA[Тип]]></type>
       <params><![CDATA[params]]></params>
     </targetFeed>
+    <publics-stat>
+        <from><![CDATA[С]]></from>
+        <to><![CDATA[по]]></to>
+        <method><![CDATA[Какую стату получаем]]></method>
+        <get-stat><![CDATA[Скачать]]></get-stat>
+    </publics-stat>
     <article>
       <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>
       <header><![CDATA[статьи]]></header>

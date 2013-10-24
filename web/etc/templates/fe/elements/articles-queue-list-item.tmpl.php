@@ -36,6 +36,7 @@
         $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
         $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
         $isRepost = false;
+        $originalId = $articleQueue->externalId;
 
         if ($articleRecord->repostArticleRecordId && isset($repostArticleRecords[$articleRecord->repostArticleRecordId])) {
             $isRepost = true;
@@ -70,12 +71,16 @@
                 <? if ($isRepost) { ?>
                     {increal:tmpl://fe/elements/articles-queue-item-content-repost.tmpl.php}
                 <? } ?>
+                <span class="original">
+                    <? if ($originalId) { ?>
+                            <a href="http://vk.com/wall{$originalId}" target="_blank">Оригинал</a>
+                    <? } ?>
+                </span>
             </div>
         </div>
 
         <?
-        if(isset($author)) {
-        } elseif (!empty($articleQueue->articleAuthor)) {
+        if (!empty($articleQueue->articleAuthor)) {
             $author = $articleQueue->articleAuthor;
         } elseif (!empty($articleQueue->articleQueueCreator)) {
             $author = $articleQueue->articleQueueCreator;
