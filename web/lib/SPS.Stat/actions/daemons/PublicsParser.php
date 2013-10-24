@@ -14,11 +14,13 @@ class PublicsParser
     const PUBLICS_PER_REQUEST  = 500;
     const PAUSE = 0.4;
     private $current_public;
+    private $base_publics = [];
 
     public function execute() {
         set_time_limit(240);
         $i = 0;
         echo 'Начинаем с: ', $this->current_public, '<br>';
+        $this->set_base_publics();
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             if ( $this->current_public > 69000000 ) {
@@ -42,10 +44,7 @@ class PublicsParser
                 if ( !isset( $public->type) || !isset( $public->members_count ) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
 
-
-
-                $check = VkPublicFactory::GetOne( array( 'vk_id' => $public->gid ));
-
+                $check = isset($this->base_publics[$public->gid]);
                 if ( $public->members_count > self::LIMIT && !$check )  {
                     $entry = new VkPublic();
                     $entry->vk_id = $public->gid;
@@ -111,5 +110,18 @@ class PublicsParser
         $cmd->SetInt( '@current_public', $current_public );
         $cmd->SetInt( '@max_public', $max_public);
         $cmd->Execute();
+    }
+
+    public function set_base_publics( ) {
+        if ( empty($this->base_publics)) {
+            $result = [];
+            $sql = 'select vk_id from stat_publics_50k';
+            $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
+            $ds = $cmd->Execute();
+            while( $ds->Next()) {
+                $result[$ds->GetInteger('vk_id')] = true;
+            }
+            $this->base_publics = $result;
+        }
     }
 }
