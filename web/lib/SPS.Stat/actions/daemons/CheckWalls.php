@@ -95,7 +95,7 @@ class CheckWalls
         foreach( $this->monitoring_array as $public_id ) {
             $post = $walls[ $public_id ][1];
             if ( isset($post->id)) {
-                $post_text = isset($post->text) ?$post_text : '';
+                $post_text = isset($post->text) ? $post->text : '';
                 $this->save_post( $public_id, $post->id,  $post_text );
             }
         }
