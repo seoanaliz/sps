@@ -38,7 +38,7 @@ class CheckWalls
     public function Execute()
     {
 //        error_reporting(0);
-        set_time_limit( 0 );
+        set_time_limit( 1000 );
 
         $this->get_mentions();
         $this->get_existing_external_ids();
@@ -107,6 +107,8 @@ class CheckWalls
 
             //заносим отсутствующие в sb посты в sb
             $this->add_posts_to_sb_queue( $walls[$public_id], $our_publics[$public_id]['sb_id'] );
+            if ( !isset( $walls_postponed[ $public_id ][1] ))
+                continue;
             $this->add_posts_to_sb_queue( $walls_postponed[$public_id], $our_publics[$public_id]['sb_id'] );
         }
 
@@ -474,7 +476,6 @@ sql;
 
         try {
             $converted_posts = ParserVkontakte::post_conv( $posts );
-
         } catch (Exception $e) {
             return false;
         }

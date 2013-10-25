@@ -73,6 +73,7 @@
                 'groups.getById'    => true,
                 'wall.getById'      => true,
                 'photos.getAlbums'  => true,
+                'groups.getMembers' => true
             );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
@@ -235,6 +236,7 @@
                             'updated_at'    =>  microtime(true),
                             'app_id'        =>  $ds->GetInteger('app_id'),
                             'vkId'          =>  $ds->GetInteger('user_id'),
+                            'errors'        =>  0
                         ];
                     }
                     MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
@@ -244,29 +246,40 @@
                 $tryes = 0;
                 $result_token = null;
                 if ( empty( $at )) {
-                    AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов!');
+                    AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов1!');
                     return false;
                 }
                 while( $tryes < 100 ) {
+                    $index_res = null;
                     $now = microtime(true);
-                    foreach( $at as $index => $token ) {
-                        if ( $token['app_id'] == $app_id && ( $now - $token['updated_at'] > 0.3 )) {
+                    foreach( $at as $index => &$token ) {
+                        if ( $token['app_id'] == $app_id && ( $now - $token['updated_at'] > 0.7 ) ) {
                             $result_token = $token;
+                            sleep(0.3);
+                            if ( !self::check_at( $token['token'])) {
+                                sleep(0.3);
+                                $token['updated_at'] = $now;
+                                $token['errors'] ++;
+                                continue;
+                            }
                             break(2);
                         }
                     }
-                    sleep(0.03);
-                    $at = json_decode(MemcacheHelper::Get( self::MEM_TOKENS_KEY), $toArray = true);
+
+                    sleep(0.1);
+                    MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
+                    $at = json_decode( MemcacheHelper::Get( self::MEM_TOKENS_KEY), $toArray = true);
                     $tryes ++;
                 }
 
                 if ( $result_token ) {
                     $at[$index]['updated_at'] = $now;
                     MemcacheHelper::Set( self::MEM_TOKENS_KEY, ObjectHelper::ToJSON( $at ));
+                    sleep(0.8);
                     return $result_token['token'];
                 }
-                Logger::Warning('нету токенов!');
-                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов!');
+//                Logger::Warning('нету токенов!');
+//                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов2!');
 
                 return false;
 
@@ -319,17 +332,17 @@
                 $cmd->Execute();
             }
 
-            public static function connect( $link, $cookie=null, $post=null, $includeHeader = true)
+            public static function connect( $link, $cookie = null, $post = null, $includeHeader = true, $returnRedirect = false)
             {
                 $ch = curl_init();
 
                 curl_setopt( $ch, CURLOPT_URL, $link );
                 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-                curl_setopt( $ch, CURLOPT_TIMEOUT, 0 );
+                curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
                 if ($includeHeader) {
                     curl_setopt( $ch, CURLOPT_HEADER, 1 );
                 }
-                curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
+                curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
                 curl_setopt($ch, CURLOPT_USERAGENT,
                     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17');
                 if( $cookie !== null )
@@ -340,6 +353,11 @@
                     curl_setopt( $ch, CURLOPT_POSTFIELDS, $post );
                 }
                 $res = curl_exec( $ch );
+                if (curl_errno($ch)) {
+                    echo "<br>error in curl: ". curl_error($ch) ."<br>";
+                    return 'error in curl: '. curl_error($ch);
+                }
+//                $headers = curl_getinfo($ch);
                 curl_close( $ch );
                 return $res;
             }
@@ -352,10 +370,6 @@
                     $pass  = self::$serv_bots[0]['pass'];
                 }
                 $res = self::connect("http://login.vk.com/?act=login&email=$login&pass=$pass");
-                if( !preg_match("/hash=([a-z0-9]{1,32})/", $res, $hash )) {
-                    return false;
-                }
-                $res = self::connect("http://vk.com/login.php?act=slogin&hash=" . $hash[1] );
                 if( preg_match( "/remixsid=(.*?);/", $res, $sid ))
                     return "remixchk=5; remixsid=$sid[1]";
                 return false;

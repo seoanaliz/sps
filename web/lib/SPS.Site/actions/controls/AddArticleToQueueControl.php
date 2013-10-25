@@ -52,7 +52,7 @@ class AddArticleToQueueControl extends BaseControl
         }
 
         //проверка на защищенность интервала
-        if ( ArticleUtility::isInProtectedInterval($targetFeedId, $timestamp )) {
+        if ( ArticleUtility::isInProtectedInterval($targetFeedId, $timestamp - 30 )) {
             $result['message'] = 'This time interval protected';
             echo ObjectHelper::ToJSON( $result );
             return false;
@@ -185,6 +185,11 @@ class AddArticleToQueueControl extends BaseControl
         echo ObjectHelper::ToJSON($result);
     }
 
+    /**
+     * @param $articleQueueItem ArticleQueue
+     * @param $articleQueueRecord ArticleRecord
+     * @return string
+     */
     protected function renderArticle($articleQueueItem, $articleQueueRecord) {
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $role = $TargetFeedAccessUtility->getRoleForTargetFeed(Request::getInteger('targetFeedId'));
@@ -193,6 +198,7 @@ class AddArticleToQueueControl extends BaseControl
         }
         $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
 
+        $articleQueueItem->articleAuthor = $this->getAuthor();
         $articleRecords = array();
         $articleRecords[$articleQueueItem->articleQueueId] = $articleQueueRecord;
         $articlesQueue = array();
@@ -224,13 +230,12 @@ class AddArticleToQueueControl extends BaseControl
             $now = DateTimeWrapper::Now();
             $grid[$place]['queue'] = $articleQueueItem;
             $grid[$place]['blocked'] = ($articleQueueItem->statusId != 1 || $articleQueueItem->endDate <= $now);
-            $author = $this->getAuthor();
             $grid[$place]['failed'] = ($articleQueueItem->statusId != StatusUtility::Finished && $articleQueueItem->endDate <= $now);
             $gridItem = $grid[$place];
         } else {
             return ''; // ---------------- RETURN
         }
-
+        $articleQueueItem->articleAuthor = $this->getAuthor();
         ob_start();
         include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
         $html = ob_get_clean();
