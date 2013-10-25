@@ -3,8 +3,7 @@
  * 474993341.08c5c6e.98d7f8e316574e7aa5452112007f6d03
  * https://instagram.com/oauth/authorize/?client_id=08c5c6e715ed4299bd336fe268bdd888&redirect_uri=http://www.akalie.0fees.net/insta.php&response_type=token
  */
-class
-InstagramHelper
+class InstagramHelper
 {
     const INST_API_URL  = 'https://api.instagram.com/v1/';
     const TOKEN         = '474993341.08c5c6e.98d7f8e316574e7aa5452112007f6d03';
@@ -63,7 +62,7 @@ InstagramHelper
         $res = json_decode( $res );
         if( $res->meta->code != self::SUCCESS_CODE ) {
             throw new Exception( 'Error in ' . $method . ' on params ' . json_encode($params) .
-                                 ', error: ' . $res );
+                                 ', error: ' . json_encode( $res ));
         } else {
             return $res->data;
         }
