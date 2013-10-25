@@ -93,6 +93,8 @@ class CheckWalls
         $ids_array = array_unique( $ids_array );
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $this->monitoring_array as $public_id ) {
+            if( !isset($walls[ $public_id ]))
+                continue;
             $post = $walls[ $public_id ][1];
             if ( isset($post->id)) {
                 $post_text = isset($post->text) ? $post->text : '';
