@@ -256,7 +256,6 @@ class GetPublicsStatControl {
     public  function form_excel_file($method, $from, $to, $data)
     {
         $to = $to->sub( new DateInterval('P1D'));
-//        include_once('C:\work\sps\sps\web\lib\SPS.Stat\PHPExcel.php');
         $pExcel = new PHPExcel();
         $pExcel->setActiveSheetIndex(0);
         $aSheet = $pExcel->getActiveSheet();
@@ -367,8 +366,11 @@ class GetPublicsStatControl {
                 }
             }
         }
-        $total_sums_for_publics = array_reverse( $total_sums_for_publics );
-        print_r($total_sums_for_publics);
+        foreach( $total_sums_for_publics as $month => $row) {
+            echo 'in ' . date('F', mktime(0, 0, 0, $month, 1, 2000))
+                . ' followers coverage is ' . $row['followers_coverage'] . ', '
+                . 'and ' . $row['reposts'] . ' reposts<br>';
+        }
         die();
     }
 
