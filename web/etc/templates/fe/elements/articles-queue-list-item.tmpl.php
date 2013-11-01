@@ -37,6 +37,8 @@
         $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
         $isRepost = false;
         $originalId = $articleQueue->externalId;
+        //отложенный ли пост. если да - у него будем показывать элементы в хедере
+        $isPostponed = ( $articleQueue->statusId == StatusUtility:: Finished && $articleQueue->startDate > DateTimeWrapper::Now());
 
         if ($articleRecord->repostArticleRecordId && isset($repostArticleRecords[$articleRecord->repostArticleRecordId])) {
             $isRepost = true;
@@ -58,7 +60,10 @@
                     <span class="locked-trigger <?= $protectTo ? 'visible': '' ?>"></span>
                     <span class="edit-trigger"></span>
                     <span class="delete"></span>
-                <? } ?>
+                <? } elseif ( $isPostponed && $canEditQueue ) {?>
+                    <span class="time-of-lock unlock"><?= $protectTo ? $protectTo: '' ?></span>
+                    <span class="locked-trigger unlock<?= $protectTo ? 'visible': '' ?>"></span>
+                <?}?>
             </div>
         <? } ?>
         <div class="post movable

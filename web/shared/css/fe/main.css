@@ -20,6 +20,9 @@ body {
 .clear {
   clear: both;
 }
+.unlock{
+    pointer-events: all
+}
 .hidden {
   display: none;
 }

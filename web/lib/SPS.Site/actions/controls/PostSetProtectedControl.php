@@ -28,13 +28,16 @@ class PostSetProtectedControl extends BaseControl {
             $result['message'] = 'Database error';
             die( ObjectHelper::ToJSON($result));
         }
-        if (false) {#(!$TargetFeedAccessUtility->canCreatePlanDeletePost($articleQueue->targetFeedId)) {
+
+        //проверим права доступа юзера
+        if (!$TargetFeedAccessUtility->canCreatePlanDeletePost($articleQueue->targetFeedId)) {
             $result['success'] = false;
             $result['message'] = 'Access Denied';
             die(ObjectHelper::ToJSON($result));
         }
 
         if ($time == '00:00') {
+            //убираем защиту
             $result['success'] = $this->removeProtection($articleQueue);
             if (!$result['success'])
                 $result['message'] = 'Database error';
@@ -65,10 +68,17 @@ class PostSetProtectedControl extends BaseControl {
             ArticleUtility::setAQStatus($articleQueue->startDate, $protectTo, StatusUtility::Finished, $articleQueue->targetFeedId );
 
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId);
+            $skipPostIds = [];
+            // если у поста уже есть id - значит, он может быть отложенным, и его двигать не надо
+            if ( !empty( $articleQueue->externalId )) {
+                $skipPostIds[] = $articleQueue->externalId;
+            }
+
             $this->clearVkPostponed(
                 $targetFeed,
                 $articleQueue->startDate->format('U'),
-                $protectTo->format('U')
+                $protectTo->format('U'),
+                $skipPostIds
             );
 
             $result['success'] = true;
@@ -95,29 +105,32 @@ class PostSetProtectedControl extends BaseControl {
     }
 
     /** @var $targetFeed TargetFeed */
-    public function clearVkPostponed( $targetFeed, $fromTs, $toTs ) {
+    public function clearVkPostponed( $targetFeed, $fromTs, $toTs, $skipPostIds = [] ) {
         $author = $this->getAuthor();
         $tokens = AccessTokenUtility::getTokens( $author->vkId, $targetFeed);
         $params = array(
             'owner_id'  =>  '-' . $targetFeed->externalId,
             'filter'    =>  'postponed',
-            'count'     =>  50
+            'count'     =>  50,
+            'v'         =>  '5.2'
         );
         $postponedPosts  = array();
         foreach( $tokens as $token )  {
-            try{
+            try {
                 $params['access_token'] = $token->accessToken;
                 $postponedPosts = VkHelper::api_request( 'wall.get', $params );
                 break;
             } catch( Exception $e ) {
-                //print_r($e->getMessage());
             }
         }
         $postsForDelete = array();
-        /* выбираем посты для сдвига, проверяем, свободно ли место под эти посты,если нет - двигаем и эти  */
+        // выбираем посты для сдвига, проверяем, свободно ли место под эти посты,если нет - двигаем и эти
         $counter = 0;
-        foreach ( $postponedPosts as $post ) {
-            if (!isset($post->date) || !($fromTs <= $post->date && $post->date <= $toTs + $counter * self::INTERVAL_BETWEEN_MOVED_POSTS )) {
+        foreach ( $postponedPosts->items as $post ) {
+            if (!isset($post->date) ||
+                !($fromTs <= $post->date && $post->date <= $toTs + $counter * self::INTERVAL_BETWEEN_MOVED_POSTS ) || //лежит ли в интервале проверки
+                in_array( $skipPostIds, $post->to_id . '_' . $post->id) //нужно ли двигать пост с этим id
+            ) {
                 continue;
             }
 
