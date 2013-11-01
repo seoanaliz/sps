@@ -671,7 +671,7 @@ i {
   border-bottom: 1px solid #dddddd;
 }
 .right-panel .items .slot.ui-state-hover {
-  background: #e9eff2;
+  background: #c1ccda;
   -webkit-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
   box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
