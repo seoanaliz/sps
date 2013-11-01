@@ -515,6 +515,8 @@ sql;
             $conn->begin();
 
             $articleQueue = ParserVkontakte::get_articleQueue_from_article( $post, $postDate, $targeetFeedId );
+            $articleQueue->addedFrom = ($postDate >  $now) ? ArticleUtility::QueueSourceVkPostponed : ArticleUtility::QueueSourceVk;
+
             ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true) );
             $articleRecord->articleQueueId = $articleQueue->articleQueueId;
             $this->make_grids( $targeetFeedId, $postDate );

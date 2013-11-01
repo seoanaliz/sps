@@ -17,6 +17,12 @@
 
         const PostsPer7HourByUser = 40;
 
+        const QueueSourceSb       = 'sb';
+
+        const QueueSourceVk       = 'vk';
+
+        const QueueSourceVkPostponed = 'vk_postponed';
+
         public static function IsTopArticleWithSmallPhoto(SourceFeed $sourceFeed, ArticleRecord $articleRecord) {
             if (!empty($articleRecord->photos) && count($articleRecord->photos) == 1 && SourceFeedUtility::IsTopFeed($sourceFeed)) {
                 $photoItem = current($articleRecord->photos);
