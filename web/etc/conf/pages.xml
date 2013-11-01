@@ -396,9 +396,6 @@
                                 <actions>SPS.Stat.GetPublicsStat</actions>
                                 <template>tmpl://vt/publics-stat/index.tmpl.php</template>
                             </page>
-                            <page uri="controls://get-publics-stat/">
-                                <actions>SPS.Stat.GetPublicsStat</actions>
-                            </page>
                         </pageGroup>
                     </pageGroup>
                 </pageGroup>
@@ -662,6 +659,9 @@
             </pageGroup>
 
             <pageGroup name="daemons" boot="">
+                <page uri="controls://get-publics-stat/">
+                    <actions>SPS.Stat.GetPublicsStat</actions>
+                </page>
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
