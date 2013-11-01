@@ -133,6 +133,7 @@ class AddArticleToQueueControl extends BaseControl
         $ArticleQueue->collectLikes = true;
         $ArticleQueue->deleteAt = null;
         $ArticleQueue->statusId = 1;
+        $ArticleQueue->addedFrom = ArticleUtility::QueueSourceSb;
 
         $articleQueueRecord = clone $articleRecord;
         $articleQueueRecord->articleRecordId = null;
