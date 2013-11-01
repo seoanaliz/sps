@@ -9,7 +9,7 @@
 
         /** in seconds*/
 
-        const TimeBeetwenPosts   =  269;
+        const TimeBeetwenPosts   =  269;//seconds
 
         const PostsPerDayInFeed  =  150;
 
@@ -85,11 +85,12 @@
             $intervalTime = new DateTimeWrapper(date('r', $newPostTimestamp));
             $from = new DateTimeWrapper(date('r', $newPostTimestamp));
             $from->modify( '- ' . self::TimeBeetwenPosts . ' seconds');
-            $search = array(
+            $search = [
                 'targetFeedId'  =>  $targetFeedId,
                 'startDateFrom' =>  $from,
-                'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . ' seconds')
-            );
+                'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . ' seconds'),
+                'addedFrom'     =>  ArticleUtility::QueueSourceSb
+            ];
             //удаляем из проверки сам пост
             if( $articleQueueId ) {
                 $search['articleQueueIdNE'] = $articleQueueId;
@@ -193,7 +194,7 @@
             $search = array(
                 'startDateTo'   =>  $newPostTime,
                 'protectToGE'   =>  $newPostTime,
-                'targetFeedId'  =>  $targetFeedId,
+                'targetFeedId'  =>  $targetFeedId
             );
             if ( $queueId ) {
                 $search['articleQueueIdNE'] = $queueId;
