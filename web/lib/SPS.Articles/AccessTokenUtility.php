@@ -112,4 +112,19 @@
             return $result;
         }
 
+        //возвращает массив токенов-смертников, для хардкорной рекламы, рандомная сортировка
+        public static function getMorituri() {
+            $morituriVkIDs = [
+                226707769,
+                226709432,
+                226735542,
+                226736927,
+                226738407,
+                226740018,
+            ];
+
+            $tokens = AccessTokenFactory::Get(['vkIdIn' => $morituriVkIDs]);
+            shuffle($tokens);
+            return $tokens;
+        }
     }

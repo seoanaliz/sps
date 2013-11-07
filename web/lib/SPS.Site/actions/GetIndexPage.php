@@ -41,10 +41,43 @@ class GetIndexPage extends BaseControl
             $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds));
         }
 
+        if ( $this->vkId != 670456 ) {
+            foreach( $targetFeeds as $tf ) {
+                if ( $tf->type != TargetFeedUtility::VK)
+                    continue;
+                $externalIds[] = $tf->externalId;
+            }
+
+            if (!empty($externalIds)) {
+                $targetFeeds = ArrayHelper::Collapse($targetFeeds, 'externalId', $toArray = false);
+                $vkPublics = VkPublicFactory::Get(
+                    array('_vk_id' => $externalIds ),
+                    array( BaseFactory::WithoutPages => true, BaseFactory::OrderBy => ' "quantity" DESC ', )
+                );
+
+                $result = array();
+                foreach ($vkPublics as $public ) {
+                    if( !isset( $targetFeeds[$public->vk_id]))
+                        continue;
+
+                    $result[$targetFeeds[$public->vk_id]->targetFeedId] = $targetFeeds[$public->vk_id];
+                    unset($targetFeeds[$public->vk_id]);
+                }
+                $targetFeeds = array_values($targetFeeds);
+
+                if (!empty($targetFeeds)) {
+                    foreach($targetFeeds as $ttf) {
+                        $result[$ttf->targetFeedId] = $ttf;
+                    }
+                }
+                $targetFeeds = $result;
+            }
+        }
+
         if (empty($currentTargetFeedId)) {
             //пытаемся получить источники для первого паблика
             if (!empty($targetFeeds)) {
-                $currentTargetFeedId = current(array_keys($targetFeeds));
+                $currentTargetFeedId = current($targetFeeds)->targetFeedId;
             } else {
                 $currentTargetFeedId = 0;
             }
@@ -94,7 +127,7 @@ class GetIndexPage extends BaseControl
         Response::setParameter('SourceAccessUtility', $SourceAccessUtility);
         Response::setParameter('sourceTypes', SourceFeedUtility::$Types);
         Response::setParameter('availableSourceTypes', $availableSourceTypes);
-        Response::setParameter('gridTypes', $gridTypes);
+        Response::setParameter('gridTypes', [ 'content' => 'Контент', 'ads' => 'Реклама']);
         Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
         Response::setParameter('articleStatuses', $articleStatuses);
         Response::setParameter('isShowSourceList', $isShowSourceList);

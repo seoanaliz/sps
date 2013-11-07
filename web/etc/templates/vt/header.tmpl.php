@@ -102,6 +102,10 @@
                     array(
                         "title"  => "vt.menu.statGroups"
                       , "link" => "vt://stat-groups/"
+                    ),
+                    array(
+                          "title"  => "vt.menu.publics-stat"
+                        , "link"   => "vt://publics-stat/"
                     )
                 )
             )

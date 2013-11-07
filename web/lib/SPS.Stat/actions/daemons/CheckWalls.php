@@ -38,7 +38,7 @@ class CheckWalls
     public function Execute()
     {
 //        error_reporting(0);
-        set_time_limit( 0 );
+        set_time_limit( 1000 );
 
         $this->get_mentions();
         $this->get_existing_external_ids();
@@ -93,8 +93,13 @@ class CheckWalls
         $ids_array = array_unique( $ids_array );
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $this->monitoring_array as $public_id ) {
+            if( !isset($walls[ $public_id ]))
+                continue;
             $post = $walls[ $public_id ][1];
-            $this->save_post( $public_id, $post->id, $post->text );
+            if ( isset($post->id)) {
+                $post_text = isset($post->text) ? $post->text : '';
+                $this->save_post( $public_id, $post->id,  $post_text );
+            }
         }
 
         $walls_postponed = StatPublics::get_public_walls_mk2( $our_publics_ids, $app = '', $getPostponed = true);
@@ -107,6 +112,8 @@ class CheckWalls
 
             //заносим отсутствующие в sb посты в sb
             $this->add_posts_to_sb_queue( $walls[$public_id], $our_publics[$public_id]['sb_id'] );
+            if ( !isset( $walls_postponed[ $public_id ][1] ))
+                continue;
             $this->add_posts_to_sb_queue( $walls_postponed[$public_id], $our_publics[$public_id]['sb_id'] );
         }
 
@@ -474,7 +481,6 @@ sql;
 
         try {
             $converted_posts = ParserVkontakte::post_conv( $posts );
-
         } catch (Exception $e) {
             return false;
         }

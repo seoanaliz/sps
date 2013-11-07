@@ -170,5 +170,11 @@
             </parameters>
         </action>
     </group>
+    <group name="publicsStat">
+        <action name="GetPublicsStat">
+            <path>controls/publicsStat/GetPublicsStatControl</path>
+        </action>
+    </group>
+
 
 </actions>
