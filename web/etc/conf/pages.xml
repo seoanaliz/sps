@@ -731,6 +731,9 @@
                 <page uri="daemons://inst-postchecker/">
                      <actions>SPS.Instagram.instPostChecker</actions>
                 </page>
+                <page uri="daemons://check-sociate/">
+                     <actions>SPS.Sociate.CheckSociatePosts</actions>
+                </page>
 
             </pageGroup>
 

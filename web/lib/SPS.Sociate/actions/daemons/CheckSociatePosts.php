@@ -4,7 +4,7 @@
  */
 //каждый час проверяем, нет ли постов в sociate на ближайшие сутки
 //кажде сутки - на 2 суток вперед
-class CheckWalls
+class CheckSociatePosts
 {
     public function Execute()
     {
