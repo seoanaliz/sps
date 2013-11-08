@@ -105,9 +105,14 @@
                 ,'protectTo'    => array(
                       'name'        => 'protectTo'
                     , 'type'        => TYPE_DATETIME
-                ))
+                )
+                ,'addedFrom' => array(
+                    'name'          => 'addedFrom'
+                    , 'type'        => TYPE_STRING
+                )
+            )
             , 'lists'     => array()
-            , 'search'    => array(
+                , 'search'    => array(
                 'startDateAsDate' => array(
                     'name'         => 'startDate'
                     , 'type'       => TYPE_DATE

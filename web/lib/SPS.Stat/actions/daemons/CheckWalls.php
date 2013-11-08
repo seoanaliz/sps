@@ -515,9 +515,10 @@ sql;
             $conn->begin();
 
             $articleQueue = ParserVkontakte::get_articleQueue_from_article( $post, $postDate, $targeetFeedId );
-            ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true) );
+            $articleQueue->addedFrom = ($postDate > $now) ? ArticleUtility::QueueSourceVkPostponed : ArticleUtility::QueueSourceVk;
+            ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true ));
             $articleRecord->articleQueueId = $articleQueue->articleQueueId;
-            $this->make_grids( $targeetFeedId, $postDate );
+            GridLineUtility::make_grids( $targeetFeedId, $postDate );
             $result = ArticleRecordFactory::Add( $articleRecord );
             if(  $result && $articleRecord->articleQueueId ) {
                 $conn->commit();
@@ -527,27 +528,6 @@ sql;
         }
     }
 
-    public function make_grids( $target_feed_id, $sent_at )
-    {
-        $date = $sent_at->format('d.m.Y');
-        $grid_line = new GridLine();
-        $grid_line->startDate = $date;
-        $grid_line->endDate = $date;
-        $grid_line->targetFeedId = $target_feed_id;
-        $grid_line->time = $sent_at->format('H:i:s');
-        $grid_line->repeat = false;
-        $grid_line->type = GridLineUtility::TYPE_CONTENT;
-        $result = GridLineFactory::Add( $grid_line, array(BaseFactory::WithReturningKeys => true));
-
-        if (!$result )
-            return false;
-
-        $grid_line_item = new GridLineItem();
-        $grid_line_item->gridLineId = $grid_line->gridLineId;
-        $grid_line_item->date = $sent_at;
-
-        return GridLineItemFactory::Add( $grid_line_item );
-    }
 
     //собираем 15 последних вступивших в паблик, нужно для точки отсчета при финализации бартера
     private function get_init_members( BarterEvent $barter_event )

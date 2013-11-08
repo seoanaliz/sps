@@ -77,5 +77,8 @@ class ArticleQueue {
 
     /** @var DateTimeWrapper */
     public $protectTo;
+
+    /** @var DateTimeWrapper */
+    public $addedFrom;
 }
 ?>

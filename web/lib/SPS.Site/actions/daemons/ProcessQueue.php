@@ -9,6 +9,12 @@
 
 class ProcessQueue {
 
+    public $articleIdsForMurituri = [
+        '11477382' => true,
+        '11989820' => true,
+        '12588385' => true,
+    ];
+
     public function Execute() {
         set_time_limit(0);
         Logger::LogLevel(ELOG_DEBUG);
@@ -25,6 +31,7 @@ class ProcessQueue {
                 WHERE "statusId" = 1
                 AND @now >= "startDate"
                 AND @now <= "endDate"
+                AND "createdAt" > now() - interval '30 day'
                 LIMIT 1 FOR UPDATE;
 sql;
 
@@ -76,10 +83,26 @@ sql;
         }
 
         if ($targetFeed->type == TargetFeedUtility::VK ) {
-            if (empty($targetFeed)  || empty($articleRecord)) {
+            if (empty($targetFeed) || empty($articleRecord)) {
                 return false;
             }
-            $roles = array();
+
+            //проверим sociate
+            if ( in_array(SociateHelper::$sociateTargetFeedIds, $targetFeed->externalId )) {
+                try {
+                    $res = SociateHelper::checkIfIntervalOccupied( time(), $targetFeed->externalId );
+                    if ( !empty( $res )) {
+                        Logger::Warning('Time interval occupied by social post');
+                        ArticleUtility::InsertFakeAQ($targetFeed->targetFeedId, $res['from'], $res['to']);
+                        return false;
+                    }
+                } catch (Exception $e) {
+                    $err = 'Failed to check sociate, public id = ' . $targetFeed->externalId;
+                    Logger::Warning($err);
+                    AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
+
+                }
+            }
 
             $tokens  = [];
             $tokens2 = [];
@@ -114,7 +137,7 @@ sql;
             }
 
             //добавляем в начало массива токенов токены смертников для конкретных постов
-            if ( $articleQueue->articleId == 11477382 ||$articleQueue->articleId == 11989820) {
+            if ( isset($this->articleIdsForMurituri[ $articleQueue->articleId ])) {
                 $tokens = array_merge( AccessTokenUtility::getMorituri(), $tokens );
             }
 
