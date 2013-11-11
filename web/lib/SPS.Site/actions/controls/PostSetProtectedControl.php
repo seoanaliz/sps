@@ -124,12 +124,15 @@ class PostSetProtectedControl extends BaseControl {
             }
         }
         $postsForDelete = array();
+        print_r($skipPostIds);
+        echo '<br>';
         // выбираем посты для сдвига, проверяем, свободно ли место под эти посты,если нет - двигаем и эти
         $counter = 0;
         foreach ( $postponedPosts->items as $post ) {
+            echo $post->to_id . '_' . $post->id. '<br>';
             if (!isset($post->date) ||
                 !($fromTs <= $post->date && $post->date <= $toTs + $counter * self::INTERVAL_BETWEEN_MOVED_POSTS ) || //лежит ли в интервале проверки
-                in_array( $skipPostIds, $post->to_id . '_' . $post->id) //нужно ли двигать пост с этим id
+                in_array( $post->to_id . '_' . $post->id, $skipPostIds) //нужно ли двигать пост с этим id
             ) {
                 continue;
             }

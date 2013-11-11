@@ -38,7 +38,12 @@
         $isRepost = false;
         $originalId = $articleQueue->externalId;
         //отложенный ли пост. если да - у него будем показывать элементы в хедере
-        $isPostponed = ( $articleQueue->statusId == StatusUtility:: Finished && $articleQueue->startDate > DateTimeWrapper::Now());
+        $isPostponed = ( $articleQueue->addedFrom == ArticleUtility::QueueSourceVkPostponed && $articleQueue->startDate > DateTimeWrapper::Now());
+        $isInProtectedInterval = (
+            $articleQueue->addedFrom == ArticleUtility::QueueSourceSb &&
+            $articleQueue->startDate > DateTimeWrapper::Now() &&
+            $articleQueue->statusId ==  StatusUtility::Finished
+        );
 
         if ($articleRecord->repostArticleRecordId && isset($repostArticleRecords[$articleRecord->repostArticleRecordId])) {
             $isRepost = true;
@@ -50,7 +55,11 @@
         ?>
         <? if ($canEditQueue) { ?>
             <div class="slot-header">
-                <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                <? if( $isInProtectedInterval && $canEditQueue ) {?>
+                    <span class="time unlock"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                <? } else {?>
+                    <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                <? } ?>
                 <span class="repeater"></span>
                 <span class="time-of-removal <?= $deleteAt ? 'visible': '' ?>"></span>
                 <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
@@ -63,7 +72,7 @@
                 <? } elseif ( $isPostponed && $canEditQueue ) {?>
                     <span class="time-of-lock unlock"><?= $protectTo ? $protectTo: '' ?></span>
                     <span class="locked-trigger unlock<?= $protectTo ? 'visible': '' ?>"></span>
-                <?}?>
+                <? } ?>
             </div>
         <? } ?>
         <div class="post movable
