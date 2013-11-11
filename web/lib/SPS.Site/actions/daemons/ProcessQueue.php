@@ -83,10 +83,26 @@ sql;
         }
 
         if ($targetFeed->type == TargetFeedUtility::VK ) {
-            if (empty($targetFeed)  || empty($articleRecord)) {
+            if (empty($targetFeed) || empty($articleRecord)) {
                 return false;
             }
-            $roles = array();
+
+            //проверим sociate
+            if ( in_array(SociateHelper::$sociateTargetFeedIds, $targetFeed->externalId )) {
+                try {
+                    $res = SociateHelper::checkIfIntervalOccupied( time(), $targetFeed->externalId );
+                    if ( !empty( $res )) {
+                        Logger::Warning('Time interval occupied by social post');
+                        ArticleUtility::InsertFakeAQ($targetFeed->targetFeedId, $res['from'], $res['to']);
+                        return false;
+                    }
+                } catch (Exception $e) {
+                    $err = 'Failed to check sociate, public id = ' . $targetFeed->externalId;
+                    Logger::Warning($err);
+                    AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
+
+                }
+            }
 
             $tokens  = [];
             $tokens2 = [];

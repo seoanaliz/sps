@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <group name="Daemons">
+        <action name="CheckSociatePosts">
+            <path>daemons/CheckSociatePosts</path>
+        </action>
+    </group>
+</actions>
