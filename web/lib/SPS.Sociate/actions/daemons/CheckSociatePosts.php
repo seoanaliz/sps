@@ -19,6 +19,7 @@ class CheckSociatePosts
                 if ( !empty( $res )) {
                     Logger::Warning('we have a sociate post!');
                     ArticleUtility::InsertFakeAQ($tf->targetFeedId, $res['from'], $res['to']);
+                    VkHelper::clearVkPostponed($tf->targetFeedIdm, $res['from'], $res['to']);
                     return false;
                 }
                 sleep( 0.1 );

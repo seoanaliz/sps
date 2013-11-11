@@ -94,6 +94,7 @@ sql;
                     if ( !empty( $res )) {
                         Logger::Warning('Time interval occupied by social post');
                         ArticleUtility::InsertFakeAQ($targetFeed->targetFeedId, $res['from'], $res['to']);
+                        VkHelper::clearVkPostponed($targetFeed->targetFeedIdm, $res['from'], $res['to']);
                         return false;
                     }
                 } catch (Exception $e) {

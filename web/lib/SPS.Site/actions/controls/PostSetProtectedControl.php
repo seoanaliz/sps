@@ -74,7 +74,7 @@ class PostSetProtectedControl extends BaseControl {
                 $skipPostIds[] = $articleQueue->externalId;
             }
 
-            $this->clearVkPostponed(
+            VkHelper::clearVkPostponed(
                 $targetFeed,
                 $articleQueue->startDate->format('U'),
                 $protectTo->format('U'),
@@ -105,88 +105,7 @@ class PostSetProtectedControl extends BaseControl {
     }
 
     /** @var $targetFeed TargetFeed */
-    public function clearVkPostponed( $targetFeed, $fromTs, $toTs, $skipPostIds = [] ) {
-        $author = $this->getAuthor();
-        $tokens = AccessTokenUtility::getTokens( $author->vkId, $targetFeed);
-        $params = array(
-            'owner_id'  =>  '-' . $targetFeed->externalId,
-            'filter'    =>  'postponed',
-            'count'     =>  50,
-            'v'         =>  '5.2'
-        );
-        $postponedPosts  = array();
-        foreach( $tokens as $token )  {
-            try {
-                $params['access_token'] = $token->accessToken;
-                $postponedPosts = VkHelper::api_request( 'wall.get', $params );
-                break;
-            } catch( Exception $e ) {
-            }
-        }
-        $postsForDelete = array();
 
-        // выбираем посты для сдвига, проверяем, свободно ли место под эти посты,если нет - двигаем и эти
-        $counter = 0;
-        foreach ( $postponedPosts->items as $post ) {
-            if (!isset($post->date) ||
-                !($fromTs <= $post->date && $post->date <= $toTs + $counter * self::INTERVAL_BETWEEN_MOVED_POSTS ) || //лежит ли в интервале проверки
-                in_array( $post->to_id . '_' . $post->id, $skipPostIds) //нужно ли двигать пост с этим id
-            ) {
-                continue;
-            }
-
-            $postsForDelete[] = $post;
-            $counter ++;
-        }
-
-        $postsForDelete = array_reverse( $postsForDelete );
-        if( !empty($postsForDelete)) {
-            $res = $this->movePosts($postsForDelete, $tokens, $toTs);
-        }
-        return;
-    }
-
-    //составляет execute код для vk и отправляет его на выполнение. смещает посты на конец периода защиты, с интервалом в 5 минут
-    public function movePosts( $posts, $tokens, $endProtectTs ) {
-        $code = '';
-        $endProtectTs += self::INTERVAL_BETWEEN_MOVED_POSTS;
-        foreach( $posts as $post ) {
-            $rtsPost = array();
-            $rtsAttachments = array();
-            if (isset( $post->attachments )) {
-                foreach( $post->attachments as $attach) {
-                    if ( $attach->type == 'link' ) {
-                        $rtsAttachments[] = $attach->link->url;
-                        continue;
-                    }
-                    $type =  $attach->type;
-                    $idName = $this->contentTypeName[$type];
-                    $rtsAttachments[] = $attach->type . $attach->$type->owner_id . '_' . $attach->$type->$idName;
-                }
-            }
-            $rtsPost['message']     = $post->text;
-            $rtsPost['post_id']     = $post->id;
-            $rtsPost['owner_id']    = $post->to_id;
-            $rtsPost['from_group']  = 1;
-            $rtsPost['publish_date']= $endProtectTs;
-            if( !empty($rtsAttachments))
-                $rtsPost['attachments'] = implode( ',', $rtsAttachments );
-            $code   .=  'API.wall.edit(' . json_encode( $rtsPost, JSON_UNESCAPED_UNICODE ) . ');';
-            $endProtectTs += self::INTERVAL_BETWEEN_MOVED_POSTS;
-        }
-
-        $res = false;
-        foreach( $tokens as $token ) {
-            $params = array('code'=> $code, 'access_token' => $token->accessToken );
-            try {
-                $res = VkHelper::api_request('execute', $params );
-                break;
-            } catch( Exception $e) {
-                //print_r($e->getMessage());
-            }
-        }
-        return (bool)$res;
-    }
 
     public function removeProtection( $articleQueue ) {
         if ( !$articleQueue->protectTo ) return true;
