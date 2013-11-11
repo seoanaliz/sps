@@ -186,7 +186,13 @@
                       'name'       => 'statusId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_NOT_EQUALS
-                ))
+                )
+                , 'statudIdIn' => array(
+                    'name'         => 'statudId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+            )
         );
         
         /** @return array */

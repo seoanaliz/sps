@@ -55,11 +55,11 @@
             $object->isDeleted = false;
             $object->deleteAt  = null;
             $object->protectTo = null;
-
+            $object->statusId = StatusUtility::Enabled; //если выносим из защищенного интервала
             ArticleQueueFactory::UpdateByMask(
                 $object,
-                array('startDate', 'endDate', 'isDeleted', 'deleteAt', 'protectTo'),
-                array('articleQueueId' => $queueId, 'statusId' => 1)
+                array('startDate', 'endDate', 'isDeleted', 'deleteAt', 'protectTo', 'statusId'),
+                array('articleQueueId' => $queueId, 'statusIdIn' => [StatusUtility::Enabled, StatusUtility::Finished])
             );
 
             $targetFeed = TargetFeedFactory::GetById($object->targetFeedId);
