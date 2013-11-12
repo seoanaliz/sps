@@ -18,9 +18,10 @@ class CheckSociatePosts
                 $res = SociateHelper::checkIfIntervalOccupied( $timestamp, $tf->externalId );
                 if ( !empty( $res )) {
                     Logger::Warning('we have a sociate post!');
-                    ArticleUtility::InsertFakeAQ($tf->targetFeedId, $res['from'], $res['to']);
-                    VkHelper::clearVkPostponed($tf->targetFeedIdm, $res['from'], $res['to']);
-                    return false;
+
+                    if ( ArticleUtility::InsertFakeAQ($tf->targetFeedId, $res['from'], $res['to'])) {
+                        VkHelper::clearVkPostponed($tf->targetFeedIdm, $res['from'], $res['to']);
+                    }
                 }
                 sleep( 0.1 );
             }
