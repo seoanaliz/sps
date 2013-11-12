@@ -34,6 +34,7 @@
             const PERM_GROUPS = 262144;        //Доступ к группам пользователя.
             const PERM_NOTIFY_ANSWER = 524288; //Доступ к оповещениям об ответах пользователю.
             const PERM_GROUP_STATS = 1048576;  //Доступ к статистике групп и приложений пользователя, администратором которых он является.
+            const INTERVAL_BETWEEN_MOVED_POSTS = 300;
 
             /**
              *id аппа статистки
@@ -66,6 +67,14 @@
                     'pass'      =>  'JHh97)&%lui'
                 ),
 
+            );
+
+            public static $contentTypeName = array(
+                'photo' =>  'pid',
+                'video' =>  'vid',
+                'audio' =>  'aid',
+                'doc'   =>  'did',
+                'poll'  =>  'poll_id',
             );
 
             public static  $open_methods = array(
@@ -163,26 +172,26 @@
                 $threads = 20; // количество потоков
 
                 $all_useragents = array(
-                "Opera/9.23 (Windows NT 5.1; U; ru)",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.4;MEGAUPLOAD 1.0",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; Alexa Toolbar; MEGAUPLOAD 2.0; rv:1.8.1.7) Gecko/20070914 Firefox/2.0.0.7;MEGAUPLOAD 1.0",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
-                "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; WOW64; Maxthon; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506; Media Center PC 5.0; InfoPath.1)",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
-                "Opera/9.10 (Windows NT 5.1; U; ru)",
-                "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.2.1; aggregator:Tailrank; http://tailrank.com/robot) Gecko/20021130",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.8",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.8",
-                "Opera/9.22 (Windows NT 6.0; U; ru)",
-                "Opera/9.22 (Windows NT 6.0; U; ru)",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.8",
-                "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; MRSPUTNIK 1, 8, 0, 17 HW; MRA 4.10 (build 01952); .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.9) Gecko/20071025 Firefox/2.0.0.9"
+                    "Opera/9.23 (Windows NT 5.1; U; ru)",
+                    "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.4;MEGAUPLOAD 1.0",
+                    "Mozilla/5.0 (Windows; U; Windows NT 5.1; Alexa Toolbar; MEGAUPLOAD 2.0; rv:1.8.1.7) Gecko/20070914 Firefox/2.0.0.7;MEGAUPLOAD 1.0",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
+                    "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; WOW64; Maxthon; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506; Media Center PC 5.0; InfoPath.1)",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
+                    "Opera/9.10 (Windows NT 5.1; U; ru)",
+                    "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.2.1; aggregator:Tailrank; http://tailrank.com/robot) Gecko/20021130",
+                    "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.8",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; MyIE2; Maxthon)",
+                    "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.8",
+                    "Opera/9.22 (Windows NT 6.0; U; ru)",
+                    "Opera/9.22 (Windows NT 6.0; U; ru)",
+                    "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.8) Gecko/20071008 Firefox/2.0.0.8",
+                    "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; MRSPUTNIK 1, 8, 0, 17 HW; MRA 4.10 (build 01952); .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)",
+                    "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.9) Gecko/20071025 Firefox/2.0.0.9"
                 );
 
                 $useragent = $all_useragents[ array_rand( $all_useragents )];
@@ -278,8 +287,8 @@
                     sleep(0.8);
                     return $result_token['token'];
                 }
-//                Logger::Warning('нету токенов!');
-//                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов2!');
+        //                Logger::Warning('нету токенов!');
+        //                AuditUtility::CreateEvent('accessTokenDead', 'vkId', -1, 'нету токенов2!');
 
                 return false;
 
@@ -357,7 +366,7 @@
                     echo "<br>error in curl: ". curl_error($ch) ."<br>";
                     return 'error in curl: '. curl_error($ch);
                 }
-//                $headers = curl_getinfo($ch);
+        //                $headers = curl_getinfo($ch);
                 curl_close( $ch );
                 return $res;
             }
@@ -483,7 +492,6 @@
             //сдвигаем на более поздный период все отложенные посты из интервала
             public static function clearVkPostponed( $targetFeed, $fromTs, $toTs, $skipPostIds = [] ) {
                 $currentId = AuthVkontakte::IsAuth();
-
                 $tokens = AccessTokenUtility::getAllTokens(
                     $targetFeed->targetFeedId,
                     $checkTokenVersion = false,
@@ -494,6 +502,7 @@
                         $tokens[$currentId] = reset($currToken)->accessToken;
                     }
                 }
+
                 $params = array(
                     'owner_id'  =>  '-' . $targetFeed->externalId,
                     'filter'    =>  'postponed',
@@ -503,7 +512,7 @@
                 $postponedPosts  = array();
                 foreach( $tokens as $token )  {
                     try {
-                        $params['access_token'] = $token->accessToken;
+                        $params['access_token'] = $token;
                         $postponedPosts = VkHelper::api_request( 'wall.get', $params );
                         break;
                     } catch( Exception $e ) {
@@ -515,7 +524,7 @@
                 $counter = 0;
                 foreach ( $postponedPosts->items as $post ) {
                     if (!isset($post->date) ||
-                        !($fromTs <= $post->date && $post->date <= $toTs + $counter * self::INTERVAL_BETWEEN_MOVED_POSTS ) || //лежит ли в интервале проверки
+                        !($fromTs <= $post->date && $post->date <= $toTs + $counter * VkHelper::INTERVAL_BETWEEN_MOVED_POSTS ) || //лежит ли в интервале проверки
                         in_array( $post->to_id . '_' . $post->id, $skipPostIds) //нужно ли двигать пост с этим id
                     ) {
                         continue;
@@ -526,16 +535,17 @@
                 }
 
                 $postsForMove = array_reverse( $postsForMove );
-                if( !empty($postsForDelete)) {
+
+                if ( !empty($postsForMove )) {
                     $res = VkHelper::movePosts($postsForMove, $tokens, $toTs);
                 }
                 return;
             }
 
             //составляет execute код для vk и отправляет его на выполнение. смещает посты на конец периода защиты, с интервалом в 5 минут
-            public function movePosts( $posts, $tokens, $endProtectTs ) {
+            public static function movePosts( $posts, $tokens, $endProtectTs ) {
                 $code = '';
-                $endProtectTs += self::INTERVAL_BETWEEN_MOVED_POSTS;
+                $endProtectTs += VkHelper::INTERVAL_BETWEEN_MOVED_POSTS;
                 foreach( $posts as $post ) {
                     $rtsPost = array();
                     $rtsAttachments = array();
@@ -546,7 +556,7 @@
                                 continue;
                             }
                             $type =  $attach->type;
-                            $idName = $this->contentTypeName[$type];
+                            $idName = VkHelper::$contentTypeName[$type];
                             $rtsAttachments[] = $attach->type . $attach->$type->owner_id . '_' . $attach->$type->$idName;
                         }
                     }
@@ -558,21 +568,20 @@
                     if( !empty($rtsAttachments))
                         $rtsPost['attachments'] = implode( ',', $rtsAttachments );
                     $code   .=  'API.wall.edit(' . json_encode( $rtsPost, JSON_UNESCAPED_UNICODE ) . ');';
-                    $endProtectTs += self::INTERVAL_BETWEEN_MOVED_POSTS;
+                    $endProtectTs += VkHelper::INTERVAL_BETWEEN_MOVED_POSTS;
                 }
 
                 $res = false;
                 foreach( $tokens as $token ) {
-                    $params = array('code'=> $code, 'access_token' => $token->accessToken );
+                    $params = array('code'=> $code, 'access_token' => $token );
                     try {
                         $res = VkHelper::api_request('execute', $params );
                         break;
                     } catch( Exception $e) {
-                        //print_r($e->getMessage());
+//                        print_r($e->getMessage());
                     }
                 }
                 return (bool)$res;
             }
-
         }
-    ?>
+?>

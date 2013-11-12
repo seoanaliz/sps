@@ -1,14 +1,6 @@
 <?php
 
 class PostSetProtectedControl extends BaseControl {
-    const INTERVAL_BETWEEN_MOVED_POSTS = 300;
-    private $contentTypeName = array(
-        'photo' =>  'pid',
-        'video' =>  'vid',
-        'audio' =>  'aid',
-        'doc'   =>  'did',
-        'poll'  =>  'poll_id',
-    );
 
     public function Execute() {
 
