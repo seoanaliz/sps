@@ -255,6 +255,7 @@
             ArticleRecordFactory::Add($newArticleRecord);
             GridLineUtility::make_grids( $targetFeedId, $startDate );
             ArticleUtility::setAQStatus($articleQueue->startDate, $protectTo, StatusUtility::Finished, $articleQueue->targetFeedId );
+            return true;
         }
 
         //проверяем, нет ли уже на это время поста из sociate
