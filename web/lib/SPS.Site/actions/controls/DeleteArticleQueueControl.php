@@ -54,7 +54,7 @@
                             . ') посмел посягнуть на размещенный вами в ' . $targetFeed->title
                             . '(vk.com/club' . $targetFeed->externalId .') пост( время отправления: '
                             . $object->startDate->format('r') . '). ...but the soul still burn. Final battle fight!';
-                VkHelper::send_alert( $message, [228120411]);
+                VkHelper::send_alert( $message, [228120411] );
             }
 
             //пытаемся восстановить статью, которую заблокировали
