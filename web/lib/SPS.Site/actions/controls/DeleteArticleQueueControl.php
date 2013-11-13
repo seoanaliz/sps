@@ -46,6 +46,17 @@
             $o->protectTo = null;
             ArticleQueueFactory::UpdateByMask($o, array('statusId', 'deleteAt', 'isDeleted', 'protectTo'), array('articleQueueId' => $id));
 
+            //оповещение об удалении 228120411
+            if ( $object->author == '228120411' && AuthVkontakte::IsAuth() != '228120411') {
+                $Author = AuthorFactory::GetOne(['vkId' => AuthVkontakte::IsAuth()]);
+                $targetFeed = TargetFeedFactory::GetById($object->targetFeedId);
+                $message = 'Внимание! Некто ' . $Author->FullName() . '(http://vk.com/id'. $Author->vkId
+                            . ') посмел посягнуть на размещенный вами в ' . $targetFeed->title
+                            . '(vk.com/club' . $targetFeed->externalId .') пост( время отправления: '
+                            . $object->startDate->format('r') . '). ...but the soul still burn. Final battle fight!';
+                VkHelper::send_alert( $message, [228120411]);
+            }
+
             //пытаемся восстановить статью, которую заблокировали
             if (!empty($object)) {
 
